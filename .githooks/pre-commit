@@ -1,0 +1,44 @@
+#!/bin/bash
+# === Pre-Commit Secret Guard ===
+# Reads blocked patterns from .githooks/blocked-patterns (gitignored)
+
+PATTERNS_FILE="$(git rev-parse --show-toplevel)/.githooks/blocked-patterns"
+
+if [ ! -f "$PATTERNS_FILE" ]; then
+  exit 0
+fi
+
+echo "🔍 Checking for leaked secrets..."
+
+STAGED=$(git diff --cached --diff-filter=ACMR --name-only | grep -v '.githooks/')
+if [ -z "$STAGED" ]; then exit 0; fi
+
+FOUND=0
+while IFS= read -r pattern; do
+  [ -z "$pattern" ] && continue
+  [[ "$pattern" == \#* ]] && continue
+  MATCHES=$(echo "$STAGED" | xargs grep -l "$pattern" 2>/dev/null)
+  if [ -n "$MATCHES" ]; then
+    echo "❌ BLOCKED: Found '$pattern' in:"
+    echo "$MATCHES" | while read file; do echo "   → $file"; done
+    FOUND=1
+  fi
+done < "$PATTERNS_FILE"
+
+if echo "$STAGED" | grep -q "bun.lock"; then
+  while IFS= read -r pattern; do
+    [ -z "$pattern" ] && continue
+    [[ "$pattern" == \#* ]] && continue
+    if git show :bun.lock 2>/dev/null | grep -q "$pattern"; then
+      echo "❌ BLOCKED: bun.lock contains '$pattern'"
+      FOUND=1
+    fi
+  done < "$PATTERNS_FILE"
+fi
+
+if [ $FOUND -eq 1 ]; then
+  echo "🚫 Commit blocked."
+  exit 1
+fi
+echo "✅ Clean."
+exit 0
