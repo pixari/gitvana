@@ -107,6 +107,10 @@ const solutions: Record<string, string[]> = {
     'git cherry-pick backup~2',
     'git cherry-pick backup~1',
     'git cherry-pick backup',
+    // Create .gitignore to prevent .env from being committed again
+    'echo ".env" > .gitignore',
+    'git add .gitignore',
+    'git commit -m "Add .gitignore to prevent secrets"',
   ],
   'act3-18-boss': [
     // Feature branch has: Add new feature, WIP feature stuff, Add db config (.secret), Complete feature, Fix critical production bug

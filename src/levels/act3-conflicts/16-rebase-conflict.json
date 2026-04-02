@@ -44,7 +44,8 @@
       { "type": "head-at", "params": { "ref": "feature" } },
       { "type": "file-exists", "params": { "path": "feature.txt" } },
       { "type": "staging-empty", "params": {} },
-      { "type": "file-content", "params": { "path": "config.txt", "notContains": "<<<<<<" } }
+      { "type": "file-content", "params": { "path": "config.txt", "notContains": "<<<<<<" } },
+      { "type": "commit-count", "params": { "min": 4 } }
     ]
   },
   "constraints": {
