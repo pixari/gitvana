@@ -86,7 +86,7 @@
 
   onMount(async () => {
     try {
-      const res = await fetch('/api/stats');
+      const res = await fetch('/api/stats/public');
       if (!res.ok) {
         error = 'The monastery records are sealed. Check back later.';
         return;

@@ -53,6 +53,47 @@ setInterval(() => {
 // --- Allowed event types ---
 const ALLOWED_TYPES = new Set(['session', 'level_start', 'level_complete', 'level_restart', 'command']);
 
+// --- Stats cache ---
+const STATS_CACHE_TTL = 5 * 60_000; // 5 minutes
+let statsCache: { data: any; expiresAt: number } | null = null;
+
+function getStats() {
+  const now = Date.now();
+  if (statsCache && now < statsCache.expiresAt) return statsCache.data;
+
+  const totalSessions = db.query("SELECT COUNT(DISTINCT session_id) as c FROM events WHERE type='session'").get() as any;
+  const totalCompletions = db.query("SELECT COUNT(*) as c FROM events WHERE type='level_complete'").get() as any;
+  const totalCommands = db.query("SELECT COUNT(*) as c FROM events WHERE type='command'").get() as any;
+  const levelStats = db.query(`
+    SELECT level_id,
+      COUNT(CASE WHEN type='level_start' THEN 1 END) as starts,
+      COUNT(CASE WHEN type='level_complete' THEN 1 END) as completions,
+      COUNT(CASE WHEN type='level_restart' THEN 1 END) as restarts
+    FROM events WHERE level_id IS NOT NULL
+    GROUP BY level_id ORDER BY level_id
+  `).all();
+  const topCommands = db.query(`
+    SELECT json_extract(data, '$.cmd') as cmd, COUNT(*) as count
+    FROM events WHERE type='command' AND data IS NOT NULL
+    GROUP BY cmd ORDER BY count DESC LIMIT 10
+  `).all();
+  const recentActivity = db.query(
+    "SELECT COUNT(*) as c FROM events WHERE created_at >= datetime('now', '-1 day')"
+  ).get() as any;
+
+  const data = {
+    totalSessions: totalSessions?.c || 0,
+    totalCompletions: totalCompletions?.c || 0,
+    totalCommands: totalCommands?.c || 0,
+    levelStats,
+    topCommands,
+    recentActivity: recentActivity?.c || 0,
+  };
+
+  statsCache = { data, expiresAt: now + STATS_CACHE_TTL };
+  return data;
+}
+
 // --- Server ---
 const DIST_DIR = "./dist";
 
@@ -91,7 +132,7 @@ Bun.serve({
       }
     }
 
-    // --- API: Stats (protected) ---
+    // --- API: Stats (protected — admin, full data, no cache) ---
     if (url.pathname === "/api/stats" && req.method === "GET") {
       const token = process.env.STATS_TOKEN;
       if (token) {
@@ -100,34 +141,19 @@ Bun.serve({
           return new Response("Unauthorized", { status: 401 });
         }
       }
+      // Bypass cache for admin
+      statsCache = null;
+      return Response.json(getStats());
+    }
 
-      const totalSessions = db.query("SELECT COUNT(DISTINCT session_id) as c FROM events WHERE type='session'").get() as any;
-      const totalCompletions = db.query("SELECT COUNT(*) as c FROM events WHERE type='level_complete'").get() as any;
-      const totalCommands = db.query("SELECT COUNT(*) as c FROM events WHERE type='command'").get() as any;
-      const levelStats = db.query(`
-        SELECT level_id,
-          COUNT(CASE WHEN type='level_start' THEN 1 END) as starts,
-          COUNT(CASE WHEN type='level_complete' THEN 1 END) as completions,
-          COUNT(CASE WHEN type='level_restart' THEN 1 END) as restarts
-        FROM events WHERE level_id IS NOT NULL
-        GROUP BY level_id ORDER BY level_id
-      `).all();
-      const topCommands = db.query(`
-        SELECT json_extract(data, '$.cmd') as cmd, COUNT(*) as count
-        FROM events WHERE type='command' AND data IS NOT NULL
-        GROUP BY cmd ORDER BY count DESC LIMIT 10
-      `).all();
-      const recentActivity = db.query(
-        "SELECT COUNT(*) as c FROM events WHERE created_at >= datetime('now', '-1 day')"
-      ).get() as any;
-
-      return Response.json({
-        totalSessions: totalSessions?.c || 0,
-        totalCompletions: totalCompletions?.c || 0,
-        totalCommands: totalCommands?.c || 0,
-        levelStats,
-        topCommands,
-        recentActivity: recentActivity?.c || 0,
+    // --- API: Stats public (cached, rate-limited, for frontend) ---
+    if (url.pathname === "/api/stats/public" && req.method === "GET") {
+      const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+      if (!checkRateLimit(ip)) {
+        return new Response("Too Many Requests", { status: 429, headers: { "Retry-After": "60" } });
+      }
+      return Response.json(getStats(), {
+        headers: { "Cache-Control": "public, max-age=300" },
       });
     }
 
