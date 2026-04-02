@@ -47,7 +47,7 @@ export function parseCommand(input: string): ParsedCommand {
     };
   }
 
-  const builtins = ['ls', 'cat', 'mkdir', 'echo', 'pwd', 'clear', 'help', 'hint', 'touch', 'rm', 'restart', 'undo'];
+  const builtins = ['ls', 'cat', 'mkdir', 'echo', 'pwd', 'clear', 'help', 'hint', 'touch', 'rm', 'restart', 'undo', 'grep', 'cd'];
   if (builtins.includes(first)) {
     return {
       type: 'builtin',

@@ -30,6 +30,10 @@ export async function runBuiltin(
       return echoCommand(args, fs, cwd);
     case 'rm':
       return rmCommand(args, fs, cwd);
+    case 'grep':
+      return grepCommand(args, fs, cwd);
+    case 'cd':
+      return cdCommand(args);
     default:
       return { output: `${command}: command not found`, success: false };
   }
@@ -173,4 +177,97 @@ async function rmCommand(args: string[], fs: FsLike, cwd: string): Promise<Built
     }
   }
   return { output: '', success: true };
+}
+
+async function grepCommand(args: string[], fs: FsLike, cwd: string): Promise<BuiltinResult> {
+  const caseInsensitive = args.includes('-i');
+  const recursive = args.includes('-r') || args.includes('-R');
+  const nonFlagArgs = args.filter(a => !a.startsWith('-'));
+
+  if (nonFlagArgs.length === 0) {
+    return { output: 'Usage: grep [-i] [-r] "pattern" [file]', success: false };
+  }
+
+  const pattern = nonFlagArgs[0];
+  const searchPattern = caseInsensitive ? pattern.toLowerCase() : pattern;
+
+  const results: string[] = [];
+
+  async function searchFile(filepath: string, displayName: string): Promise<void> {
+    try {
+      const content = await fs.promises.readFile(filepath, 'utf8') as string;
+      const lines = content.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const compareLine = caseInsensitive ? line.toLowerCase() : line;
+        if (compareLine.includes(searchPattern)) {
+          if (recursive || nonFlagArgs.length > 2) {
+            results.push(`${displayName}:${line}`);
+          } else {
+            results.push(line);
+          }
+        }
+      }
+    } catch {
+      // skip unreadable files
+    }
+  }
+
+  async function searchDir(dirPath: string, prefix: string): Promise<void> {
+    try {
+      const entries = await fs.promises.readdir(dirPath) as string[];
+      for (const entry of entries) {
+        if (entry === '.git') continue;
+        const fullPath = `${dirPath}/${entry}`;
+        const displayPath = prefix ? `${prefix}/${entry}` : entry;
+        try {
+          const stat = await fs.promises.stat(fullPath) as { type: string };
+          if (stat.type === 'dir') {
+            await searchDir(fullPath, displayPath);
+          } else {
+            await searchFile(fullPath, displayPath);
+          }
+        } catch {
+          await searchFile(fullPath, displayPath);
+        }
+      }
+    } catch { /* skip unreadable dirs */ }
+  }
+
+  if (recursive) {
+    await searchDir(cwd, '');
+  } else if (nonFlagArgs.length >= 2) {
+    // grep "pattern" file1 [file2 ...]
+    for (let i = 1; i < nonFlagArgs.length; i++) {
+      const filepath = resolvePath(nonFlagArgs[i], cwd);
+      await searchFile(filepath, nonFlagArgs[i]);
+    }
+  } else {
+    return { output: 'Usage: grep [-i] [-r] "pattern" [file]', success: false };
+  }
+
+  if (results.length === 0) {
+    return { output: '', success: false };
+  }
+  return { output: results.join('\n'), success: true };
+}
+
+function cdCommand(args: string[]): Promise<BuiltinResult> {
+  const target = args[0] || '';
+
+  if (!target || target === '~' || target === '/workspace' || target === '.') {
+    return Promise.resolve({ output: '', success: true });
+  }
+
+  if (target === '..') {
+    return Promise.resolve({
+      output: 'Already at the root of the workspace',
+      success: true,
+    });
+  }
+
+  return Promise.resolve({
+    output: 'Directory navigation is simplified in Gitvana. All files are in /workspace.',
+    success: true,
+  });
 }

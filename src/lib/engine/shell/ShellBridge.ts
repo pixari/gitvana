@@ -9,6 +9,56 @@ import { commandDocs } from '../../../docs/commands/index.js';
 
 const PROMPT = '\x1b[32mgitvana\x1b[0m:\x1b[34m/workspace\x1b[0m$ ';
 
+/**
+ * Split a command line on && and ; operators, but only when they
+ * appear outside of single or double quotes.
+ * Returns an array of segments and delimiters interleaved, e.g.:
+ *   'echo "a; b" && ls' => ['echo "a; b"', '&&', 'ls']
+ */
+function splitOnChainOperators(line: string): string[] {
+  const parts: string[] = [];
+  let current = '';
+  let inQuote: string | null = null;
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+
+    if (inQuote) {
+      current += ch;
+      if (ch === inQuote) inQuote = null;
+      continue;
+    }
+
+    if (ch === '"' || ch === "'") {
+      inQuote = ch;
+      current += ch;
+      continue;
+    }
+
+    // Check for &&
+    if (ch === '&' && line[i + 1] === '&') {
+      if (current.trim()) parts.push(current);
+      parts.push('&&');
+      current = '';
+      i++; // skip second &
+      continue;
+    }
+
+    // Check for ;
+    if (ch === ';') {
+      if (current.trim()) parts.push(current);
+      parts.push(';');
+      current = '';
+      continue;
+    }
+
+    current += ch;
+  }
+
+  if (current.trim()) parts.push(current);
+  return parts;
+}
+
 export class ShellBridge {
   private lineBuffer = '';
   private cursorPos = 0;
@@ -174,7 +224,7 @@ export class ShellBridge {
   private static readonly GIT_FLAGS: Record<string, string[]> = {
     'add':      ['-u', '--update', '-A', '--all'],
     'commit':   ['-m', '--message'],
-    'log':      ['--oneline', '--all', '--graph', '-n', '--max-count'],
+    'log':      ['--oneline', '--all', '--graph', '-n', '--max-count', '--author', '--grep'],
     'diff':     ['--staged', '--cached', '--stat'],
     'reset':    ['--soft', '--mixed', '--hard'],
     'checkout': ['-b'],
@@ -188,7 +238,7 @@ export class ShellBridge {
   };
 
   private static readonly BUILTINS = [
-    'git', 'ls', 'cat', 'echo', 'touch', 'mkdir', 'rm', 'pwd',
+    'git', 'ls', 'cat', 'echo', 'touch', 'mkdir', 'rm', 'pwd', 'grep', 'cd',
     'clear', 'edit', 'help', 'hint', 'docs', 'solution', 'solve', 'skip', 'undo',
   ];
 
@@ -370,10 +420,9 @@ export class ShellBridge {
     // Support ; chaining (runs next command regardless of success)
     // and && chaining (stops on first failure)
     if (line.includes('&&') || line.includes(';')) {
-      // Split on && and ; while preserving the delimiter
+      // Split on && and ; while respecting quoted strings
       const segments: { cmd: string; stopOnFail: boolean }[] = [];
-      // Split by && or ; keeping track of which delimiter was used
-      const parts = line.split(/(&&|;)/);
+      const parts = splitOnChainOperators(line);
       let stopOnFail = false; // doesn't matter for first segment
       for (const part of parts) {
         const trimmed = part.trim();
@@ -495,6 +544,8 @@ export class ShellBridge {
       '  \x1b[36mtouch\x1b[0m <file>     Create an empty file',
       '  \x1b[36mmkdir\x1b[0m [-p] dir   Create a directory',
       '  \x1b[36mrm\x1b[0m <file>        Remove a file (careful!)',
+      '  \x1b[36mgrep\x1b[0m "pat" file  Search file contents',
+      '  \x1b[36mcd\x1b[0m [dir]           Change directory',
       '  \x1b[36mpwd\x1b[0m              Where am I?',
       '  \x1b[36mclear\x1b[0m            Clean the terminal',
       '  \x1b[36medit\x1b[0m <file>      Open the monastery editor',

@@ -9,6 +9,43 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
   const depthIdx = args.indexOf('-n') !== -1 ? args.indexOf('-n') : args.indexOf('--max-count');
   const depth = depthIdx !== -1 ? parseInt(args[depthIdx + 1], 10) || 10 : 10;
 
+  // Parse --author=Name or --author "Name"
+  let authorFilter: string | null = null;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i].startsWith('--author=')) {
+      authorFilter = args[i].slice('--author='.length).toLowerCase();
+    } else if (args[i] === '--author' && i + 1 < args.length) {
+      authorFilter = args[i + 1].toLowerCase();
+    }
+  }
+
+  // Parse --grep=text or --grep "text"
+  let grepFilter: string | null = null;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i].startsWith('--grep=')) {
+      grepFilter = args[i].slice('--grep='.length).toLowerCase();
+    } else if (args[i] === '--grep' && i + 1 < args.length) {
+      grepFilter = args[i + 1].toLowerCase();
+    }
+  }
+
+  // Parse ref argument: first non-flag arg that isn't a value for -n/--max-count/--author/--grep
+  const flagsWithValues = new Set(['-n', '--max-count', '--author', '--grep']);
+  const knownFlags = new Set(['--oneline', '--all', '--graph', '-n', '--max-count', '--author', '--grep']);
+  let refArg: string | null = null;
+  for (let i = 0; i < args.length; i++) {
+    if (flagsWithValues.has(args[i])) {
+      i++; // skip the value
+      continue;
+    }
+    if (args[i].startsWith('-')) continue;
+    if (args[i - 1] && flagsWithValues.has(args[i - 1])) continue;
+    // Check if it looks like an --arg=value (already handled above)
+    if (args[i].startsWith('--author=') || args[i].startsWith('--grep=')) continue;
+    refArg = args[i];
+    break;
+  }
+
   try {
     let commits;
     if (allBranches) {
@@ -30,7 +67,26 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
       allCommits.sort((a, b) => b.commit.author.timestamp - a.commit.author.timestamp);
       commits = allCommits.slice(0, depth);
     } else {
-      commits = await git.log({ fs: engine.fs, dir: engine.dir, depth });
+      const logOpts: { fs: typeof engine.fs; dir: string; depth: number; ref?: string } = {
+        fs: engine.fs, dir: engine.dir, depth,
+      };
+      if (refArg) logOpts.ref = refArg;
+      commits = await git.log(logOpts);
+    }
+
+    // Apply --author filter
+    if (authorFilter) {
+      commits = commits.filter(c =>
+        c.commit.author.name.toLowerCase().includes(authorFilter!) ||
+        c.commit.author.email.toLowerCase().includes(authorFilter!)
+      );
+    }
+
+    // Apply --grep filter
+    if (grepFilter) {
+      commits = commits.filter(c =>
+        c.commit.message.toLowerCase().includes(grepFilter!)
+      );
     }
 
     if (commits.length === 0) {

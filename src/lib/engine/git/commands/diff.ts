@@ -1,10 +1,17 @@
 import git from 'isomorphic-git';
 import type { GitEngine } from '../GitEngine.js';
 import type { CommandResult } from '../types.js';
+import { resolveRef, getFilesAtCommit } from '../ref-resolver.js';
 
 export async function diffCommand(args: string[], engine: GitEngine): Promise<CommandResult> {
   const staged = args.includes('--staged') || args.includes('--cached');
   const stat = args.includes('--stat');
+
+  // Check for range diff: branch1..branch2 or branch1...branch2
+  const rangeArg = args.find(a => !a.startsWith('-') && (a.includes('...') || a.includes('..')));
+  if (rangeArg) {
+    return rangeDiff(rangeArg, engine);
+  }
 
   const matrix = await git.statusMatrix({ fs: engine.fs, dir: engine.dir });
 
@@ -156,4 +163,80 @@ async function diffStat(
   lines.push(` ${fileStats.length} ${filesWord}${insertions}${deletions}`);
 
   return { output: lines.join('\n'), success: true };
+}
+
+async function rangeDiff(rangeArg: string, engine: GitEngine): Promise<CommandResult> {
+  try {
+    const isThreeDot = rangeArg.includes('...');
+    const separator = isThreeDot ? '...' : '..';
+    const [leftRef, rightRef] = rangeArg.split(separator);
+
+    if (!leftRef || !rightRef) {
+      return { output: `fatal: invalid range '${rangeArg}'`, success: false };
+    }
+
+    let leftOid: string;
+    const rightOid = await resolveRef(rightRef, engine);
+
+    if (isThreeDot) {
+      // Three-dot diff: find the merge base (common ancestor)
+      const leftCommits = await git.log({ fs: engine.fs, dir: engine.dir, ref: leftRef });
+      const rightCommits = await git.log({ fs: engine.fs, dir: engine.dir, ref: rightRef });
+      const leftOids = new Set(leftCommits.map(c => c.oid));
+      const baseCommit = rightCommits.find(c => leftOids.has(c.oid));
+      if (!baseCommit) {
+        return { output: `fatal: no common ancestor between '${leftRef}' and '${rightRef}'`, success: false };
+      }
+      leftOid = baseCommit.oid;
+    } else {
+      leftOid = await resolveRef(leftRef, engine);
+    }
+
+    const leftFiles = await getFilesAtCommit(engine, leftOid);
+    const rightFiles = await getFilesAtCommit(engine, rightOid);
+
+    const allPaths = new Set([...leftFiles.keys(), ...rightFiles.keys()]);
+    const lines: string[] = [];
+
+    for (const filepath of [...allPaths].sort()) {
+      const oldContent = leftFiles.get(filepath) || '';
+      const newContent = rightFiles.get(filepath) || '';
+
+      if (oldContent === newContent) continue;
+
+      lines.push(`diff --git a/${filepath} b/${filepath}`);
+
+      if (!leftFiles.has(filepath)) {
+        lines.push('--- /dev/null');
+      } else {
+        lines.push(`--- a/${filepath}`);
+      }
+      if (!rightFiles.has(filepath)) {
+        lines.push('+++ /dev/null');
+      } else {
+        lines.push(`+++ b/${filepath}`);
+      }
+
+      const oldLines = oldContent.split('\n');
+      const newLines = newContent.split('\n');
+
+      lines.push(`@@ -1,${oldLines.length} +1,${newLines.length} @@`);
+      for (const l of oldLines) {
+        if (l || oldContent) lines.push(`-${l}`);
+      }
+      for (const l of newLines) {
+        if (l || newContent) lines.push(`+${l}`);
+      }
+      lines.push('');
+    }
+
+    if (lines.length === 0) {
+      return { output: '', success: true };
+    }
+
+    return { output: lines.join('\n'), success: true };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return { output: `fatal: ${msg}`, success: false };
+  }
 }
