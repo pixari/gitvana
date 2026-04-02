@@ -3,6 +3,28 @@ import type { GitEngine } from '../GitEngine.js';
 import type { CommandResult } from '../types.js';
 import { getFilesAtCommit } from '../ref-resolver.js';
 
+/** Parse an ISO date string (YYYY-MM-DD) into a Unix timestamp (seconds). Returns null on invalid input. */
+function parseISODate(value: string): number | null {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  const d = new Date(`${match[1]}-${match[2]}-${match[3]}T00:00:00Z`);
+  if (isNaN(d.getTime())) return null;
+  return Math.floor(d.getTime() / 1000);
+}
+
+/** Compute a relative time string like "2 hours ago" from a Unix timestamp (seconds). */
+function relativeDate(timestamp: number): string {
+  const now = Math.floor(Date.now() / 1000);
+  const diff = now - timestamp;
+  if (diff < 60) return `${diff} seconds ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
+  if (diff < 2592000) return `${Math.floor(diff / 604800)} weeks ago`;
+  if (diff < 31536000) return `${Math.floor(diff / 2592000)} months ago`;
+  return `${Math.floor(diff / 31536000)} years ago`;
+}
+
 export async function logCommand(args: string[], engine: GitEngine): Promise<CommandResult> {
   const oneline = args.includes('--oneline');
   const allBranches = args.includes('--all');
@@ -31,9 +53,41 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
     }
   }
 
-  // Parse ref argument: first non-flag arg that isn't a value for -n/--max-count/--author/--grep
-  const flagsWithValues = new Set(['-n', '--max-count', '--author', '--grep']);
-  const knownFlags = new Set(['--oneline', '--all', '--graph', '-p', '--patch', '-n', '--max-count', '--author', '--grep']);
+  // Parse --since=DATE or --since DATE
+  let sinceTimestamp: number | null = null;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i].startsWith('--since=')) {
+      sinceTimestamp = parseISODate(args[i].slice('--since='.length));
+    } else if (args[i] === '--since' && i + 1 < args.length) {
+      sinceTimestamp = parseISODate(args[i + 1]);
+    }
+  }
+
+  // Parse --until=DATE or --until DATE
+  let untilTimestamp: number | null = null;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i].startsWith('--until=')) {
+      untilTimestamp = parseISODate(args[i].slice('--until='.length));
+    } else if (args[i] === '--until' && i + 1 < args.length) {
+      untilTimestamp = parseISODate(args[i + 1]);
+    }
+  }
+
+  // Parse --format="..." or --pretty=format:"..."
+  let customFormat: string | null = null;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i].startsWith('--format=')) {
+      customFormat = args[i].slice('--format='.length);
+    } else if (args[i] === '--format' && i + 1 < args.length) {
+      customFormat = args[i + 1];
+    } else if (args[i].startsWith('--pretty=format:')) {
+      customFormat = args[i].slice('--pretty=format:'.length);
+    }
+  }
+
+  // Parse ref argument: first non-flag arg that isn't a value for -n/--max-count/--author/--grep/--since/--until/--format
+  const flagsWithValues = new Set(['-n', '--max-count', '--author', '--grep', '--since', '--until', '--format']);
+  const knownFlags = new Set(['--oneline', '--all', '--graph', '-p', '--patch', '-n', '--max-count', '--author', '--grep', '--since', '--until', '--format']);
   let refArg: string | null = null;
   for (let i = 0; i < args.length; i++) {
     if (flagsWithValues.has(args[i])) {
@@ -43,7 +97,9 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
     if (args[i].startsWith('-')) continue;
     if (args[i - 1] && flagsWithValues.has(args[i - 1])) continue;
     // Check if it looks like an --arg=value (already handled above)
-    if (args[i].startsWith('--author=') || args[i].startsWith('--grep=')) continue;
+    if (args[i].startsWith('--author=') || args[i].startsWith('--grep=') ||
+        args[i].startsWith('--since=') || args[i].startsWith('--until=') ||
+        args[i].startsWith('--format=') || args[i].startsWith('--pretty=')) continue;
     refArg = args[i];
     break;
   }
@@ -91,8 +147,49 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
       );
     }
 
+    // Apply --since filter
+    if (sinceTimestamp !== null) {
+      commits = commits.filter(c => c.commit.author.timestamp >= sinceTimestamp!);
+    }
+
+    // Apply --until filter
+    if (untilTimestamp !== null) {
+      commits = commits.filter(c => c.commit.author.timestamp <= untilTimestamp!);
+    }
+
     if (commits.length === 0) {
       return { output: 'fatal: your current branch does not have any commits yet', success: false };
+    }
+
+    // Custom --format output
+    if (customFormat !== null) {
+      // Build ref decoration map
+      const branches = await git.listBranches({ fs: engine.fs, dir: engine.dir });
+      const currentBranch = await git.currentBranch({ fs: engine.fs, dir: engine.dir });
+      const refMap = new Map<string, string[]>();
+      for (const branch of branches) {
+        try {
+          const oid = await git.resolveRef({ fs: engine.fs, dir: engine.dir, ref: branch });
+          if (!refMap.has(oid)) refMap.set(oid, []);
+          const label = branch === currentBranch ? `HEAD -> ${branch}` : branch;
+          refMap.get(oid)!.push(label);
+        } catch { /* skip */ }
+      }
+
+      const lines = commits.map(c => {
+        let line = customFormat!;
+        const refs = refMap.get(c.oid);
+        const decoration = refs ? ` (${refs.join(', ')})` : '';
+        line = line.replace(/%H/g, c.oid);
+        line = line.replace(/%h/g, c.oid.slice(0, 7));
+        line = line.replace(/%s/g, c.commit.message.split('\n')[0]);
+        line = line.replace(/%an/g, c.commit.author.name);
+        line = line.replace(/%ae/g, c.commit.author.email);
+        line = line.replace(/%ar/g, relativeDate(c.commit.author.timestamp));
+        line = line.replace(/%d/g, decoration);
+        return line;
+      });
+      return { output: lines.join('\n'), success: true };
     }
 
     if (oneline) {

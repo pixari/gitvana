@@ -19,10 +19,35 @@ export async function branchCommand(args: string[], engine: GitEngine): Promise<
     return { output: `Deleted branch ${name}.`, success: true };
   }
 
-  // No args: list branches
-  if (args.length === 0 || (args.length === 1 && args[0] === '-a')) {
+  const verboseFlag = args.includes('-v') || args.includes('--verbose');
+
+  // No args (or only display flags): list branches
+  const displayOnly = args.every(a => ['-a', '-v', '--verbose'].includes(a));
+  if (args.length === 0 || displayOnly) {
     const branches = await git.listBranches({ fs: engine.fs, dir: engine.dir });
     const current = await git.currentBranch({ fs: engine.fs, dir: engine.dir });
+
+    if (verboseFlag) {
+      const lines: string[] = [];
+      for (const b of branches) {
+        const prefix = b === current ? '* ' : '  ';
+        try {
+          const commits = await git.log({ fs: engine.fs, dir: engine.dir, ref: b, depth: 1 });
+          if (commits.length > 0) {
+            const c = commits[0];
+            const shortHash = c.oid.slice(0, 7);
+            const subject = c.commit.message.split('\n')[0];
+            lines.push(`${prefix}${b}\t${shortHash} ${subject}`);
+          } else {
+            lines.push(`${prefix}${b}`);
+          }
+        } catch {
+          lines.push(`${prefix}${b}`);
+        }
+      }
+      return { output: lines.join('\n'), success: true };
+    }
+
     const lines = branches.map((b) => (b === current ? `* ${b}` : `  ${b}`));
     return { output: lines.join('\n'), success: true };
   }

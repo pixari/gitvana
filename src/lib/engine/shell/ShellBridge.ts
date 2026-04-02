@@ -156,6 +156,7 @@ export class ShellBridge {
   private hintEngine = new HintEngine();
   private onSkipRequest: (() => void) | null = null;
   private onRestartRequest: (() => void) | null = null;
+  private aliases = new Map<string, string>();
 
   constructor(
     private terminal: Terminal,
@@ -362,11 +363,12 @@ export class ShellBridge {
   private static readonly GIT_FLAGS: Record<string, string[]> = {
     'add':      ['-u', '--update', '-A', '--all'],
     'commit':   ['-m', '--message'],
-    'log':      ['--oneline', '--all', '--graph', '-p', '--patch', '-n', '--max-count', '--author', '--grep'],
+    'log':      ['--oneline', '--all', '--graph', '-p', '--patch', '-n', '--max-count', '--author', '--grep', '--since', '--until', '--format', '--pretty'],
+    'status':   ['-s', '--short'],
     'diff':     ['--staged', '--cached', '--stat'],
     'reset':    ['--soft', '--mixed', '--hard'],
     'checkout': ['-b'],
-    'branch':   ['-d', '-D', '--delete', '--force-delete'],
+    'branch':   ['-d', '-D', '--delete', '--force-delete', '-v', '--verbose'],
     'tag':      ['-a', '--annotate', '-d', '--delete', '-l', '--list', '-m', '--message'],
     'rm':       ['--cached', '-r', '--recursive'],
     'stash':    ['push', 'pop', 'apply', 'list', 'drop'],
@@ -381,7 +383,7 @@ export class ShellBridge {
   private static readonly BUILTINS = [
     'git', 'ls', 'cat', 'echo', 'touch', 'mkdir', 'rm', 'pwd', 'grep', 'cd',
     'clear', 'edit', 'help', 'hint', 'docs', 'solution', 'solve', 'skip', 'undo',
-    'head', 'tail', 'wc', 'history',
+    'head', 'tail', 'wc', 'history', 'alias',
   ];
 
   private static readonly FILE_ARG_COMMANDS = ['add', 'cat', 'edit', 'rm', 'touch', 'mv'];
@@ -559,6 +561,16 @@ export class ShellBridge {
 
     this.history.push(line);
 
+    // Handle alias command before alias expansion
+    if (line === 'alias' || line.startsWith('alias ')) {
+      this.handleAlias(line);
+      this.writePrompt();
+      return;
+    }
+
+    // Alias expansion: replace first word if it matches an alias
+    line = this.expandAlias(line);
+
     // Pipe support: cmd1 | cmd2
     // Check for pipes before chain operators. Note: pipes within chain segments
     // are handled separately below.
@@ -593,7 +605,8 @@ export class ShellBridge {
       }
 
       for (const seg of segments) {
-        const expandedCmd = await this.expandGlobs(seg.cmd);
+        const aliasExpanded = this.expandAlias(seg.cmd);
+        const expandedCmd = await this.expandGlobs(aliasExpanded);
         const success = await this.executeOneCommand(expandedCmd);
         if (!success && seg.stopOnFail) break;
       }
@@ -704,6 +717,64 @@ export class ShellBridge {
     this.writePrompt();
   }
 
+  private handleAlias(line: string): void {
+    const trimmed = line.trim();
+    if (trimmed === 'alias') {
+      // Show all aliases
+      if (this.aliases.size === 0) {
+        this.writeLine('No aliases defined.');
+      } else {
+        const lines: string[] = [];
+        for (const [name, value] of this.aliases) {
+          lines.push(`alias ${name}='${value}'`);
+        }
+        this.writeLine(lines.join('\n'));
+      }
+      return;
+    }
+
+    // Parse: alias name="value" or alias name='value' or alias name=value
+    const rest = trimmed.slice('alias '.length).trim();
+    const eqIdx = rest.indexOf('=');
+    if (eqIdx === -1) {
+      // Show single alias
+      const value = this.aliases.get(rest);
+      if (value) {
+        this.writeLine(`alias ${rest}='${value}'`);
+      } else {
+        this.writeLine(`alias: ${rest}: not found`);
+      }
+      return;
+    }
+
+    const name = rest.slice(0, eqIdx);
+    let value = rest.slice(eqIdx + 1);
+    // Strip surrounding quotes
+    if ((value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+
+    if (!name) {
+      this.writeLine('Usage: alias name="command"');
+      return;
+    }
+
+    this.aliases.set(name, value);
+    this.writeLine(`alias ${name}='${value}'`);
+  }
+
+  private expandAlias(line: string): string {
+    const spaceIdx = line.indexOf(' ');
+    const firstWord = spaceIdx === -1 ? line : line.slice(0, spaceIdx);
+    const rest = spaceIdx === -1 ? '' : line.slice(spaceIdx);
+    const aliasValue = this.aliases.get(firstWord);
+    if (aliasValue) {
+      return aliasValue + rest;
+    }
+    return line;
+  }
+
   private getHelpText(): string {
     return [
       'The monastery provides the following tools:',
@@ -722,6 +793,7 @@ export class ShellBridge {
       '  \x1b[36mtail\x1b[0m [-N] file    Show last N lines (default 10)',
       '  \x1b[36mwc\x1b[0m [-l] file      Count lines/words/chars',
       '  \x1b[36mhistory\x1b[0m [-c]      Show/clear command history',
+      '  \x1b[36malias\x1b[0m [name=cmd]  Define command shortcuts',
       '  \x1b[36mclear\x1b[0m            Clean the terminal',
       '  \x1b[36medit\x1b[0m <file>      Open the monastery editor',
       '  \x1b[36mhelp\x1b[0m             You are here',
