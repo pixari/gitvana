@@ -14,53 +14,219 @@
       "Squash all 5 feature commits into one with message 'Add complete feature'",
       "Switch to main and merge the feature branch"
     ],
-    "newCommands": ["git reset --soft HEAD~N"]
+    "newCommands": [
+      "git reset --soft HEAD~N"
+    ]
   },
   "initialState": {
     "strategy": "replay",
     "replayScript": [
-      { "command": "init", "args": {} },
-      { "command": "writeFile", "args": { "path": "base.txt", "content": "base" } },
-      { "command": "add", "args": { "path": "base.txt" } },
-      { "command": "commit", "args": { "message": "Initial" } },
-      { "command": "branch", "args": { "name": "feature" } },
-      { "command": "checkout", "args": { "ref": "feature" } },
-      { "command": "writeFile", "args": { "path": "feature.txt", "content": "step 1" } },
-      { "command": "add", "args": { "path": "feature.txt" } },
-      { "command": "commit", "args": { "message": "wip" } },
-      { "command": "writeFile", "args": { "path": "feature.txt", "content": "step 1\nstep 2" } },
-      { "command": "add", "args": { "path": "feature.txt" } },
-      { "command": "commit", "args": { "message": "fix" } },
-      { "command": "writeFile", "args": { "path": "feature.txt", "content": "step 1\nstep 2\nstep 3" } },
-      { "command": "add", "args": { "path": "feature.txt" } },
-      { "command": "commit", "args": { "message": "oops" } },
-      { "command": "writeFile", "args": { "path": "feature.txt", "content": "step 1\nstep 2\nstep 3\nstep 4" } },
-      { "command": "add", "args": { "path": "feature.txt" } },
-      { "command": "commit", "args": { "message": "actually fix" } },
-      { "command": "writeFile", "args": { "path": "feature.txt", "content": "step 1\nstep 2\nstep 3\nstep 4\ndone" } },
-      { "command": "add", "args": { "path": "feature.txt" } },
-      { "command": "commit", "args": { "message": "ok done" } }
+      {
+        "command": "init",
+        "args": {}
+      },
+      {
+        "command": "writeFile",
+        "args": {
+          "path": "base.txt",
+          "content": "base"
+        }
+      },
+      {
+        "command": "add",
+        "args": {
+          "path": "base.txt"
+        }
+      },
+      {
+        "command": "commit",
+        "args": {
+          "message": "Initial"
+        }
+      },
+      {
+        "command": "branch",
+        "args": {
+          "name": "feature"
+        }
+      },
+      {
+        "command": "checkout",
+        "args": {
+          "ref": "feature"
+        }
+      },
+      {
+        "command": "writeFile",
+        "args": {
+          "path": "feature.txt",
+          "content": "step 1"
+        }
+      },
+      {
+        "command": "add",
+        "args": {
+          "path": "feature.txt"
+        }
+      },
+      {
+        "command": "commit",
+        "args": {
+          "message": "wip"
+        }
+      },
+      {
+        "command": "writeFile",
+        "args": {
+          "path": "feature.txt",
+          "content": "step 1\nstep 2"
+        }
+      },
+      {
+        "command": "add",
+        "args": {
+          "path": "feature.txt"
+        }
+      },
+      {
+        "command": "commit",
+        "args": {
+          "message": "fix"
+        }
+      },
+      {
+        "command": "writeFile",
+        "args": {
+          "path": "feature.txt",
+          "content": "step 1\nstep 2\nstep 3"
+        }
+      },
+      {
+        "command": "add",
+        "args": {
+          "path": "feature.txt"
+        }
+      },
+      {
+        "command": "commit",
+        "args": {
+          "message": "oops"
+        }
+      },
+      {
+        "command": "writeFile",
+        "args": {
+          "path": "feature.txt",
+          "content": "step 1\nstep 2\nstep 3\nstep 4"
+        }
+      },
+      {
+        "command": "add",
+        "args": {
+          "path": "feature.txt"
+        }
+      },
+      {
+        "command": "commit",
+        "args": {
+          "message": "actually fix"
+        }
+      },
+      {
+        "command": "writeFile",
+        "args": {
+          "path": "feature.txt",
+          "content": "step 1\nstep 2\nstep 3\nstep 4\ndone"
+        }
+      },
+      {
+        "command": "add",
+        "args": {
+          "path": "feature.txt"
+        }
+      },
+      {
+        "command": "commit",
+        "args": {
+          "message": "ok done"
+        }
+      }
     ],
     "head": "feature"
   },
   "targetState": {
     "validators": [
-      { "type": "head-at", "params": { "ref": "main" } },
-      { "type": "commit-message-contains", "params": { "message": "Add complete feature" } },
-      { "type": "staging-empty", "params": {} },
-      { "type": "commit-count", "params": { "min": 2 } }
+      {
+        "type": "head-at",
+        "params": {
+          "ref": "main"
+        }
+      },
+      {
+        "type": "commit-message-contains",
+        "params": {
+          "message": "Add complete feature"
+        }
+      },
+      {
+        "type": "staging-empty",
+        "params": {}
+      },
+      {
+        "type": "commit-count",
+        "params": {
+          "min": 2
+        }
+      },
+      {
+        "type": "commit-message-contains",
+        "params": {
+          "notMessage": "wip"
+        }
+      },
+      {
+        "type": "commit-message-contains",
+        "params": {
+          "notMessage": "oops"
+        }
+      },
+      {
+        "type": "commit-message-contains",
+        "params": {
+          "notMessage": "actually fix"
+        }
+      }
     ]
   },
   "constraints": {
     "maxCommands": 8
   },
   "hints": [
-    { "trigger": "after-attempts", "triggerValue": 3, "text": "The Head Monk's eye twitches: 'On the feature branch, git reset --soft HEAD~5 will undo 5 commits but keep the changes staged. Then recommit.'", "penalty": 0.25 },
-    { "trigger": "after-attempts", "triggerValue": 5, "text": "A scroll falls from the shelf: 'git reset --soft HEAD~5, then git commit -m \"Add complete feature\", then git checkout main && git merge feature.'", "penalty": 0.5 },
-    { "trigger": "manual", "text": "The cat takes pity: git reset --soft HEAD~5 && git commit -m \"Add complete feature\" && git checkout main && git merge feature", "penalty": 1 }
+    {
+      "trigger": "after-attempts",
+      "triggerValue": 3,
+      "text": "The Head Monk's eye twitches: 'On the feature branch, git reset --soft HEAD~5 will undo 5 commits but keep the changes staged. Then recommit.'",
+      "penalty": 0.25
+    },
+    {
+      "trigger": "after-attempts",
+      "triggerValue": 5,
+      "text": "A scroll falls from the shelf: 'git reset --soft HEAD~5, then git commit -m \"Add complete feature\", then git checkout main && git merge feature.'",
+      "penalty": 0.5
+    },
+    {
+      "trigger": "manual",
+      "text": "The cat takes pity: git reset --soft HEAD~5 && git commit -m \"Add complete feature\" && git checkout main && git merge feature",
+      "penalty": 1
+    }
   ],
   "rewards": {
-    "stars": { "maxCommands": { "two": 6, "three": 4 } },
+    "stars": {
+      "maxCommands": {
+        "two": 6,
+        "three": 4
+      }
+    },
     "achievement": "squash-ceremony"
   }
 }

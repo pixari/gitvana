@@ -152,7 +152,8 @@
         "type": "file-content",
         "params": {
           "path": "app.js",
-          "contains": "42"
+          "contains": "42",
+          "notContains": "return 1"
         }
       }
     ]

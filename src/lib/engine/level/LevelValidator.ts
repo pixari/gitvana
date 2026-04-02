@@ -212,25 +212,35 @@ export class LevelValidator {
   private async validateCommitMessage(
     validator: ValidatorConfig,
   ): Promise<{ validator: ValidatorConfig; passed: boolean; message: string }> {
-    const params = validator.params as { message?: string; text?: string };
+    const params = validator.params as { message?: string; text?: string; notMessage?: string };
     const needle = params.message || params.text || '';
+    const forbidden = params.notMessage;
 
     try {
       const commits = await git.log({ fs: this.engine.fs, dir: this.engine.dir, depth: 50 });
-      if (commits.length === 0) {
+      if (commits.length === 0 && needle) {
         return { validator, passed: false, message: `Need commit with '${needle}'` };
       }
 
-      const found = commits.some((c) =>
-        c.commit.message.toLowerCase().includes(needle.toLowerCase()),
-      );
-      return {
-        validator,
-        passed: found,
-        message: found
-          ? 'Commit message matches'
-          : `No commit message contains '${needle}'`,
-      };
+      if (needle) {
+        const found = commits.some((c) =>
+          c.commit.message.toLowerCase().includes(needle.toLowerCase()),
+        );
+        if (!found) {
+          return { validator, passed: false, message: `No commit message contains '${needle}'` };
+        }
+      }
+
+      if (forbidden) {
+        const hasForbidden = commits.some((c) =>
+          c.commit.message.toLowerCase().includes(forbidden.toLowerCase()),
+        );
+        if (hasForbidden) {
+          return { validator, passed: false, message: `History still contains '${forbidden}' commits` };
+        }
+      }
+
+      return { validator, passed: true, message: 'Commit messages match' };
     } catch {
       return { validator, passed: false, message: `Need commit with '${needle}'` };
     }
