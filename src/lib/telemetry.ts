@@ -38,6 +38,7 @@ function trackEvent(type: string, levelId?: string | null, data?: Record<string,
 // Command tracking throttle
 let lastCommandTime = 0;
 const COMMAND_THROTTLE = 1000; // 1 second
+let currentLevelId: string | null = null;
 
 export function initTelemetry(): void {
   // Session start
@@ -49,6 +50,7 @@ export function initTelemetry(): void {
 
   // Level events via event bus
   eventBus.on('level:loaded', ({ levelId }) => {
+    currentLevelId = levelId;
     trackEvent('level_start', levelId);
   });
 
@@ -56,12 +58,12 @@ export function initTelemetry(): void {
     trackEvent('level_complete', levelId, { stars });
   });
 
-  // Command tracking (throttled)
+  // Command tracking (throttled, includes levelId)
   eventBus.on('command:executed', ({ command, success }) => {
     const now = Date.now();
     if (now - lastCommandTime < COMMAND_THROTTLE) return;
     lastCommandTime = now;
-    trackEvent('command', null, { cmd: command, ok: success });
+    trackEvent('command', currentLevelId, { cmd: command, ok: success });
   });
 }
 

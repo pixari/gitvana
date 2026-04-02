@@ -7,42 +7,154 @@
   "difficulty": "intermediate",
   "mode": "strict",
   "briefing": {
-    "narrative": "The monastery's lead developer — a monk who insists that 'monk-driven development' is a valid methodology — has a problem.\n\n\"The hotfix branch is a disaster,\" he says, scrolling through commits. \"Three commits: debug logging, the ACTUAL fix, and then MORE debug logging. I need the fix on main, but if those debug files touch main, the Head Monk will assign me to latrine duty for a month.\"\n\nHe looks at you with desperate eyes. \"Cherry-pick ONLY the fix commit. Leave the debug garbage on the hotfix branch where it belongs.\"\n\nThe monastery cat is debugging by staring intensely at the screen. Its methodology is also valid.",
+    "narrative": "The monastery's lead developer \u2014 a monk who insists that 'monk-driven development' is a valid methodology \u2014 has a problem.\n\n\"The hotfix branch is a disaster,\" he says, scrolling through commits. \"Three commits: debug logging, the ACTUAL fix, and then MORE debug logging. I need the fix on main, but if those debug files touch main, the Head Monk will assign me to latrine duty for a month.\"\n\nHe looks at you with desperate eyes. \"Cherry-pick ONLY the fix commit. Leave the debug garbage on the hotfix branch where it belongs.\"\n\nThe monastery cat is debugging by staring intensely at the screen. Its methodology is also valid.",
     "concept": "git cherry-pick <commit> copies a single commit from one branch to another. Unlike merging (which brings ALL commits), cherry-picking lets you select exactly which commits you want. Use git log on the source branch to find the right commit hash.",
     "objectives": [
       "Check the hotfix branch log to find the fix commit",
       "Cherry-pick ONLY the commit that fixes app.js (the one with 'return 42')",
       "Do NOT bring the debug files to main"
     ],
-    "newCommands": ["git cherry-pick <commit>", "git log <branch>"]
+    "newCommands": [
+      "git cherry-pick <commit>",
+      "git log <branch>"
+    ]
   },
   "initialState": {
     "strategy": "replay",
     "replayScript": [
-      { "command": "init", "args": {} },
-      { "command": "writeFile", "args": { "path": "app.js", "content": "function main() { return 1; }" } },
-      { "command": "add", "args": { "path": "app.js" } },
-      { "command": "commit", "args": { "message": "Initial app" } },
-      { "command": "branch", "args": { "name": "hotfix" } },
-      { "command": "checkout", "args": { "ref": "hotfix" } },
-      { "command": "writeFile", "args": { "path": "debug.txt", "content": "console.log everywhere" } },
-      { "command": "add", "args": { "path": "debug.txt" } },
-      { "command": "commit", "args": { "message": "Add debug logging" } },
-      { "command": "writeFile", "args": { "path": "app.js", "content": "function main() { return 42; }" } },
-      { "command": "add", "args": { "path": "app.js" } },
-      { "command": "commit", "args": { "message": "Fix: return correct value" } },
-      { "command": "writeFile", "args": { "path": "debug2.txt", "content": "more debug stuff" } },
-      { "command": "add", "args": { "path": "debug2.txt" } },
-      { "command": "commit", "args": { "message": "More debug logging" } },
-      { "command": "checkout", "args": { "ref": "main" } }
+      {
+        "command": "init",
+        "args": {}
+      },
+      {
+        "command": "writeFile",
+        "args": {
+          "path": "app.js",
+          "content": "function main() { return 1; }"
+        }
+      },
+      {
+        "command": "add",
+        "args": {
+          "path": "app.js"
+        }
+      },
+      {
+        "command": "commit",
+        "args": {
+          "message": "Initial app"
+        }
+      },
+      {
+        "command": "branch",
+        "args": {
+          "name": "hotfix"
+        }
+      },
+      {
+        "command": "checkout",
+        "args": {
+          "ref": "hotfix"
+        }
+      },
+      {
+        "command": "writeFile",
+        "args": {
+          "path": "debug.txt",
+          "content": "console.log everywhere"
+        }
+      },
+      {
+        "command": "add",
+        "args": {
+          "path": "debug.txt"
+        }
+      },
+      {
+        "command": "commit",
+        "args": {
+          "message": "Add debug logging"
+        }
+      },
+      {
+        "command": "writeFile",
+        "args": {
+          "path": "app.js",
+          "content": "function main() { return 42; }"
+        }
+      },
+      {
+        "command": "add",
+        "args": {
+          "path": "app.js"
+        }
+      },
+      {
+        "command": "commit",
+        "args": {
+          "message": "Fix: return correct value"
+        }
+      },
+      {
+        "command": "writeFile",
+        "args": {
+          "path": "debug2.txt",
+          "content": "more debug stuff"
+        }
+      },
+      {
+        "command": "add",
+        "args": {
+          "path": "debug2.txt"
+        }
+      },
+      {
+        "command": "commit",
+        "args": {
+          "message": "More debug logging"
+        }
+      },
+      {
+        "command": "checkout",
+        "args": {
+          "ref": "main"
+        }
+      }
     ],
     "head": "main"
   },
   "targetState": {
     "validators": [
-      { "type": "file-content", "params": { "path": "app.js", "contains": "42" } },
-      { "type": "staging-empty", "params": {} },
-      { "type": "commit-count", "params": { "min": 2 } }
+      {
+        "type": "file-content",
+        "params": {
+          "path": "app.js",
+          "contains": "42"
+        }
+      },
+      {
+        "type": "staging-empty",
+        "params": {}
+      },
+      {
+        "type": "commit-count",
+        "params": {
+          "min": 2
+        }
+      },
+      {
+        "type": "head-at",
+        "params": {
+          "branch": "main"
+        }
+      },
+      {
+        "type": "file-content",
+        "params": {
+          "path": "app.js",
+          "contains": "42"
+        }
+      }
     ]
   },
   "constraints": {
@@ -58,7 +170,7 @@
     {
       "trigger": "after-attempts",
       "triggerValue": 4,
-      "text": "A monk slides a note under the door: 'git cherry-pick <hash> — use the hash of the fix commit from git log hotfix. Only that one. The debug commits must stay where they are.'",
+      "text": "A monk slides a note under the door: 'git cherry-pick <hash> \u2014 use the hash of the fix commit from git log hotfix. Only that one. The debug commits must stay where they are.'",
       "penalty": 0.5
     },
     {
@@ -69,7 +181,10 @@
   ],
   "rewards": {
     "stars": {
-      "maxCommands": { "two": 4, "three": 2 }
+      "maxCommands": {
+        "two": 4,
+        "three": 2
+      }
     },
     "achievement": "cherry-picker"
   }
