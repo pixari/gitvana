@@ -184,7 +184,8 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
     }
 
     if (commits.length === 0) {
-      return { output: 'fatal: your current branch does not have any commits yet', success: false };
+      const branch = await engine.getCurrentBranch() || 'main';
+      return { output: `fatal: your current branch '${branch}' does not have any commits yet`, success: false };
     }
 
     // Apply --reverse: show oldest first
@@ -262,7 +263,8 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
 
     return { output: lines.join('\n'), success: true };
   } catch {
-    return { output: 'fatal: your current branch does not have any commits yet', success: false };
+    const branch = await engine.getCurrentBranch() || 'main';
+    return { output: `fatal: your current branch '${branch}' does not have any commits yet`, success: false };
   }
 }
 

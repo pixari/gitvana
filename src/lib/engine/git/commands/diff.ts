@@ -9,6 +9,10 @@ export async function diffCommand(args: string[], engine: GitEngine): Promise<Co
   const nameOnly = args.includes('--name-only');
   const nameStatus = args.includes('--name-status');
 
+  // Check for "git diff HEAD" — show all changes (staged + unstaged) vs HEAD
+  const nonFlagArgs = args.filter(a => !a.startsWith('-'));
+  const headArg = nonFlagArgs.find(a => a === 'HEAD');
+
   // Check for range diff: branch1..branch2 or branch1...branch2
   const rangeArg = args.find(a => !a.startsWith('-') && (a.includes('...') || a.includes('..')));
   if (rangeArg) {
@@ -21,19 +25,24 @@ export async function diffCommand(args: string[], engine: GitEngine): Promise<Co
   const matrix = await git.statusMatrix({ fs: engine.fs, dir: engine.dir });
 
   if (nameOnly || nameStatus) {
-    return diffNames(matrix, staged, nameStatus);
+    return diffNames(matrix, staged || !!headArg, nameStatus, headArg);
   }
 
   if (stat) {
-    return diffStat(matrix, staged, engine);
+    return diffStat(matrix, staged || !!headArg, engine, headArg);
   }
 
   const lines: string[] = [];
 
   for (const [filepath, head, workdir, stage] of matrix) {
-    const hasChange = staged
-      ? head !== stage
-      : stage !== workdir;
+    // "git diff HEAD" shows all changes vs HEAD (staged + unstaged combined)
+    // "git diff --staged" shows HEAD vs staging
+    // "git diff" (no args) shows staging vs working dir
+    const hasChange = headArg
+      ? (head !== workdir || head !== stage)
+      : staged
+        ? head !== stage
+        : stage !== workdir;
 
     if (!hasChange) continue;
 
@@ -43,8 +52,8 @@ export async function diffCommand(args: string[], engine: GitEngine): Promise<Co
       let oldContent = '';
       let newContent = '';
 
-      if (staged) {
-        // Compare HEAD vs staging
+      if (headArg || staged) {
+        // Compare HEAD vs working dir (headArg) or HEAD vs staging (staged)
         if (head !== 0) {
           const headOid = await git.resolveRef({ fs: engine.fs, dir: engine.dir, ref: 'HEAD' });
           const { blob } = await git.readBlob({
@@ -55,7 +64,12 @@ export async function diffCommand(args: string[], engine: GitEngine): Promise<Co
           });
           oldContent = new TextDecoder().decode(blob);
         }
-        if (stage !== 0) {
+        if (headArg) {
+          // "git diff HEAD" — compare HEAD vs working directory
+          if (workdir !== 0) {
+            newContent = await engine.fs.promises.readFile(`${engine.dir}/${filepath}`, 'utf8') as string;
+          }
+        } else if (stage !== 0) {
           newContent = await engine.fs.promises.readFile(`${engine.dir}/${filepath}`, 'utf8') as string;
         }
       } else {
@@ -104,11 +118,14 @@ function diffNames(
   matrix: StatusMatrix,
   staged: boolean,
   showStatus: boolean,
+  headArg?: string,
 ): CommandResult {
   const lines: string[] = [];
 
   for (const [filepath, head, workdir, stage] of matrix) {
-    const hasChange = staged ? head !== stage : stage !== workdir;
+    const hasChange = headArg
+      ? (head !== workdir || head !== stage)
+      : staged ? head !== stage : stage !== workdir;
     if (!hasChange) continue;
 
     if (showStatus) {
@@ -191,11 +208,14 @@ async function diffStat(
   matrix: StatusMatrix,
   staged: boolean,
   engine: GitEngine,
+  headArg?: string,
 ): Promise<CommandResult> {
   const fileStats: { name: string; added: number; removed: number }[] = [];
 
   for (const [filepath, head, workdir, stage] of matrix) {
-    const hasChange = staged ? head !== stage : stage !== workdir;
+    const hasChange = headArg
+      ? (head !== workdir || head !== stage)
+      : staged ? head !== stage : stage !== workdir;
     if (!hasChange) continue;
 
     let oldContent = '';

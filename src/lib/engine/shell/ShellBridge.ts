@@ -371,7 +371,7 @@ export class ShellBridge {
     'branch':   ['-d', '-D', '--delete', '--force-delete', '-v', '--verbose', '-m', '--move', '--merged', '--no-merged'],
     'tag':      ['-a', '--annotate', '-d', '--delete', '-l', '--list', '-m', '--message'],
     'rm':       ['--cached', '-r', '--recursive'],
-    'stash':    ['push', 'pop', 'apply', 'list', 'drop'],
+    'stash':    ['push', 'pop', 'apply', 'list', 'drop', 'show'],
     'rebase':   ['--continue', '--abort'],
     'merge':    ['--abort', '--no-ff'],
     'bisect':   ['start', 'good', 'bad', 'reset'],
@@ -622,7 +622,15 @@ export class ShellBridge {
     switch (parsed.type) {
       case 'git': {
         const result = await this.engine.execute(parsed.command, parsed.args);
-        if (result.output) {
+        if (result.output && result.output.startsWith('__DOCS__:')) {
+          // "git help [command]" — route to docs handler
+          const cmdName = result.output.slice('__DOCS__:'.length);
+          if (this.onDocRequest) {
+            this.onDocRequest(cmdName);
+          } else {
+            this.writeLine('Use "docs <command>" to view documentation.');
+          }
+        } else if (result.output) {
           this.writeLine(result.output);
         }
         this.hintEngine.recordAttempt(parsed.command, parsed.args, result.success, result.output);
@@ -913,7 +921,12 @@ export class ShellBridge {
     const parsed = parseCommand(cmdLine);
     if (parsed.type === 'git') {
       const result = await this.engine.execute(parsed.command, parsed.args);
-      if (result.output) this.writeLine(result.output);
+      if (result.output && result.output.startsWith('__DOCS__:')) {
+        const cmdName = result.output.slice('__DOCS__:'.length);
+        if (this.onDocRequest) this.onDocRequest(cmdName);
+      } else if (result.output) {
+        this.writeLine(result.output);
+      }
       this.hintEngine.recordAttempt(parsed.command, parsed.args, result.success, result.output);
       this.maybeShowAutoHint();
       return result.success;

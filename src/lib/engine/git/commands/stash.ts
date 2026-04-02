@@ -16,6 +16,8 @@ export async function stashCommand(args: string[], engine: GitEngine): Promise<C
       return stashList(engine);
     case 'drop':
       return stashDrop(args.slice(1), engine);
+    case 'show':
+      return stashShow(args.slice(1), engine);
     default:
       return { output: `error: unknown stash subcommand '${subcommand}'`, success: false };
   }
@@ -210,4 +212,45 @@ function stashDrop(args: string[], engine: GitEngine): CommandResult {
     output: `Dropped stash@{${index}}`,
     success: true,
   };
+}
+
+function stashShow(args: string[], engine: GitEngine): CommandResult {
+  if (engine.stashStack.length === 0) {
+    return { output: 'error: no stash entries found', success: false };
+  }
+
+  // Parse stash@{N} or default to 0
+  let index = 0;
+  if (args[0]) {
+    const match = args[0].match(/^stash@\{(\d+)\}$/);
+    if (match) {
+      index = parseInt(match[1], 10);
+    } else {
+      const parsed = parseInt(args[0], 10);
+      if (!isNaN(parsed)) index = parsed;
+    }
+  }
+
+  if (index < 0 || index >= engine.stashStack.length) {
+    return { output: `error: stash@{${index}} does not exist`, success: false };
+  }
+
+  const entry = engine.stashStack[index];
+  const lines: string[] = [];
+
+  for (const [filepath, content] of entry.files) {
+    if (content === '\0DELETED') {
+      lines.push(` ${filepath} | deleted`);
+    } else {
+      const lineCount = content.split('\n').length;
+      lines.push(` ${filepath} | ${lineCount} ${'+'}`);
+    }
+  }
+
+  if (lines.length > 0) {
+    const fileWord = lines.length === 1 ? 'file changed' : 'files changed';
+    lines.push(` ${lines.length} ${fileWord}`);
+  }
+
+  return { output: lines.join('\n'), success: true };
 }

@@ -139,9 +139,40 @@ export class GitEngine {
     'commit', 'checkout', 'switch', 'merge', 'reset', 'cherry-pick', 'revert', 'rebase',
   ]);
 
+  private static readonly TYPO_MAP: Record<string, string> = {
+    'comit': 'commit', 'commti': 'commit', 'commt': 'commit',
+    'stauts': 'status', 'staus': 'status',
+    'chekout': 'checkout', 'chekcout': 'checkout',
+    'brnach': 'branch', 'bracnh': 'branch',
+    'mege': 'merge', 'mreage': 'merge',
+    'satus': 'status', 'stahs': 'stash',
+    'dif': 'diff', 'reabse': 'rebase',
+    'chery-pick': 'cherry-pick', 'cherrypick': 'cherry-pick',
+    'tga': 'tag', 'tags': 'tag',
+    'lgo': 'log', 'lig': 'log',
+    'ad': 'add', 'aadd': 'add',
+    'inint': 'init', 'inti': 'init',
+    'pul': 'pull', 'psuh': 'push',
+    'shwo': 'show', 'sahow': 'show',
+    'rset': 'reset', 'reste': 'reset',
+    'revet': 'revert',
+  };
+
   async execute(command: string, args: string[]): Promise<CommandResult> {
+    // Handle "git help [command]" as a docs alias
+    if (command === 'help') {
+      return { output: '__DOCS__:' + (args[0] || ''), success: true };
+    }
+
     const handler = this.commands.get(command);
     if (!handler) {
+      const suggestion = GitEngine.TYPO_MAP[command];
+      if (suggestion) {
+        return {
+          output: `git: '${command}' is not a git command. Did you mean 'git ${suggestion}'?`,
+          success: false,
+        };
+      }
       return { output: `git: '${command}' is not a git command.`, success: false };
     }
 

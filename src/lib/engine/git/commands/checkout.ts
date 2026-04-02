@@ -6,13 +6,14 @@ import { resolveRef } from '../ref-resolver.js';
 export async function checkoutCommand(args: string[], engine: GitEngine): Promise<CommandResult> {
   const createBranch = args.includes('-b');
 
-  // Handle: git checkout <ref> -- <file>
+  // Handle: git checkout [<ref>] -- <file>
   const dashDashIndex = args.indexOf('--');
   if (dashDashIndex !== -1) {
     const ref = args.slice(0, dashDashIndex).filter((a) => !a.startsWith('-'))[0];
     const filepath = args.slice(dashDashIndex + 1).filter((a) => !a.startsWith('-'))[0];
-    if (ref && filepath) {
-      return restoreFileFromRef(ref, filepath, engine);
+    if (filepath) {
+      // If no ref before --, default to HEAD
+      return restoreFileFromRef(ref || 'HEAD', filepath, engine);
     }
   }
 

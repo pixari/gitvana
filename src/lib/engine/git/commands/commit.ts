@@ -27,8 +27,9 @@ export async function commitCommand(args: string[], engine: GitEngine): Promise<
   const matrix = await git.statusMatrix({ fs: engine.fs, dir: engine.dir });
   const staged = matrix.filter(([, head, , stage]) => head !== stage);
   if (staged.length === 0 && !allowEmpty) {
+    const branch = await git.currentBranch({ fs: engine.fs, dir: engine.dir }) || 'main';
     return {
-      output: 'nothing to commit, working tree clean',
+      output: `On branch ${branch}\nnothing to commit, working tree clean`,
       success: false,
     };
   }
