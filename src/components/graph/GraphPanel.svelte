@@ -61,6 +61,15 @@
   let currentBranchName = $state<string | null>(null);
   let unsub: (() => void) | null = null;
 
+  // --- Animation tracking ---
+  let previousOids = $state<Set<string>>(new Set());
+  let previousEdgeKeys = $state<Set<string>>(new Set());
+  let previousHeadOid = $state<string | null>(null);
+  let newOids = $state<Set<string>>(new Set());
+  let newEdgeKeys = $state<Set<string>>(new Set());
+  let headMoved = $state(false);
+  let graphFlash = $state(false);
+
   // --- Graph building ---
   function buildGraph(commits: CommitInfo[], branches: BranchInfo[], headOid: string | null, currentBranch: string | null) {
     if (commits.length === 0) return { nodes: [] as GraphNode[], edges: [] as GraphEdge[] };
@@ -238,6 +247,29 @@
     isDetachedHead = curBranch === null && headOid !== null;
 
     const result = buildGraph(allCommits, allBranches, headOid, curBranch);
+
+    // --- Detect new nodes and edges for animation ---
+    const currentOids = new Set(result.nodes.map(n => n.oid));
+    const currentEdgeKeySet = new Set(result.edges.map(e => `${e.fromOid}->${e.toOid}`));
+
+    if (previousOids.size > 0) {
+      newOids = new Set([...currentOids].filter(oid => !previousOids.has(oid)));
+      newEdgeKeys = new Set([...currentEdgeKeySet].filter(k => !previousEdgeKeys.has(k)));
+      headMoved = previousHeadOid !== null && previousHeadOid !== headOid;
+
+      // Flash the panel border on any state change
+      graphFlash = true;
+      setTimeout(() => { graphFlash = false; }, 200);
+    } else {
+      newOids = new Set();
+      newEdgeKeys = new Set();
+      headMoved = false;
+    }
+
+    previousOids = currentOids;
+    previousEdgeKeys = currentEdgeKeySet;
+    previousHeadOid = headOid;
+
     nodes = result.nodes;
     edges = result.edges;
 
@@ -261,7 +293,7 @@
   });
 </script>
 
-<div class="graph-container">
+<div class="graph-container" class:graph-flash={graphFlash}>
   <div class="panel-header">
     <span class="panel-title">COMMIT GRAPH</span>
     {#if isDetachedHead}
@@ -319,14 +351,17 @@
           {@const fromNode = oidToNode.get(edge.fromOid)}
           {@const toNode = oidToNode.get(edge.toOid)}
           {#if fromNode && toNode}
+            {@const edgeKey = `${edge.fromOid}->${edge.toOid}`}
+            {@const isNewEdge = newEdgeKeys.has(edgeKey)}
             <path
               d={edgePath(fromNode, toNode)}
               fill="none"
               stroke={edge.color}
               stroke-width={edge.isMergeEdge ? 1.5 : 2}
               stroke-opacity={edge.isMergeEdge ? 0.35 : 0.5}
-              stroke-dasharray={edge.isMergeEdge ? '4 3' : 'none'}
+              stroke-dasharray={edge.isMergeEdge ? '4 3' : isNewEdge ? '100' : 'none'}
               class="graph-edge"
+              class:new-edge={isNewEdge}
             />
           {/if}
         {/each}
@@ -336,6 +371,9 @@
           {@const cx = nodeX(node.lane)}
           {@const cy = nodeY(node.row)}
           {@const r = node.isCurrentBranch ? NODE_RADIUS_CURRENT : NODE_RADIUS}
+          {@const isNewNode = newOids.has(node.oid)}
+
+          <g class="node-group" class:new-node={isNewNode} style="--node-cx: {cx}px; --node-cy: {cy}px;">
 
           <!-- HEAD pulsing glow -->
           {#if node.isHead}
@@ -400,7 +438,7 @@
 
           <!-- HEAD label (left side) -->
           {#if node.isHead}
-            <g class="head-label-group">
+            <g class="head-label-group" class:head-moved={headMoved}>
               {#if isDetachedHead}
                 <!-- Detached HEAD badge -->
                 <rect
@@ -471,7 +509,7 @@
           {#each node.branchLabels as label, i}
             {@const labelX = cx + LABEL_OFFSET_X + 62 + node.message.length * 5.5 + 12 + i * 8}
             {@const tagWidth = label.name.length * 6.5 + 12}
-            <g>
+            <g class="branch-label-group">
               <rect
                 x={labelX}
                 y={cy - 8}
@@ -496,6 +534,7 @@
               </text>
             </g>
           {/each}
+          </g>
         {/each}
       </svg>
     </div>
@@ -594,6 +633,44 @@
     display: block;
   }
 
+  /* --- Flash effect on state change --- */
+  .graph-flash {
+    border-color: #4a4a7e;
+    transition: border-color 0.2s ease;
+  }
+
+  /* --- New node appear animation --- */
+  .new-node {
+    animation: node-appear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  @keyframes node-appear {
+    from { opacity: 0; transform: scale(0); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* --- New edge draw animation --- */
+  .new-edge {
+    animation: edge-draw 0.5s ease-out;
+  }
+
+  @keyframes edge-draw {
+    from { stroke-dashoffset: 100; }
+    to { stroke-dashoffset: 0; }
+  }
+
+  /* --- HEAD movement animation --- */
+  .head-moved {
+    animation: head-slide 0.3s ease;
+  }
+
+  @keyframes head-slide {
+    from { opacity: 0.4; }
+    to { opacity: 1; }
+  }
+
   .graph-edge {
     transition: d 0.3s ease;
   }
@@ -647,6 +724,10 @@
     fill: #5f574f;
     pointer-events: none;
     user-select: none;
+  }
+
+  .branch-label-group {
+    transition: transform 0.3s ease;
   }
 
   .branch-label {
