@@ -11,6 +11,7 @@ const PROMPT = '\x1b[32mgitvana\x1b[0m:\x1b[34m/workspace\x1b[0m$ ';
 
 export class ShellBridge {
   private lineBuffer = '';
+  private cursorPos = 0;
   private history: string[] = [];
   private historyIndex = -1;
   private onEditRequest: ((filepath: string) => void) | null = null;
@@ -72,6 +73,31 @@ export class ShellBridge {
     if (data.startsWith('\x1b[')) {
       if (data === '\x1b[A') this.navigateHistory(1);
       else if (data === '\x1b[B') this.navigateHistory(-1);
+      else if (data === '\x1b[D') {
+        // Left arrow
+        if (this.cursorPos > 0) {
+          this.cursorPos--;
+          this.terminal.write('\x1b[D');
+        }
+      } else if (data === '\x1b[C') {
+        // Right arrow
+        if (this.cursorPos < this.lineBuffer.length) {
+          this.cursorPos++;
+          this.terminal.write('\x1b[C');
+        }
+      } else if (data === '\x1b[H' || data === '\x1b[1~') {
+        // Home — move to start of line
+        if (this.cursorPos > 0) {
+          this.terminal.write(`\x1b[${this.cursorPos}D`);
+          this.cursorPos = 0;
+        }
+      } else if (data === '\x1b[F' || data === '\x1b[4~') {
+        // End — move to end of line
+        if (this.cursorPos < this.lineBuffer.length) {
+          this.terminal.write(`\x1b[${this.lineBuffer.length - this.cursorPos}C`);
+          this.cursorPos = this.lineBuffer.length;
+        }
+      }
       return;
     }
 
@@ -80,13 +106,26 @@ export class ShellBridge {
         case '\r': // Enter
         case '\n':
           this.terminal.write('\r\n');
+          this.cursorPos = 0;
           await this.executeLine();
           break;
 
         case '\x7f': // Backspace
-          if (this.lineBuffer.length > 0) {
-            this.lineBuffer = this.lineBuffer.slice(0, -1);
-            this.terminal.write('\b \b');
+          if (this.cursorPos > 0) {
+            this.lineBuffer =
+              this.lineBuffer.slice(0, this.cursorPos - 1) +
+              this.lineBuffer.slice(this.cursorPos);
+            this.cursorPos--;
+            // Move cursor back one position
+            this.terminal.write('\b');
+            // Rewrite everything from cursorPos to end, then erase trailing char
+            const restAfterBS = this.lineBuffer.slice(this.cursorPos);
+            this.terminal.write(restAfterBS + ' ');
+            // Move cursor back to correct position
+            const moveBackBS = restAfterBS.length + 1;
+            if (moveBackBS > 0) {
+              this.terminal.write(`\x1b[${moveBackBS}D`);
+            }
           }
           break;
 
@@ -95,6 +134,7 @@ export class ShellBridge {
 
         case '\x03': // Ctrl+C
           this.lineBuffer = '';
+          this.cursorPos = 0;
           this.terminal.write('^C\r\n');
           this.writePrompt();
           break;
@@ -105,8 +145,19 @@ export class ShellBridge {
 
         default:
           if (char >= ' ') {
-            this.lineBuffer += char;
-            this.terminal.write(char);
+            // Insert char at cursorPos
+            this.lineBuffer =
+              this.lineBuffer.slice(0, this.cursorPos) +
+              char +
+              this.lineBuffer.slice(this.cursorPos);
+            this.cursorPos++;
+            // Write the new char plus everything after it
+            const restAfterInsert = this.lineBuffer.slice(this.cursorPos);
+            this.terminal.write(char + restAfterInsert);
+            // Move cursor back to the right position
+            if (restAfterInsert.length > 0) {
+              this.terminal.write(`\x1b[${restAfterInsert.length}D`);
+            }
           }
           break;
       }
@@ -206,6 +257,7 @@ export class ShellBridge {
       // Single match — complete the word and add a space
       const completion = candidates[0].slice(prefix.length) + ' ';
       this.lineBuffer += completion;
+      this.cursorPos = this.lineBuffer.length;
       this.terminal.write(completion);
     } else {
       // Multiple matches — show options, then re-display prompt + input
@@ -213,6 +265,7 @@ export class ShellBridge {
       this.writeLine(candidates.join('  '));
       this.writePrompt();
       this.terminal.write(this.lineBuffer);
+      this.cursorPos = this.lineBuffer.length;
     }
   }
 
@@ -234,10 +287,13 @@ export class ShellBridge {
     const newIndex = this.historyIndex + direction;
     if (newIndex < -1 || newIndex >= this.history.length) return;
 
-    // Clear current line
-    while (this.lineBuffer.length > 0) {
+    // Move cursor to end of line first, then clear
+    if (this.cursorPos < this.lineBuffer.length) {
+      this.terminal.write(`\x1b[${this.lineBuffer.length - this.cursorPos}C`);
+    }
+    // Clear current line from the end
+    for (let i = 0; i < this.lineBuffer.length; i++) {
       this.terminal.write('\b \b');
-      this.lineBuffer = this.lineBuffer.slice(0, -1);
     }
 
     this.historyIndex = newIndex;
@@ -247,11 +303,13 @@ export class ShellBridge {
       this.lineBuffer = this.history[this.history.length - 1 - newIndex];
       this.terminal.write(this.lineBuffer);
     }
+    this.cursorPos = this.lineBuffer.length;
   }
 
   private async executeLine(): Promise<void> {
     const line = this.lineBuffer.trim();
     this.lineBuffer = '';
+    this.cursorPos = 0;
     this.historyIndex = -1;
 
     if (!line) {

@@ -10,6 +10,16 @@ export async function addCommand(args: string[], engine: GitEngine): Promise<Com
     };
   }
 
+  // Check for unsupported interactive flags
+  const unsupportedFlags = ['-p', '--patch', '-i', '--interactive', '-e', '--edit'];
+  const foundFlag = args.find(a => unsupportedFlags.includes(a));
+  if (foundFlag) {
+    return {
+      output: "Partial staging (git add -p) is not available in Gitvana.\nTip: Use 'edit <file>' to modify, then 'git add <file>' to stage.",
+      success: false,
+    };
+  }
+
   for (const filepath of args) {
     if (filepath === '.' || filepath === '-A' || filepath === '--all') {
       try {

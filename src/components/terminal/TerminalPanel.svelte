@@ -57,7 +57,7 @@
         white: '#c2c3c7',
       },
       fontFamily: '"JetBrains Mono", "Consolas", monospace',
-      fontSize: 14,
+      fontSize: 15,
       lineHeight: 1.2,
       cursorBlink: true,
       cursorStyle: 'block',

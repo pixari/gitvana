@@ -44,7 +44,9 @@
   "targetState": {
     "validators": [
       { "type": "tag-exists", "params": { "name": "v1.0" } },
-      { "type": "tag-exists", "params": { "name": "v2.0" } }
+      { "type": "tag-exists", "params": { "name": "v2.0" } },
+      { "type": "head-at", "params": { "target": "main" } },
+      { "type": "commit-count", "params": { "branch": "main", "min": 6 } }
     ]
   },
   "constraints": {
