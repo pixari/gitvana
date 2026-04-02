@@ -10,6 +10,8 @@ export async function stashCommand(args: string[], engine: GitEngine): Promise<C
       return stashPush(engine);
     case 'pop':
       return stashPop(engine);
+    case 'apply':
+      return stashApply(args.slice(1), engine);
     case 'list':
       return stashList(engine);
     case 'drop':
@@ -119,6 +121,51 @@ async function stashPop(engine: GitEngine): Promise<CommandResult> {
   } catch (err) {
     // If applying fails, push back onto stack
     engine.stashStack.unshift(entry);
+    const message = err instanceof Error ? err.message : String(err);
+    return { output: `error: ${message}`, success: false };
+  }
+}
+
+async function stashApply(args: string[], engine: GitEngine): Promise<CommandResult> {
+  if (engine.stashStack.length === 0) {
+    return { output: 'error: no stash entries found', success: false };
+  }
+
+  // Parse stash@{N} or default to 0
+  let index = 0;
+  if (args[0]) {
+    const match = args[0].match(/^stash@\{(\d+)\}$/);
+    if (match) {
+      index = parseInt(match[1], 10);
+    } else {
+      const parsed = parseInt(args[0], 10);
+      if (!isNaN(parsed)) index = parsed;
+    }
+  }
+
+  if (index < 0 || index >= engine.stashStack.length) {
+    return { output: `error: stash@{${index}} does not exist`, success: false };
+  }
+
+  const entry = engine.stashStack[index];
+
+  try {
+    // Restore saved files (same as pop, but don't remove from stack)
+    for (const [filepath, content] of entry.files) {
+      if (content === '\0DELETED') {
+        try {
+          await engine.fs.promises.unlink(`${engine.dir}/${filepath}`);
+        } catch { /* already gone */ }
+      } else {
+        await engine.fs.promises.writeFile(`${engine.dir}/${filepath}`, content, 'utf8');
+      }
+    }
+
+    return {
+      output: `Applied stash@{${index}}`,
+      success: true,
+    };
+  } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return { output: `error: ${message}`, success: false };
   }

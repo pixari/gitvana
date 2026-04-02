@@ -42,6 +42,26 @@ export async function addCommand(args: string[], engine: GitEngine): Promise<Com
       continue;
     }
 
+    if (filepath === '-u' || filepath === '--update') {
+      try {
+        const matrix = await git.statusMatrix({ fs: engine.fs, dir: engine.dir });
+        for (const [file, head, workdir] of matrix) {
+          // Only stage tracked files (head !== 0), skip untracked (head === 0)
+          if (head === 0) continue;
+          if (workdir === 0) {
+            // Deleted in working dir
+            await git.remove({ fs: engine.fs, dir: engine.dir, filepath: file });
+          } else if (workdir === 2) {
+            // Modified in working dir
+            await git.add({ fs: engine.fs, dir: engine.dir, filepath: file });
+          }
+        }
+      } catch {
+        // empty repo — nothing tracked yet, -u is a no-op
+      }
+      continue;
+    }
+
     try {
       await engine.fs.promises.stat(`${engine.dir}/${filepath}`);
       await git.add({ fs: engine.fs, dir: engine.dir, filepath });

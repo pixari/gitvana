@@ -5,6 +5,7 @@ import type { CommandResult } from '../types.js';
 export async function logCommand(args: string[], engine: GitEngine): Promise<CommandResult> {
   const oneline = args.includes('--oneline');
   const allBranches = args.includes('--all');
+  const graph = args.includes('--graph');
   const depthIdx = args.indexOf('-n') !== -1 ? args.indexOf('-n') : args.indexOf('--max-count');
   const depth = depthIdx !== -1 ? parseInt(args[depthIdx + 1], 10) || 10 : 10;
 
@@ -37,19 +38,32 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
     }
 
     if (oneline) {
-      const lines = commits.map((c) => `${c.oid.slice(0, 7)} ${c.commit.message.split('\n')[0]}`);
+      const prefix = graph ? '* ' : '';
+      const lines = commits.map((c) => `${prefix}${c.oid.slice(0, 7)} ${c.commit.message.split('\n')[0]}`);
       return { output: lines.join('\n'), success: true };
     }
 
     const lines: string[] = [];
-    for (const c of commits) {
-      lines.push(`commit ${c.oid}`);
-      lines.push(`Author: ${c.commit.author.name} <${c.commit.author.email}>`);
-      const date = new Date(c.commit.author.timestamp * 1000);
-      lines.push(`Date:   ${date.toUTCString()}`);
-      lines.push('');
-      lines.push(`    ${c.commit.message.trim()}`);
-      lines.push('');
+    for (let i = 0; i < commits.length; i++) {
+      const c = commits[i];
+      const isLast = i === commits.length - 1;
+      if (graph) {
+        lines.push(`* commit ${c.oid}`);
+        lines.push(`| Author: ${c.commit.author.name} <${c.commit.author.email}>`);
+        const date = new Date(c.commit.author.timestamp * 1000);
+        lines.push(`| Date:   ${date.toUTCString()}`);
+        lines.push('|');
+        lines.push(`|     ${c.commit.message.trim()}`);
+        lines.push(isLast ? '' : '|');
+      } else {
+        lines.push(`commit ${c.oid}`);
+        lines.push(`Author: ${c.commit.author.name} <${c.commit.author.email}>`);
+        const date = new Date(c.commit.author.timestamp * 1000);
+        lines.push(`Date:   ${date.toUTCString()}`);
+        lines.push('');
+        lines.push(`    ${c.commit.message.trim()}`);
+        lines.push('');
+      }
     }
 
     return { output: lines.join('\n'), success: true };

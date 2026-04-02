@@ -172,14 +172,16 @@ export class ShellBridge {
   ];
 
   private static readonly GIT_FLAGS: Record<string, string[]> = {
+    'add':      ['-u', '--update', '-A', '--all'],
     'commit':   ['-m', '--message'],
-    'log':      ['--oneline', '--all', '-n', '--max-count'],
+    'log':      ['--oneline', '--all', '--graph', '-n', '--max-count'],
+    'diff':     ['--staged', '--cached', '--stat'],
     'reset':    ['--soft', '--mixed', '--hard'],
     'checkout': ['-b'],
     'branch':   ['-d', '-D', '--delete', '--force-delete'],
     'tag':      ['-a', '--annotate', '-d', '--delete', '-l', '--list', '-m', '--message'],
     'rm':       ['--cached', '-r', '--recursive'],
-    'stash':    ['push', 'pop', 'list', 'drop'],
+    'stash':    ['push', 'pop', 'apply', 'list', 'drop'],
     'rebase':   ['--continue', '--abort'],
     'merge':    ['--abort', '--no-ff'],
     'bisect':   ['start', 'good', 'bad', 'reset'],
@@ -306,8 +308,54 @@ export class ShellBridge {
     this.cursorPos = this.lineBuffer.length;
   }
 
+  /** Expand simple glob patterns (*.ext) in a command line */
+  private async expandGlobs(line: string): Promise<string> {
+    // Tokenize respecting quotes
+    const tokens = line.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g);
+    if (!tokens) return line;
+
+    let expanded = false;
+    const result: string[] = [];
+
+    for (const token of tokens) {
+      // Skip quoted tokens or tokens without *
+      if (token.startsWith('"') || token.startsWith("'") || !token.includes('*')) {
+        result.push(token);
+        continue;
+      }
+
+      try {
+        const entries = await this.engine.fs.promises.readdir(this.engine.dir) as string[];
+        const files = entries.filter((f: string) => f !== '.git');
+
+        let matched: string[];
+        if (token === '*') {
+          matched = files;
+        } else if (token.startsWith('*.')) {
+          const ext = token.slice(1); // e.g. ".js"
+          matched = files.filter((f: string) => f.endsWith(ext));
+        } else {
+          // Unsupported glob pattern, keep as-is
+          result.push(token);
+          continue;
+        }
+
+        if (matched.length > 0) {
+          result.push(...matched);
+          expanded = true;
+        } else {
+          result.push(token); // no match, keep literal
+        }
+      } catch {
+        result.push(token);
+      }
+    }
+
+    return expanded ? result.join(' ') : line;
+  }
+
   private async executeLine(): Promise<void> {
-    const line = this.lineBuffer.trim();
+    let line = this.lineBuffer.trim();
     this.lineBuffer = '';
     this.cursorPos = 0;
     this.historyIndex = -1;
@@ -319,16 +367,37 @@ export class ShellBridge {
 
     this.history.push(line);
 
-    // Support && chaining
-    if (line.includes('&&')) {
-      const parts = line.split('&&').map((p) => p.trim()).filter(Boolean);
+    // Support ; chaining (runs next command regardless of success)
+    // and && chaining (stops on first failure)
+    if (line.includes('&&') || line.includes(';')) {
+      // Split on && and ; while preserving the delimiter
+      const segments: { cmd: string; stopOnFail: boolean }[] = [];
+      // Split by && or ; keeping track of which delimiter was used
+      const parts = line.split(/(&&|;)/);
+      let stopOnFail = false; // doesn't matter for first segment
       for (const part of parts) {
-        const success = await this.executeOneCommand(part);
-        if (!success) break; // stop on first failure (like real &&)
+        const trimmed = part.trim();
+        if (trimmed === '&&') {
+          stopOnFail = true;
+        } else if (trimmed === ';') {
+          stopOnFail = false;
+        } else if (trimmed) {
+          segments.push({ cmd: trimmed, stopOnFail });
+          stopOnFail = false;
+        }
+      }
+
+      for (const seg of segments) {
+        const expandedCmd = await this.expandGlobs(seg.cmd);
+        const success = await this.executeOneCommand(expandedCmd);
+        if (!success && seg.stopOnFail) break;
       }
       this.writePrompt();
       return;
     }
+
+    // Expand globs
+    line = await this.expandGlobs(line);
 
     const parsed = parseCommand(line);
 
