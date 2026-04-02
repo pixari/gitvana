@@ -117,6 +117,7 @@
     <span class="terminal-dot yellow"></span>
     <span class="terminal-dot green"></span>
     <span class="terminal-title">TERMINAL</span>
+    <span class="alpha-tag">ALPHA</span>
     <div class="header-actions">
       <button class="header-btn" onclick={toggleSound} title={soundEnabled ? 'Mute' : 'Unmute'}>
         {soundEnabled ? '🔊' : '🔇'}
@@ -151,6 +152,23 @@
     padding: 6px 12px;
     background: #1a1a2e;
     border-bottom: 1px solid #2a2a4e;
+  }
+
+  .alpha-tag {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 6px;
+    color: #ff004d;
+    background: #ff004d18;
+    border: 1px solid #ff004d44;
+    border-radius: 3px;
+    padding: 2px 5px;
+    letter-spacing: 1px;
+    animation: alpha-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes alpha-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
   }
 
   .header-actions {
