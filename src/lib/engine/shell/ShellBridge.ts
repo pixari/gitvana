@@ -371,7 +371,7 @@ export class ShellBridge {
     'switch':   ['-c', '--create', '-b'],
     'restore':  ['--staged', '--source'],
     'show':     ['--stat'],
-    'branch':   ['-d', '-D', '--delete', '--force-delete', '-v', '--verbose', '-m', '--move', '--merged', '--no-merged'],
+    'branch':   ['-d', '-D', '--delete', '--force-delete', '-v', '--verbose', '-m', '--move', '--merged', '--no-merged', '-r', '-a'],
     'tag':      ['-a', '--annotate', '-d', '--delete', '-l', '--list', '-m', '--message'],
     'rm':       ['--cached', '-r', '--recursive'],
     'stash':    ['push', 'pop', 'apply', 'list', 'drop', 'show'],
@@ -379,6 +379,9 @@ export class ShellBridge {
     'merge':    ['--abort', '--no-ff'],
     'bisect':   ['start', 'good', 'bad', 'reset'],
     'config':   ['--list', '-l'],
+    'push':     ['--force', '-f', '-u', '--set-upstream'],
+    'pull':     ['--rebase'],
+    'fetch':    ['--all'],
     'remote':   ['add', 'remove', '-v'],
     'clean':    ['-f', '-n', '-d', '--force', '--dry-run'],
   };

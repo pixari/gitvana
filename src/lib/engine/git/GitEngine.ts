@@ -51,6 +51,8 @@ export interface StashEntry {
 export class GitEngine {
   fs!: FS;
   dir = '/workspace';
+  remoteDir = '/remote/origin';
+  remotes: Map<string, { url: string; dir: string }> = new Map();
   private commands = new Map<string, CommandHandler>();
   private allowedCommands: Set<string> | null = null;
   private commandCount = 0;
@@ -60,7 +62,7 @@ export class GitEngine {
     ['user.name', 'Player'],
     ['user.email', 'player@gitvana.dev'],
   ]);
-  private snapshots: { files: Map<string, string | Uint8Array>; reflog: ReflogEntry[]; stash: StashEntry[] }[] = [];
+  private snapshots: { files: Map<string, string | Uint8Array>; reflog: ReflogEntry[]; stash: StashEntry[]; remotes: Map<string, { url: string; dir: string }> }[] = [];
   private readonly MAX_SNAPSHOTS = 10;
 
   constructor() {
@@ -232,7 +234,7 @@ export class GitEngine {
   }
 
   private async buildReflogMessage(command: string, args: string[], prevBranch: string | null): Promise<string> {
-    const nonFlagArgs = args.filter((a) => !a.startsWith('-'));
+    const nonFlagArgs = args.filter((a) => a != null && !a.startsWith('-'));
     switch (command) {
       case 'commit': {
         const mIndex = args.indexOf('-m');
@@ -309,6 +311,19 @@ export class GitEngine {
           branches.push({ name, oid: '', isCurrent: name === current });
         }
       }
+      // Include remote tracking branches
+      for (const remoteName of this.remotes.keys()) {
+        try {
+          const remoteDir = `${this.dir}/.git/refs/remotes/${remoteName}`;
+          const entries = await this.fs.promises.readdir(remoteDir) as string[];
+          for (const entry of entries) {
+            try {
+              const oid = await git.resolveRef({ fs: this.fs, dir: this.dir, ref: `refs/remotes/${remoteName}/${entry}` });
+              branches.push({ name: `${remoteName}/${entry}`, oid, isCurrent: false, isRemote: true });
+            } catch { /* skip */ }
+          }
+        } catch { /* no remote refs yet */ }
+      }
       return branches;
     } catch {
       return [];
@@ -365,9 +380,22 @@ export class GitEngine {
     try {
       const branches = await git.listBranches({ fs: this.fs, dir: this.dir });
       const allCommits = new Map<string, CommitInfo>();
-      for (const branch of branches) {
+
+      // Collect all refs to walk: local branches + remote tracking branches
+      const refs: string[] = [...branches];
+      for (const remoteName of this.remotes.keys()) {
         try {
-          const commits = await git.log({ fs: this.fs, dir: this.dir, ref: branch, depth });
+          const remoteDir = `${this.dir}/.git/refs/remotes/${remoteName}`;
+          const entries = await this.fs.promises.readdir(remoteDir) as string[];
+          for (const entry of entries) {
+            refs.push(`refs/remotes/${remoteName}/${entry}`);
+          }
+        } catch { /* no remote refs */ }
+      }
+
+      for (const ref of refs) {
+        try {
+          const commits = await git.log({ fs: this.fs, dir: this.dir, ref, depth });
           for (const c of commits) {
             if (!allCommits.has(c.oid)) {
               allCommits.set(c.oid, {
@@ -379,7 +407,7 @@ export class GitEngine {
             }
           }
         } catch {
-          // skip branches that fail (e.g. orphan)
+          // skip refs that fail (e.g. orphan)
         }
       }
       return Array.from(allCommits.values());
@@ -399,10 +427,18 @@ export class GitEngine {
   async saveSnapshot(): Promise<void> {
     const files = new Map<string, string | Uint8Array>();
     await this.walkDir(this.dir, files);
+    // Also snapshot /remote directory if it exists
+    try {
+      const remoteStat = await this.fs.promises.stat('/remote');
+      if (remoteStat.isDirectory?.() || (remoteStat as any).type === 'dir') {
+        await this.walkDir('/remote', files);
+      }
+    } catch { /* /remote doesn't exist yet */ }
     this.snapshots.push({
       files,
       reflog: [...this.reflogEntries],
       stash: [...this.stashStack],
+      remotes: new Map(this.remotes),
     });
     if (this.snapshots.length > this.MAX_SNAPSHOTS) {
       this.snapshots.shift();
@@ -427,6 +463,7 @@ export class GitEngine {
     }
     this.reflogEntries = snapshot.reflog;
     this.stashStack = snapshot.stash;
+    this.remotes = snapshot.remotes ?? new Map();
     return true;
   }
 
@@ -460,12 +497,24 @@ export class GitEngine {
     this.stashStack = [];
     this.reflogEntries = [];
     this.snapshots = [];
+    this.remotes = new Map();
     this.configStore = new Map([
       ['user.name', 'Player'],
       ['user.email', 'player@gitvana.dev'],
     ]);
     // Note: bisect and rebase state files live inside .git/ which is wiped by
     // createFreshFs(), so no explicit cleanup is needed here.
+    // /remote directory is also wiped since createFreshFs() replaces the entire filesystem.
+  }
+
+  /** Initialize a bare remote repository on the in-memory filesystem. */
+  async initRemote(name: string, url: string): Promise<void> {
+    const dir = `/remote/${name}`;
+    this.remotes.set(name, { url, dir });
+    // Create bare repo directories
+    try { await this.fs.promises.mkdir('/remote'); } catch {}
+    try { await this.fs.promises.mkdir(dir); } catch {}
+    await git.init({ fs: this.fs, dir, defaultBranch: 'main' });
   }
 }
 

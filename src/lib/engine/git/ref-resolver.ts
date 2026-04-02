@@ -41,6 +41,24 @@ export async function resolveRef(ref: string, engine: GitEngine): Promise<string
     return await git.resolveRef({ fs: engine.fs, dir: engine.dir, ref: 'HEAD' });
   }
 
+  // Handle remote tracking refs: origin/main -> refs/remotes/origin/main
+  if (ref.includes('/')) {
+    const slashIdx = ref.indexOf('/');
+    const remoteName = ref.slice(0, slashIdx);
+    const branchName = ref.slice(slashIdx + 1);
+    if (engine.remotes.has(remoteName)) {
+      try {
+        return await git.resolveRef({
+          fs: engine.fs,
+          dir: engine.dir,
+          ref: `refs/remotes/${remoteName}/${branchName}`,
+        });
+      } catch {
+        // Fall through to normal resolution
+      }
+    }
+  }
+
   try {
     return await git.resolveRef({ fs: engine.fs, dir: engine.dir, ref });
   } catch {

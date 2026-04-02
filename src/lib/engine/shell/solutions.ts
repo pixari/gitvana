@@ -395,6 +395,24 @@ const solutions: Record<string, string[]> = {
     // 8. Tag the final result
     'git tag v3.0',
   ],
+
+  // === Act 6: Remote Levels ===
+  'act6-36-first-push': [
+    'echo "Ancient monastery wisdom" > scroll.txt',
+    'git add scroll.txt',
+    'git commit -m "Add scroll of wisdom"',
+    'git push origin main',
+  ],
+  'act6-37-fetch-forward': [
+    'git fetch origin',
+    'git merge origin/main',
+  ],
+  'act6-38-pull-conflict': [
+    'git pull origin main',
+    'echo "Monday: Kung Fu" > schedule.txt',
+    'git add schedule.txt',
+    'git commit -m "Resolve merge conflict: keep Kung Fu"',
+  ],
 };
 
 export function getLevelSolution(levelId: string): string[] {

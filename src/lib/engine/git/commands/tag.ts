@@ -17,7 +17,7 @@ export async function tagCommand(args: string[], engine: GitEngine): Promise<Com
 
   // git tag -d <name>
   if (deleteFlag) {
-    const name = args.filter((a) => !a.startsWith('-'))[0];
+    const name = args.filter((a) => a != null && !a.startsWith('-'))[0];
     if (!name) {
       return { output: 'fatal: tag name required', success: false };
     }
@@ -67,7 +67,7 @@ export async function tagCommand(args: string[], engine: GitEngine): Promise<Com
   }
 
   // git tag (no args) or git tag -l [pattern] → list tags
-  const nonFlagArgs = args.filter((a) => !a.startsWith('-'));
+  const nonFlagArgs = args.filter((a) => a != null && !a.startsWith('-'));
   if (nonFlagArgs.length === 0 || (listFlag && nonFlagArgs.length <= 1)) {
     // Parse optional pattern for -l: git tag -l "v1.*"
     let pattern: string | null = null;

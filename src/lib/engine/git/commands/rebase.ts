@@ -12,7 +12,7 @@ export async function rebaseCommand(args: string[], engine: GitEngine): Promise<
     return rebaseContinue(engine);
   }
 
-  const targetBranch = args.filter((a) => !a.startsWith('-'))[0];
+  const targetBranch = args.filter((a) => a != null && !a.startsWith('-'))[0];
   if (!targetBranch) {
     return { output: 'fatal: no branch specified for rebase', success: false };
   }

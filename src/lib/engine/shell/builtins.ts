@@ -55,7 +55,7 @@ function resolvePath(filepath: string, cwd: string): string {
 async function lsCommand(args: string[], fs: FsLike, cwd: string): Promise<BuiltinResult> {
   const showAll = args.includes('-a') || args.includes('-la') || args.includes('-al');
   const long = args.includes('-l') || args.includes('-la') || args.includes('-al');
-  const dir = args.filter((a) => !a.startsWith('-'))[0] || '.';
+  const dir = args.filter((a) => a != null && !a.startsWith('-'))[0] || '.';
   const targetPath = resolvePath(dir, cwd);
 
   try {
@@ -104,7 +104,7 @@ async function catCommand(args: string[], fs: FsLike, cwd: string): Promise<Buil
 
 async function mkdirCommand(args: string[], fs: FsLike, cwd: string): Promise<BuiltinResult> {
   const recursive = args.includes('-p');
-  const dirs = args.filter((a) => !a.startsWith('-'));
+  const dirs = args.filter((a) => a != null && !a.startsWith('-'));
 
   for (const dir of dirs) {
     const dirPath = resolvePath(dir, cwd);
@@ -195,7 +195,7 @@ async function echoCommand(args: string[], fs: FsLike, cwd: string): Promise<Bui
 }
 
 async function rmCommand(args: string[], fs: FsLike, cwd: string): Promise<BuiltinResult> {
-  const files = args.filter((a) => !a.startsWith('-'));
+  const files = args.filter((a) => a != null && !a.startsWith('-'));
   for (const file of files) {
     const filepath = resolvePath(file, cwd);
     try {
@@ -210,7 +210,7 @@ async function rmCommand(args: string[], fs: FsLike, cwd: string): Promise<Built
 async function grepCommand(args: string[], fs: FsLike, cwd: string): Promise<BuiltinResult> {
   const caseInsensitive = args.includes('-i');
   const recursive = args.includes('-r') || args.includes('-R');
-  const nonFlagArgs = args.filter(a => !a.startsWith('-'));
+  const nonFlagArgs = args.filter(a => a != null && !a.startsWith('-'));
 
   if (nonFlagArgs.length === 0) {
     return { output: 'Usage: grep [-i] [-r] "pattern" [file]', success: false };
@@ -340,7 +340,7 @@ async function tailCommand(args: string[], fs: FsLike, cwd: string): Promise<Bui
 
 async function wcCommand(args: string[], fs: FsLike, cwd: string): Promise<BuiltinResult> {
   const lineOnly = args.includes('-l');
-  const nonFlagArgs = args.filter(a => !a.startsWith('-'));
+  const nonFlagArgs = args.filter(a => a != null && !a.startsWith('-'));
 
   if (nonFlagArgs.length === 0) {
     return { output: 'wc: missing file operand', success: false };
@@ -365,7 +365,7 @@ async function wcCommand(args: string[], fs: FsLike, cwd: string): Promise<Built
 }
 
 async function mvBuiltinCommand(args: string[], fs: FsLike, cwd: string): Promise<BuiltinResult> {
-  const positional = args.filter(a => !a.startsWith('-'));
+  const positional = args.filter(a => a != null && !a.startsWith('-'));
 
   if (positional.length < 2) {
     return { output: 'usage: mv <source> <destination>', success: false };

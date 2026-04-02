@@ -4,7 +4,7 @@ import type { CommandResult } from '../types.js';
 import { resolveRef, getFilesAtCommit, writeConflictMarkers } from '../ref-resolver.js';
 
 export async function revertCommand(args: string[], engine: GitEngine): Promise<CommandResult> {
-  const ref = args.filter((a) => !a.startsWith('-'))[0];
+  const ref = args.filter((a) => a != null && !a.startsWith('-'))[0];
 
   if (!ref) {
     return { output: 'error: you must specify a commit to revert', success: false };

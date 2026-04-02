@@ -13,6 +13,12 @@
 
   const entries = [
     {
+      date: '2026-04-03',
+      title: 'Simulated Remotes \u2014 Push, Fetch, Pull',
+      tags: ['feature', 'engine'],
+      content: 'Git push, fetch, and pull now work via simulated remote repositories running entirely in the browser. 3 new levels teaching remote collaboration. Remote tracking branches visible in the commit graph. Dev blog page added.'
+    },
+    {
       date: '2026-04-02',
       title: 'v1.0 \u2014 The Grand Opening',
       tags: ['release'],

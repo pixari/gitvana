@@ -50,6 +50,12 @@ export class LevelValidator {
           return await this.validateNoMergeCommits(validator);
         case 'file-not-exists':
           return await this.validateFileNotExists(validator);
+        case 'remote-exists':
+          return await this.validateRemoteExists(validator);
+        case 'remote-branch-exists':
+          return await this.validateRemoteBranchExists(validator);
+        case 'pushed-to-remote':
+          return await this.validatePushedToRemote(validator);
         default:
           return { validator, passed: false, message: `Unknown validator: ${validator.type}` };
       }
@@ -376,6 +382,60 @@ export class LevelValidator {
       };
     } catch {
       return { validator, passed: false, message: `Tag '${name}' not found` };
+    }
+  }
+
+  private async validateRemoteExists(
+    validator: ValidatorConfig,
+  ): Promise<{ validator: ValidatorConfig; passed: boolean; message: string }> {
+    const { name } = validator.params as { name: string };
+    const exists = this.engine.remotes.has(name);
+    return {
+      validator,
+      passed: exists,
+      message: exists ? `Remote '${name}' exists` : `Remote '${name}' not found`,
+    };
+  }
+
+  private async validateRemoteBranchExists(
+    validator: ValidatorConfig,
+  ): Promise<{ validator: ValidatorConfig; passed: boolean; message: string }> {
+    const { remote, branch } = validator.params as { remote: string; branch: string };
+    try {
+      await git.resolveRef({
+        fs: this.engine.fs,
+        dir: this.engine.dir,
+        ref: `refs/remotes/${remote}/${branch}`,
+      });
+      return { validator, passed: true, message: `Tracking ref '${remote}/${branch}' exists` };
+    } catch {
+      return { validator, passed: false, message: `Tracking ref '${remote}/${branch}' not found — did you fetch or push?` };
+    }
+  }
+
+  private async validatePushedToRemote(
+    validator: ValidatorConfig,
+  ): Promise<{ validator: ValidatorConfig; passed: boolean; message: string }> {
+    const { remote, branch } = validator.params as { remote: string; branch: string };
+    const remoteInfo = this.engine.remotes.get(remote);
+    if (!remoteInfo) {
+      return { validator, passed: false, message: `Remote '${remote}' not found` };
+    }
+    try {
+      // Check that the remote repo has the branch
+      const remoteBranches = await git.listBranches({ fs: this.engine.fs, dir: remoteInfo.dir });
+      if (!remoteBranches.includes(branch)) {
+        return { validator, passed: false, message: `Branch '${branch}' not pushed to '${remote}'` };
+      }
+      // Check that local and remote are in sync
+      const localOid = await git.resolveRef({ fs: this.engine.fs, dir: this.engine.dir, ref: branch });
+      const remoteOid = await git.resolveRef({ fs: this.engine.fs, dir: remoteInfo.dir, ref: branch });
+      if (localOid !== remoteOid) {
+        return { validator, passed: false, message: `Branch '${branch}' is not in sync with '${remote}'` };
+      }
+      return { validator, passed: true, message: `Branch '${branch}' pushed to '${remote}'` };
+    } catch (err) {
+      return { validator, passed: false, message: `Push check failed: ${err instanceof Error ? err.message : err}` };
     }
   }
 }

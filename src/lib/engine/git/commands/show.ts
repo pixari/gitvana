@@ -5,7 +5,7 @@ import { resolveRef, getFilesAtCommit } from '../ref-resolver.js';
 
 export async function showCommand(args: string[], engine: GitEngine): Promise<CommandResult> {
   const stat = args.includes('--stat');
-  const nonFlagArgs = args.filter(a => !a.startsWith('-'));
+  const nonFlagArgs = args.filter(a => a != null && !a.startsWith('-'));
   const ref = nonFlagArgs[0] || 'HEAD';
 
   // git show <commit>:<file> → show file content at a specific commit

@@ -4,7 +4,7 @@ import type { CommandResult } from '../types.js';
 
 export async function mvCommand(args: string[], engine: GitEngine): Promise<CommandResult> {
   // Filter out flags
-  const positional = args.filter(a => !a.startsWith('-'));
+  const positional = args.filter(a => a != null && !a.startsWith('-'));
 
   if (positional.length < 2) {
     return {

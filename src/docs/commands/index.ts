@@ -422,4 +422,77 @@ export const commandDocs: Record<string, CommandDoc> = {
     related: ['log', 'checkout', 'show'],
     seeAlso: ['bisect-debugging'],
   },
+
+  remote: {
+    name: 'remote',
+    syntax: 'git remote [add|remove] <name> [<url>]',
+    description:
+      '"git remote" manages connections to other copies of your repository. A remote is a bookmark -- it stores a name (usually "origin") and a URL so you don\'t have to type the full address every time you push or fetch. The remote itself doesn\'t contain any code; it\'s just a reference. Actual data transfer happens through "push", "fetch", and "pull".',
+    options: [
+      { flag: '-v, --verbose', description: 'Show remote URLs alongside names' },
+      { flag: 'add <name> <url>', description: 'Register a new remote with the given name and URL' },
+      { flag: 'remove <name>', description: 'Unregister a remote and clean up its tracking refs' },
+    ],
+    examples: [
+      { command: 'git remote', explanation: 'List all configured remote names' },
+      { command: 'git remote -v', explanation: 'Show remote names with their URLs' },
+      { command: 'git remote add origin https://github.com/you/repo.git', explanation: 'Add a remote named "origin"' },
+      { command: 'git remote remove upstream', explanation: 'Remove a remote named "upstream"' },
+    ],
+    tip: '"origin" is just a convention -- it\'s the default name for the remote you cloned from. You can name remotes whatever you want and have multiple remotes (e.g., "origin" for your fork and "upstream" for the original repo).',
+    related: ['push', 'fetch', 'pull'],
+  },
+
+  push: {
+    name: 'push',
+    syntax: 'git push [<remote>] [<branch>]',
+    description:
+      '"git push" uploads your local commits to a remote repository. It sends new commit objects and updates the remote branch ref to point to your latest commit. By default it pushes to "origin" and the current branch. Push only works if the remote branch can be fast-forwarded to your commits -- if someone else pushed first, you need to pull and merge before pushing.',
+    options: [
+      { flag: '-u, --set-upstream', description: 'Set the upstream tracking branch (so future "git push" works without arguments)' },
+      { flag: '-f, --force', description: 'Force-push even if the remote has diverged (DANGER: overwrites remote history)' },
+    ],
+    examples: [
+      { command: 'git push', explanation: 'Push current branch to its upstream remote' },
+      { command: 'git push origin main', explanation: 'Push the "main" branch to the "origin" remote' },
+      { command: 'git push -u origin feature', explanation: 'Push "feature" and set upstream tracking' },
+      { command: 'git push --force', explanation: 'Force-push (use with extreme caution!)' },
+    ],
+    tip: 'Never force-push to a shared branch unless you know what you\'re doing. It rewrites remote history and can destroy other people\'s work. If "git push" is rejected, pull first to integrate remote changes.',
+    related: ['fetch', 'pull', 'remote'],
+  },
+
+  fetch: {
+    name: 'fetch',
+    syntax: 'git fetch [<remote>] [--all]',
+    description:
+      '"git fetch" downloads new commits from a remote without changing your working directory or current branch. It updates your remote tracking refs (e.g., "origin/main") so you can see what changed on the remote. Fetch is safe -- it only downloads, never modifies your local branches. After fetching, you can inspect the changes with "git log origin/main" and decide whether to merge.',
+    options: [
+      { flag: '--all', description: 'Fetch from all configured remotes' },
+    ],
+    examples: [
+      { command: 'git fetch', explanation: 'Fetch from the default remote (origin)' },
+      { command: 'git fetch origin', explanation: 'Fetch new commits from "origin"' },
+      { command: 'git fetch --all', explanation: 'Fetch from all remotes' },
+      { command: 'git log origin/main', explanation: 'After fetching, inspect remote changes' },
+    ],
+    tip: 'Prefer "git fetch" + "git merge" over "git pull" when you want to inspect changes before integrating them. Fetch is always safe; it never changes your local work.',
+    related: ['pull', 'push', 'merge', 'remote'],
+  },
+
+  pull: {
+    name: 'pull',
+    syntax: 'git pull [<remote>] [<branch>]',
+    description:
+      '"git pull" is shorthand for "git fetch" followed by "git merge". It downloads new commits from the remote and immediately merges them into your current branch. If your branch hasn\'t diverged from the remote, the merge is a fast-forward (just moving the pointer). If both sides have new commits, git creates a merge commit. If both changed the same lines, you\'ll get a merge conflict to resolve.',
+    options: [
+      { flag: '--rebase', description: 'Rebase instead of merge (replay your commits on top of the remote)' },
+    ],
+    examples: [
+      { command: 'git pull', explanation: 'Pull from the upstream remote and merge' },
+      { command: 'git pull origin main', explanation: 'Pull the "main" branch from "origin" and merge it' },
+    ],
+    tip: 'If you want more control, use "git fetch" + "git merge" separately. "git pull" is convenient but can surprise you with merge conflicts if you\'re not expecting diverged history.',
+    related: ['fetch', 'push', 'merge', 'remote'],
+  },
 };

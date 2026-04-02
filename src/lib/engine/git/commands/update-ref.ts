@@ -7,7 +7,7 @@ export async function updateRefCommand(args: string[], engine: GitEngine): Promi
   const deleteFlag = args.includes('-d');
 
   if (deleteFlag) {
-    const refName = args.filter((a) => !a.startsWith('-'))[0];
+    const refName = args.filter((a) => a != null && !a.startsWith('-'))[0];
     if (!refName) {
       return { output: 'usage: git update-ref -d <ref>', success: false };
     }
@@ -37,7 +37,7 @@ export async function updateRefCommand(args: string[], engine: GitEngine): Promi
   }
 
   // git update-ref <ref> <newvalue>
-  const nonFlagArgs = args.filter((a) => !a.startsWith('-'));
+  const nonFlagArgs = args.filter((a) => a != null && !a.startsWith('-'));
   if (nonFlagArgs.length >= 2) {
     const refName = nonFlagArgs[0];
     const newValue = nonFlagArgs[1];

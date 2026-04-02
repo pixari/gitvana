@@ -4,7 +4,7 @@ import type { CommandResult } from '../types.js';
 import { resolveRef, writeConflictMarkers } from '../ref-resolver.js';
 
 export async function cherryPickCommand(args: string[], engine: GitEngine): Promise<CommandResult> {
-  const commitRef = args.filter((a) => !a.startsWith('-'))[0];
+  const commitRef = args.filter((a) => a != null && !a.startsWith('-'))[0];
 
   if (!commitRef) {
     return { output: 'fatal: no commit specified', success: false };

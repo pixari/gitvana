@@ -23,6 +23,7 @@
     name: string;
     color: string;
     isCurrent: boolean;
+    isRemote: boolean;
   }
 
   interface GraphEdge {
@@ -78,8 +79,12 @@
     const branchOrder: string[] = [];
     const branchColorMap = new Map<string, string>();
 
+    // Separate local and remote branches
+    const localBranches = branches.filter(b => !b.isRemote);
+    const remoteBranches = branches.filter(b => b.isRemote);
+
     // Sort: current branch first, then main/master, then alphabetical
-    const sorted = [...branches].sort((a, b) => {
+    const sorted = [...localBranches].sort((a, b) => {
       if (a.name === 'main' || a.name === 'master') return -1;
       if (b.name === 'main' || b.name === 'master') return 1;
       if (a.isCurrent) return -1;
@@ -94,6 +99,14 @@
       }
     }
 
+    // Remote branches share color with their local counterpart
+    for (const rb of remoteBranches) {
+      const localName = rb.name.split('/').slice(1).join('/'); // origin/main -> main
+      const color = branchColorMap.get(localName) || BRANCH_COLORS[branchOrder.length % BRANCH_COLORS.length];
+      branchColorMap.set(rb.name, color);
+      // Don't add to branchOrder — remotes don't get their own lane
+    }
+
     // Map tip oid -> branch info
     const tipToBranches = new Map<string, BranchLabel[]>();
     for (const b of branches) {
@@ -102,11 +115,12 @@
         name: b.name,
         color: branchColorMap.get(b.name) || BRANCH_COLORS[0],
         isCurrent: b.isCurrent,
+        isRemote: !!b.isRemote,
       });
       tipToBranches.set(b.oid, existing);
     }
 
-    // Assign each commit to the "best" branch
+    // Assign each commit to the "best" branch (local branches only for lane assignment)
     const commitBranch = new Map<string, string>();
     const commitMap = new Map<string, CommitInfo>();
     for (const c of commits) {
@@ -507,7 +521,8 @@
 
           <!-- Branch labels (right of message) -->
           {#each node.branchLabels as label, i}
-            {@const labelX = cx + LABEL_OFFSET_X + 62 + node.message.length * 5.5 + 12 + i * 8}
+            {@const prevLabels = node.branchLabels.slice(0, i)}
+            {@const labelX = cx + LABEL_OFFSET_X + 62 + node.message.length * 5.5 + 12 + prevLabels.reduce((sum, l) => sum + l.name.length * 6.5 + 20, 0)}
             {@const tagWidth = label.name.length * 6.5 + 12}
             <g class="branch-label-group">
               <rect
@@ -517,17 +532,20 @@
                 height={16}
                 rx="2"
                 fill={label.color}
-                fill-opacity={label.isCurrent ? 0.25 : 0.12}
+                fill-opacity={label.isRemote ? 0.06 : label.isCurrent ? 0.25 : 0.12}
                 stroke={label.color}
                 stroke-width={label.isCurrent ? 1.5 : 1}
-                stroke-opacity={label.isCurrent ? 0.8 : 0.4}
+                stroke-opacity={label.isRemote ? 0.3 : label.isCurrent ? 0.8 : 0.4}
+                stroke-dasharray={label.isRemote ? '3 2' : 'none'}
               />
               <text
                 x={labelX + 6}
                 y={cy + 1}
                 class="branch-label"
                 class:branch-label-current={label.isCurrent}
+                class:branch-label-remote={label.isRemote}
                 fill={label.color}
+                fill-opacity={label.isRemote ? 0.5 : 1}
                 dominant-baseline="middle"
               >
                 {label.name}
@@ -740,6 +758,10 @@
   .branch-label-current {
     font-weight: bold;
     filter: brightness(1.2);
+  }
+
+  .branch-label-remote {
+    font-style: italic;
   }
 
   .head-label {

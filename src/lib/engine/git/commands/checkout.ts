@@ -9,15 +9,15 @@ export async function checkoutCommand(args: string[], engine: GitEngine): Promis
   // Handle: git checkout [<ref>] -- <file>
   const dashDashIndex = args.indexOf('--');
   if (dashDashIndex !== -1) {
-    const ref = args.slice(0, dashDashIndex).filter((a) => !a.startsWith('-'))[0];
-    const filepath = args.slice(dashDashIndex + 1).filter((a) => !a.startsWith('-'))[0];
+    const ref = args.slice(0, dashDashIndex).filter((a) => a != null && !a.startsWith('-'))[0];
+    const filepath = args.slice(dashDashIndex + 1).filter((a) => a != null && !a.startsWith('-'))[0];
     if (filepath) {
       // If no ref before --, default to HEAD
       return restoreFileFromRef(ref || 'HEAD', filepath, engine);
     }
   }
 
-  const branchName = args.filter((a) => !a.startsWith('-'))[0];
+  const branchName = args.filter((a) => a != null && !a.startsWith('-'))[0];
 
   if (!branchName) {
     return { output: 'error: you must specify a branch to checkout', success: false };
@@ -45,6 +45,25 @@ export async function checkoutCommand(args: string[], engine: GitEngine): Promis
       success: true,
     };
   } catch (err) {
+    // Auto-create local branch from remote tracking branch (like real git)
+    if (!createBranch && !branchName.includes('/') && !branchName.includes('@')) {
+      for (const remoteName of engine.remotes.keys()) {
+        try {
+          const oid = await git.resolveRef({
+            fs: engine.fs,
+            dir: engine.dir,
+            ref: `refs/remotes/${remoteName}/${branchName}`,
+          });
+          // Remote tracking branch exists — create local branch and checkout
+          await git.branch({ fs: engine.fs, dir: engine.dir, ref: branchName, object: oid });
+          await git.checkout({ fs: engine.fs, dir: engine.dir, ref: branchName });
+          return {
+            output: `branch '${branchName}' set up to track '${remoteName}/${branchName}'.\nSwitched to a new branch '${branchName}'`,
+            success: true,
+          };
+        } catch { /* no such tracking ref */ }
+      }
+    }
     const message = err instanceof Error ? err.message : String(err);
     return { output: `error: ${message}`, success: false };
   }

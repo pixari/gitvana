@@ -2,6 +2,7 @@ import git from 'isomorphic-git';
 import type { GitEngine } from '../git/GitEngine.js';
 import type { LevelDefinition, ReplayStep } from '../../../levels/schema.js';
 import { eventBus } from '../events/GameEventBus.js';
+import { pushCommand } from '../git/commands/remote.js';
 
 export class LevelLoader {
   constructor(private engine: GitEngine) {}
@@ -124,6 +125,51 @@ export class LevelLoader {
             author: { name: 'Setup', email: 'setup@gitvana.dev' },
           });
           break;
+
+        case 'remote-add': {
+          const remoteName = step.args.name || 'origin';
+          const remoteUrl = step.args.url || remoteName;
+          await this.engine.initRemote(remoteName, remoteUrl);
+          break;
+        }
+
+        case 'push': {
+          const pushArgs: string[] = [];
+          if (step.args.remote) pushArgs.push(step.args.remote);
+          if (step.args.branch) pushArgs.push(step.args.branch);
+          await pushCommand(pushArgs, this.engine);
+          break;
+        }
+
+        case 'remote-commit': {
+          // Write a file and commit directly in the remote repo
+          const remoteName = step.args.remote || 'origin';
+          const remoteInfo = this.engine.remotes.get(remoteName);
+          if (!remoteInfo) throw new Error(`Remote '${remoteName}' not found`);
+          const remoteDir = remoteInfo.dir;
+          const filePath = `${remoteDir}/${step.args.path}`;
+          // Create parent dirs
+          const parts = step.args.path.split('/');
+          if (parts.length > 1) {
+            let dir = remoteDir;
+            for (const part of parts.slice(0, -1)) {
+              dir = `${dir}/${part}`;
+              try { await this.engine.fs.promises.mkdir(dir); } catch { /* exists */ }
+            }
+          }
+          await this.engine.fs.promises.writeFile(filePath, step.args.content || '', 'utf8');
+          await git.add({ fs: this.engine.fs, dir: remoteDir, filepath: step.args.path });
+          await git.commit({
+            fs: this.engine.fs,
+            dir: remoteDir,
+            message: step.args.message || 'Remote commit',
+            author: {
+              name: step.args.author || 'Brother Guybrush',
+              email: step.args.email || 'guybrush@gitvana.dev',
+            },
+          });
+          break;
+        }
       }
     }
   }

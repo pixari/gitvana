@@ -3,7 +3,7 @@ import type { GitEngine } from '../GitEngine.js';
 import type { CommandResult } from '../types.js';
 
 export async function blameCommand(args: string[], engine: GitEngine): Promise<CommandResult> {
-  const filepath = args.filter((a) => !a.startsWith('-'))[0];
+  const filepath = args.filter((a) => a != null && !a.startsWith('-'))[0];
 
   if (!filepath) {
     return { output: 'fatal: no file specified', success: false };

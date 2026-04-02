@@ -1,0 +1,56 @@
+{
+  "id": "act6-37-fetch-forward",
+  "act": 6,
+  "order": 37,
+  "title": "The Remote Scrolls",
+  "subtitle": "Another monk pushed new work — fetch it and fast-forward",
+  "difficulty": "intermediate",
+  "mode": "strict",
+  "briefing": {
+    "narrative": "While you were meditating, Brother Guybrush pushed two new commits to the remote. Your local repo is now BEHIND origin/main.\n\nThe Head Monk strokes his beard. \"This is the daily reality of collaboration. Others push work. You must FETCH to see what changed, then integrate their work into your branch.\"\n\n\"Use 'git fetch' to download their commits, then 'git log' to see what's new. Since you haven't diverged, a simple merge will fast-forward your branch.\"\n\nThe cat has already fetched a mouse from the remote garden. It's ahead of you in every way.",
+    "concept": "When others push to a remote, your local repo doesn't know about it until you fetch.\n\n'git fetch' downloads new commits and updates tracking refs (origin/main).\n'git pull' does fetch + merge in one step.\n\nWhen your branch hasn't diverged, the merge is a 'fast-forward' — it simply moves your branch pointer forward.",
+    "objectives": [
+      "Fetch the latest changes from origin",
+      "Merge origin/main into your local main (or use git pull)",
+      "Verify that 'ancient-wisdom.txt' now exists locally",
+      "Your main branch should have all 4 commits"
+    ],
+    "newCommands": ["fetch", "pull"]
+  },
+  "initialState": {
+    "strategy": "replay",
+    "replayScript": [
+      { "command": "init", "args": {} },
+      { "command": "writeFile", "args": { "path": "readme.txt", "content": "Monastery Repository" } },
+      { "command": "add", "args": { "path": "readme.txt" } },
+      { "command": "commit", "args": { "message": "Initial setup" } },
+      { "command": "writeFile", "args": { "path": "rules.txt", "content": "1. Always commit\n2. Never force push\n3. Write good messages" } },
+      { "command": "add", "args": { "path": "rules.txt" } },
+      { "command": "commit", "args": { "message": "Add monastery rules" } },
+      { "command": "remote-add", "args": { "name": "origin", "url": "origin" } },
+      { "command": "push", "args": { "remote": "origin", "branch": "main" } },
+
+      { "command": "remote-commit", "args": { "remote": "origin", "path": "meditation.txt", "content": "Daily meditation schedule:\n06:00 - Morning chant\n12:00 - Noon reflection\n18:00 - Evening contemplation", "message": "Add meditation schedule", "author": "Brother Guybrush" } },
+      { "command": "remote-commit", "args": { "remote": "origin", "path": "ancient-wisdom.txt", "content": "The Three Laws of Version Control:\n1. Commit early, commit often\n2. Branch freely, merge carefully\n3. Push only what you mean to share", "message": "Add ancient wisdom scroll", "author": "Brother Guybrush" } }
+    ],
+    "head": "main"
+  },
+  "targetState": {
+    "validators": [
+      { "type": "file-exists", "params": { "path": "ancient-wisdom.txt" } },
+      { "type": "commit-count", "params": { "min": 4 } },
+      { "type": "head-at", "params": { "branch": "main" } }
+    ]
+  },
+  "constraints": {
+    "maxCommands": 15
+  },
+  "hints": [
+    { "trigger": "after-attempts", "triggerValue": 3, "text": "Start with: git fetch origin", "penalty": 0 },
+    { "trigger": "after-attempts", "triggerValue": 5, "text": "Check what's new: git log --oneline origin/main", "penalty": 0 },
+    { "trigger": "after-attempts", "triggerValue": 7, "text": "Merge it in: git merge origin/main (or just: git pull)", "command": "git pull", "penalty": 1 }
+  ],
+  "rewards": {
+    "stars": { "maxCommands": { "two": 6, "three": 3 } }
+  }
+}

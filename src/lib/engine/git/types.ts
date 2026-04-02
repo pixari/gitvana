@@ -15,6 +15,7 @@ export interface BranchInfo {
   name: string;
   oid: string;
   isCurrent: boolean;
+  isRemote?: boolean;
 }
 
 export interface FileStatus {

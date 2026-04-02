@@ -27,6 +27,7 @@
   import DocsPage from './components/docs/DocsPage.svelte';
   import ChangelogPage from './components/changelog/ChangelogPage.svelte';
   import StatsPage from './components/stats/StatsPage.svelte';
+  import DevBlogPage from './components/devblog/DevBlogPage.svelte';
   import { getAllLevels, getLevels } from './levels/index.js';
   import { onMount } from 'svelte';
   import { trackEvent } from './lib/telemetry.js';
@@ -78,9 +79,16 @@
     return hash === '#/stats' || hash === '#/stats/';
   }
 
+  // --- Dev Blog page routing ---
+  function isDevBlogRoute(): boolean {
+    const hash = window.location.hash;
+    return hash === '#/devblog' || hash === '#/devblog/';
+  }
+
   let docsRoute = $state(parseDocsRoute());
   let showChangelog = $state(isChangelogRoute());
   let showStats = $state(isStatsRoute());
+  let showDevBlog = $state(isDevBlogRoute());
 
   // Listen for hash changes to support in-page navigation
   if (typeof window !== 'undefined') {
@@ -88,12 +96,13 @@
       docsRoute = parseDocsRoute();
       showChangelog = isChangelogRoute();
       showStats = isStatsRoute();
+      showDevBlog = isDevBlogRoute();
     });
   }
 
   // --- Landing page ---
   const hasSavedProgress = !!loadProgress();
-  let showLanding = $state(!isSharePage && !hasSavedProgress && !window.location.hash && !isChangelogRoute());
+  let showLanding = $state(!isSharePage && !hasSavedProgress && !window.location.hash && !isChangelogRoute() && !isDevBlogRoute());
 
   function handlePlay() {
     showLanding = false;
@@ -243,6 +252,8 @@
   <ChangelogPage />
 {:else if showStats}
   <StatsPage />
+{:else if showDevBlog}
+  <DevBlogPage />
 {:else}
 
 {#if showLanding}

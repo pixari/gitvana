@@ -10,11 +10,11 @@ export async function diffCommand(args: string[], engine: GitEngine): Promise<Co
   const nameStatus = args.includes('--name-status');
 
   // Check for "git diff HEAD" — show all changes (staged + unstaged) vs HEAD
-  const nonFlagArgs = args.filter(a => !a.startsWith('-'));
+  const nonFlagArgs = args.filter(a => a != null && !a.startsWith('-'));
   const headArg = nonFlagArgs.find(a => a === 'HEAD');
 
   // Check for range diff: branch1..branch2 or branch1...branch2
-  const rangeArg = args.find(a => !a.startsWith('-') && (a.includes('...') || a.includes('..')));
+  const rangeArg = args.find(a => a != null && !a.startsWith('-') && (a.includes('...') || a.includes('..')));
   if (rangeArg) {
     if (nameOnly || nameStatus) {
       return rangeDiffNames(rangeArg, engine, nameStatus);

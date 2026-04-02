@@ -24,7 +24,7 @@ export async function mergeCommand(args: string[], engine: GitEngine): Promise<C
   }
 
   const noFastForward = args.includes('--no-ff');
-  const theirBranch = args.filter((a) => !a.startsWith('-'))[0];
+  const theirBranch = args.filter((a) => a != null && !a.startsWith('-'))[0];
 
   if (!theirBranch) {
     return { output: 'fatal: no branch specified for merge', success: false };

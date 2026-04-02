@@ -22,6 +22,18 @@ db.exec("CREATE INDEX IF NOT EXISTS idx_events_type ON events(type)");
 db.exec("CREATE INDEX IF NOT EXISTS idx_events_level ON events(level_id)");
 db.exec("CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id)");
 
+db.exec(`CREATE TABLE IF NOT EXISTS blog_likes (
+  post_id TEXT NOT NULL,
+  session_id TEXT NOT NULL,
+  created_at TEXT DEFAULT (datetime('now')),
+  PRIMARY KEY (post_id, session_id)
+)`);
+
+const insertLike = db.prepare("INSERT OR IGNORE INTO blog_likes (post_id, session_id) VALUES (?, ?)");
+const removeLike = db.prepare("DELETE FROM blog_likes WHERE post_id = ? AND session_id = ?");
+const countLikes = db.prepare("SELECT post_id, COUNT(*) as count FROM blog_likes GROUP BY post_id");
+const hasLiked = db.prepare("SELECT 1 FROM blog_likes WHERE post_id = ? AND session_id = ?");
+
 const insertEvent = db.prepare(
   "INSERT INTO events (type, level_id, data, session_id) VALUES (?, ?, ?, ?)"
 );
@@ -127,6 +139,43 @@ Bun.serve({
         insertEvent.run(type, levelId || null, dataStr, sessionId);
 
         return new Response(null, { status: 204 });
+      } catch {
+        return new Response("Bad Request", { status: 400 });
+      }
+    }
+
+    // --- API: Blog likes ---
+    if (url.pathname === "/api/blog/likes" && req.method === "GET") {
+      const sessionId = url.searchParams.get("session");
+      const rows = countLikes.all() as { post_id: string; count: number }[];
+      const counts: Record<string, number> = {};
+      for (const row of rows) counts[row.post_id] = row.count;
+      const liked: Record<string, boolean> = {};
+      if (sessionId) {
+        for (const row of rows) {
+          liked[row.post_id] = !!(hasLiked.get(row.post_id, sessionId));
+        }
+      }
+      return Response.json({ counts, liked }, {
+        headers: { "Cache-Control": "public, max-age=30" },
+      });
+    }
+
+    if (url.pathname === "/api/blog/likes" && req.method === "POST") {
+      const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+      if (!checkRateLimit(ip)) {
+        return new Response("Too Many Requests", { status: 429 });
+      }
+      try {
+        const { postId, sessionId, unlike } = await req.json();
+        if (!postId || !sessionId) return new Response("Bad request", { status: 400 });
+        if (unlike) {
+          removeLike.run(postId, sessionId);
+        } else {
+          insertLike.run(postId, sessionId);
+        }
+        const row = db.query("SELECT COUNT(*) as c FROM blog_likes WHERE post_id = ?").get(postId) as any;
+        return Response.json({ count: row?.c || 0 });
       } catch {
         return new Response("Bad Request", { status: 400 });
       }

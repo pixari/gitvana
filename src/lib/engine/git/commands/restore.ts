@@ -24,7 +24,7 @@ export async function restoreCommand(args: string[], engine: GitEngine): Promise
       i++; // skip value
       continue;
     }
-    if (args[i].startsWith('-')) continue;
+    if (args[i] == null || args[i].startsWith('-')) continue;
     if (args[i - 1] && flagsWithValues.has(args[i - 1])) continue;
     if (args[i].startsWith('--source=')) continue;
     files.push(args[i]);

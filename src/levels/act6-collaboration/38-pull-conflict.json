@@ -1,0 +1,57 @@
+{
+  "id": "act6-38-pull-conflict",
+  "act": 6,
+  "order": 38,
+  "title": "Divergent Paths",
+  "subtitle": "Your work and the remote have diverged — resolve the conflict",
+  "difficulty": "advanced",
+  "mode": "strict",
+  "briefing": {
+    "narrative": "Disaster. While you changed Monday to 'Kung Fu', Brother Guybrush changed Monday to 'Calligraphy' on the remote. You both edited the SAME LINE.\n\nThe Head Monk sighs deeply. \"This is the most common pain in collaborative work. You both changed the same line. When you pull, Git cannot decide whose change wins — you'll see conflict markers.\"\n\n\"Resolve the conflict by choosing what Monday should be — or combine both. Edit the file, remove the conflict markers, then add and commit.\"\n\nThe cat watches two birds fight over the same worm. It finds the parallel amusing.",
+    "concept": "When local and remote diverge on the same file, 'git pull' creates a merge conflict.\n\nConflict markers look like:\n<<<<<<< HEAD\nyour changes\n=======\ntheir changes\n>>>>>>> origin/main\n\nResolve by editing the file to combine both changes, then 'git add' and 'git commit'.",
+    "objectives": [
+      "Pull from origin to see the conflict",
+      "Resolve the conflict in schedule.txt",
+      "The file must contain 'Kung Fu' (your Monday choice)",
+      "Add and commit the resolved merge"
+    ],
+    "newCommands": []
+  },
+  "initialState": {
+    "strategy": "replay",
+    "replayScript": [
+      { "command": "init", "args": {} },
+      { "command": "writeFile", "args": { "path": "schedule.txt", "content": "Monastery Weekly Schedule:\nMonday: Meditation\nWednesday: Tea Ceremony" } },
+      { "command": "add", "args": { "path": "schedule.txt" } },
+      { "command": "commit", "args": { "message": "Initial schedule" } },
+      { "command": "remote-add", "args": { "name": "origin", "url": "origin" } },
+      { "command": "push", "args": { "remote": "origin", "branch": "main" } },
+
+      { "command": "remote-commit", "args": { "remote": "origin", "path": "schedule.txt", "content": "Monastery Weekly Schedule:\nMonday: Calligraphy\nWednesday: Tea Ceremony", "message": "Update Monday to Calligraphy", "author": "Brother Guybrush" } },
+
+      { "command": "writeFile", "args": { "path": "schedule.txt", "content": "Monastery Weekly Schedule:\nMonday: Kung Fu\nWednesday: Tea Ceremony" } },
+      { "command": "add", "args": { "path": "schedule.txt" } },
+      { "command": "commit", "args": { "message": "Update Monday to Kung Fu" } }
+    ],
+    "head": "main"
+  },
+  "targetState": {
+    "validators": [
+      { "type": "merge-commit-exists", "params": {} },
+      { "type": "no-conflicts", "params": {} },
+      { "type": "file-content", "params": { "path": "schedule.txt", "contains": "Kung Fu", "notContains": "<<<<<<<" } },
+      { "type": "head-at", "params": { "branch": "main" } }
+    ]
+  },
+  "constraints": {
+    "maxCommands": 20
+  },
+  "hints": [
+    { "trigger": "after-attempts", "triggerValue": 3, "text": "Start by pulling: git pull origin main", "penalty": 0 },
+    { "trigger": "after-attempts", "triggerValue": 5, "text": "Check the conflict: cat schedule.txt — you'll see <<<<<<< markers", "penalty": 0 },
+    { "trigger": "after-attempts", "triggerValue": 7, "text": "Edit the file to keep both Kung Fu AND Calligraphy, remove conflict markers, then: git add schedule.txt && git commit -m \"Resolve merge\"", "penalty": 1 }
+  ],
+  "rewards": {
+    "stars": { "maxCommands": { "two": 10, "three": 6 } }
+  }
+}

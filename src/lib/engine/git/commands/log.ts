@@ -99,7 +99,7 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
       i++; // skip the value
       continue;
     }
-    if (args[i].startsWith('-')) continue;
+    if (args[i] == null || args[i].startsWith('-')) continue;
     if (args[i - 1] && flagsWithValues.has(args[i - 1])) continue;
     // Check if it looks like an --arg=value (already handled above)
     if (args[i].startsWith('--author=') || args[i].startsWith('--grep=') ||
@@ -209,6 +209,20 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
           refMap.get(oid)!.push(label);
         } catch { /* skip */ }
       }
+      // Add remote tracking refs
+      for (const remoteName of engine.remotes.keys()) {
+        try {
+          const remoteDir = `${engine.dir}/.git/refs/remotes/${remoteName}`;
+          const entries = await engine.fs.promises.readdir(remoteDir) as string[];
+          for (const entry of entries) {
+            try {
+              const oid = await git.resolveRef({ fs: engine.fs, dir: engine.dir, ref: `refs/remotes/${remoteName}/${entry}` });
+              if (!refMap.has(oid)) refMap.set(oid, []);
+              refMap.get(oid)!.push(`${remoteName}/${entry}`);
+            } catch { /* skip */ }
+          }
+        } catch { /* no remote refs */ }
+      }
 
       const lines = commits.map(c => {
         let line = customFormat!;
@@ -247,6 +261,20 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
           if (!refMap.has(oid)) refMap.set(oid, []);
           refMap.get(oid)!.push(`tag: ${tag}`);
         } catch { /* skip */ }
+      }
+      // Add remote tracking refs
+      for (const remoteName of engine.remotes.keys()) {
+        try {
+          const remoteDir = `${engine.dir}/.git/refs/remotes/${remoteName}`;
+          const entries = await engine.fs.promises.readdir(remoteDir) as string[];
+          for (const entry of entries) {
+            try {
+              const oid = await git.resolveRef({ fs: engine.fs, dir: engine.dir, ref: `refs/remotes/${remoteName}/${entry}` });
+              if (!refMap.has(oid)) refMap.set(oid, []);
+              refMap.get(oid)!.push(`${remoteName}/${entry}`);
+            } catch { /* skip */ }
+          }
+        } catch { /* no remote refs */ }
       }
     }
 

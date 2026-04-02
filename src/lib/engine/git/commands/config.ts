@@ -16,7 +16,7 @@ export async function configCommand(args: string[], engine: GitEngine): Promise<
   }
 
   // Filter out flags
-  const positional = args.filter(a => !a.startsWith('-'));
+  const positional = args.filter(a => a != null && !a.startsWith('-'));
 
   if (positional.length === 0) {
     return {

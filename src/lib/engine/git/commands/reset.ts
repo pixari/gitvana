@@ -9,7 +9,7 @@ export async function resetCommand(args: string[], engine: GitEngine): Promise<C
     : args.includes('--mixed') ? 'mixed'
     : null;
 
-  const nonFlagArgs = args.filter((a) => !a.startsWith('-'));
+  const nonFlagArgs = args.filter((a) => a != null && !a.startsWith('-'));
 
   // git reset --soft/mixed/hard HEAD~N or ref
   if (mode && nonFlagArgs.length > 0) {

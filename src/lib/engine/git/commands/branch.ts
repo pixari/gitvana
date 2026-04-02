@@ -10,7 +10,7 @@ export async function branchCommand(args: string[], engine: GitEngine): Promise<
   const noMergedFlag = args.includes('--no-merged');
 
   if (deleteFlag) {
-    const name = args.filter((a) => !a.startsWith('-'))[0];
+    const name = args.filter((a) => a != null && !a.startsWith('-'))[0];
     if (!name) {
       return { output: 'fatal: branch name required', success: false };
     }
@@ -24,7 +24,7 @@ export async function branchCommand(args: string[], engine: GitEngine): Promise<
 
   // Rename branch: git branch -m old new
   if (moveFlag) {
-    const nonFlagArgs = args.filter((a) => !a.startsWith('-'));
+    const nonFlagArgs = args.filter((a) => a != null && !a.startsWith('-'));
     if (nonFlagArgs.length < 2) {
       return { output: 'fatal: usage: git branch -m <old-name> <new-name>', success: false };
     }
@@ -40,6 +40,25 @@ export async function branchCommand(args: string[], engine: GitEngine): Promise<
   }
 
   const verboseFlag = args.includes('-v') || args.includes('--verbose');
+  const remoteFlag = args.includes('-r');
+  const allFlag = args.includes('-a');
+
+  // -r: list remote tracking branches only
+  if (remoteFlag && !allFlag) {
+    const lines: string[] = [];
+    try {
+      const remotesDir = `${engine.dir}/.git/refs/remotes`;
+      const remoteNames = await engine.fs.promises.readdir(remotesDir) as string[];
+      for (const remote of remoteNames) {
+        const remoteDir = `${remotesDir}/${remote}`;
+        const branches = await engine.fs.promises.readdir(remoteDir) as string[];
+        for (const branch of branches) {
+          lines.push(`  remotes/${remote}/${branch}`);
+        }
+      }
+    } catch { /* no remote tracking refs */ }
+    return { output: lines.join('\n'), success: true };
+  }
 
   // --merged / --no-merged filtering
   if (mergedFlag || noMergedFlag) {
@@ -72,7 +91,7 @@ export async function branchCommand(args: string[], engine: GitEngine): Promise<
   }
 
   // No args (or only display flags): list branches
-  const displayOnly = args.every(a => ['-a', '-v', '--verbose'].includes(a));
+  const displayOnly = args.every(a => ['-a', '-r', '-v', '--verbose'].includes(a));
   if (args.length === 0 || displayOnly) {
     const branches = await git.listBranches({ fs: engine.fs, dir: engine.dir });
     const current = await git.currentBranch({ fs: engine.fs, dir: engine.dir });
@@ -99,11 +118,27 @@ export async function branchCommand(args: string[], engine: GitEngine): Promise<
     }
 
     const lines = branches.map((b) => (b === current ? `* ${b}` : `  ${b}`));
+
+    // -a: also include remote tracking branches
+    if (allFlag) {
+      try {
+        const remotesDir = `${engine.dir}/.git/refs/remotes`;
+        const remoteNames = await engine.fs.promises.readdir(remotesDir) as string[];
+        for (const remote of remoteNames) {
+          const remoteDir = `${remotesDir}/${remote}`;
+          const remoteBranches = await engine.fs.promises.readdir(remoteDir) as string[];
+          for (const branch of remoteBranches) {
+            lines.push(`  remotes/${remote}/${branch}`);
+          }
+        }
+      } catch { /* no remote tracking refs */ }
+    }
+
     return { output: lines.join('\n'), success: true };
   }
 
   // Create branch
-  const nonFlagArgs = args.filter((a) => !a.startsWith('-'));
+  const nonFlagArgs = args.filter((a) => a != null && !a.startsWith('-'));
   const name = nonFlagArgs[0];
   const startPoint = nonFlagArgs[1];
 

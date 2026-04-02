@@ -40,7 +40,7 @@ export interface LevelDefinition {
 }
 
 export interface ReplayStep {
-  command: 'init' | 'writeFile' | 'deleteFile' | 'add' | 'remove' | 'commit' | 'branch' | 'deleteBranch' | 'checkout' | 'merge';
+  command: 'init' | 'writeFile' | 'deleteFile' | 'add' | 'remove' | 'commit' | 'branch' | 'deleteBranch' | 'checkout' | 'merge' | 'remote-add' | 'push' | 'remote-commit';
   args: Record<string, string>;
 }
 
@@ -59,7 +59,10 @@ export interface ValidatorConfig {
     | 'no-conflicts'
     | 'tag-exists'
     | 'no-merge-commits'
-    | 'file-not-exists';
+    | 'file-not-exists'
+    | 'remote-exists'
+    | 'remote-branch-exists'
+    | 'pushed-to-remote';
   params: Record<string, unknown>;
 }
 

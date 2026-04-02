@@ -1,0 +1,50 @@
+{
+  "id": "act6-36-first-push",
+  "act": 6,
+  "order": 36,
+  "title": "First Push",
+  "subtitle": "Share your work with the remote monastery",
+  "difficulty": "intermediate",
+  "mode": "strict",
+  "briefing": {
+    "narrative": "The Monastery of Version Control has expanded. There is now a REMOTE monastery — a mirror of your repository that other monks can access.\n\nThe Head Monk hands you a scroll: \"A remote repository named 'origin' has been set up. Your task is simple, young monk: create meaningful work, then PUSH it to origin so all may benefit from your wisdom.\"\n\nThe cat stretches lazily. It has already pushed its napping schedule to three remote locations.\n\n\"Remember: first you commit locally, then you push. The remote only receives what you explicitly share.\"",
+    "concept": "Remote repositories are copies of your repo that live elsewhere. 'git push' sends your commits to a remote. Before pushing, you need a remote configured with 'git remote add'.\n\nThe workflow: commit locally, then push to share.\n\n'git push origin main' pushes your main branch to the remote named 'origin'.",
+    "objectives": [
+      "Create a file called 'scroll.txt' with any content",
+      "Add and commit it with a meaningful message",
+      "Push your main branch to origin",
+      "Verify with 'git branch -r' that origin/main exists"
+    ],
+    "newCommands": ["remote", "push"]
+  },
+  "initialState": {
+    "strategy": "replay",
+    "replayScript": [
+      { "command": "init", "args": {} },
+      { "command": "writeFile", "args": { "path": "welcome.txt", "content": "Welcome to the Monastery of Version Control" } },
+      { "command": "add", "args": { "path": "welcome.txt" } },
+      { "command": "commit", "args": { "message": "Initial monastery setup" } },
+      { "command": "remote-add", "args": { "name": "origin", "url": "origin" } }
+    ],
+    "head": "main"
+  },
+  "targetState": {
+    "validators": [
+      { "type": "file-exists", "params": { "path": "scroll.txt" } },
+      { "type": "commit-count", "params": { "min": 2 } },
+      { "type": "pushed-to-remote", "params": { "remote": "origin", "branch": "main" } },
+      { "type": "remote-branch-exists", "params": { "remote": "origin", "branch": "main" } }
+    ]
+  },
+  "constraints": {
+    "maxCommands": 20
+  },
+  "hints": [
+    { "trigger": "after-attempts", "triggerValue": 3, "text": "Create a file first: echo \"wisdom\" > scroll.txt", "penalty": 0 },
+    { "trigger": "after-attempts", "triggerValue": 5, "text": "Stage and commit: git add scroll.txt && git commit -m \"Add scroll\"", "penalty": 0 },
+    { "trigger": "after-attempts", "triggerValue": 7, "text": "Push to remote: git push origin main", "command": "git push origin main", "penalty": 1 }
+  ],
+  "rewards": {
+    "stars": { "maxCommands": { "two": 8, "three": 5 } }
+  }
+}
