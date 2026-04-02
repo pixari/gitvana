@@ -366,12 +366,14 @@ export class ShellBridge {
       '  \x1b[36mhelp\x1b[0m             You are here',
       '  \x1b[36mhint\x1b[0m             Ask the monks for guidance',
       '  \x1b[36mdocs\x1b[0m [cmd]       Read the monastery scrolls',
-      '',
-      '\x1b[33m  Monastery secrets:\x1b[0m',
-      '  solution         Peek at the ancient scrolls',
-      '  solve            Let the monastery cat do it',
-      '  skip             Sneak past the Head Monk',
-      '  restart          Start this level over',
+      '  \x1b[36mrestart\x1b[0m          Start this level over',
+      ...((import.meta.env.DEV || import.meta.env.VITE_DEV_TOOLS === 'true') ? [
+        '',
+        '\x1b[33m  Dev tools:\x1b[0m',
+        '  solution         Peek at the ancient scrolls',
+        '  solve            Let the monastery cat do it',
+        '  skip             Sneak past the Head Monk',
+      ] : []),
     ].join('\n');
   }
 

@@ -27,8 +27,9 @@ export function parseCommand(input: string): ParsedCommand {
     };
   }
 
-  const devCommands = ['solve', 'skip', 'solution', 'restart'];
-  if (devCommands.includes(first)) {
+  const isDevMode = import.meta.env.DEV || import.meta.env.VITE_DEV_TOOLS === 'true';
+  const devCommands = ['solve', 'skip', 'solution'];
+  if (isDevMode && devCommands.includes(first)) {
     return {
       type: 'builtin',
       command: first,
@@ -46,7 +47,7 @@ export function parseCommand(input: string): ParsedCommand {
     };
   }
 
-  const builtins = ['ls', 'cat', 'mkdir', 'echo', 'pwd', 'clear', 'help', 'hint', 'touch', 'rm'];
+  const builtins = ['ls', 'cat', 'mkdir', 'echo', 'pwd', 'clear', 'help', 'hint', 'touch', 'rm', 'restart'];
   if (builtins.includes(first)) {
     return {
       type: 'builtin',

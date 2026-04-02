@@ -284,7 +284,9 @@
   </GameLayout>
 {/key}
 
-<DevPanel level={currentLevel} onSolve={handleSolve} onSkip={handleSkip} onReset={() => { clearProgress(); location.reload(); }} />
+{#if import.meta.env.DEV || import.meta.env.VITE_DEV_TOOLS === 'true'}
+  <DevPanel level={currentLevel} onSolve={handleSolve} onSkip={handleSkip} onReset={() => { clearProgress(); location.reload(); }} />
+{/if}
 
 {#if screen === 'intro'}
   <LevelIntro level={currentLevel} {completedLevels} onStart={startLevel} />
