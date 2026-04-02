@@ -6,6 +6,7 @@ import type { LevelDefinition } from '../../../levels/schema.js';
 import { eventBus } from '../events/GameEventBus.js';
 import { getLevelSolution } from './solutions.js';
 import { commandDocs } from '../../../docs/commands/index.js';
+import { HintEngine } from './hint-engine.js';
 
 const PROMPT = '\x1b[32mgitvana\x1b[0m:\x1b[34m/workspace\x1b[0m$ ';
 
@@ -67,6 +68,7 @@ export class ShellBridge {
   private onEditRequest: ((filepath: string) => void) | null = null;
   private onDocRequest: ((commandName: string) => void) | null = null;
   private currentLevel: LevelDefinition | null = null;
+  private hintEngine = new HintEngine();
   private onSkipRequest: (() => void) | null = null;
   private onRestartRequest: (() => void) | null = null;
 
@@ -90,6 +92,7 @@ export class ShellBridge {
 
   setLevel(level: LevelDefinition): void {
     this.currentLevel = level;
+    this.hintEngine.setLevel(level);
   }
 
   setSkipHandler(handler: () => void): void {
@@ -456,6 +459,8 @@ export class ShellBridge {
         if (result.output) {
           this.writeLine(result.output);
         }
+        this.hintEngine.recordAttempt(parsed.command, parsed.args, result.success, result.output);
+        this.maybeShowAutoHint();
         break;
       }
 
@@ -565,14 +570,14 @@ export class ShellBridge {
   }
 
   private showHint(): void {
-    if (!this.currentLevel || this.currentLevel.hints.length === 0) {
-      this.writeLine('No hints available for this level.');
-      return;
-    }
-    const hint = this.currentLevel.hints[0];
-    this.writeLine(`\x1b[33mHint:\x1b[0m ${hint.text}`);
-    if (hint.command) {
-      this.writeLine(`\x1b[36m  ${hint.command}\x1b[0m`);
+    const hint = this.hintEngine.getHint();
+    this.writeLine(hint);
+  }
+
+  private maybeShowAutoHint(): void {
+    const autoHint = this.hintEngine.getAutoHint();
+    if (autoHint) {
+      this.writeLine(autoHint);
     }
   }
 
@@ -650,6 +655,8 @@ export class ShellBridge {
     if (parsed.type === 'git') {
       const result = await this.engine.execute(parsed.command, parsed.args);
       if (result.output) this.writeLine(result.output);
+      this.hintEngine.recordAttempt(parsed.command, parsed.args, result.success, result.output);
+      this.maybeShowAutoHint();
       return result.success;
     } else if (parsed.type === 'builtin') {
       const rawArgs = parsed.command === 'echo'
