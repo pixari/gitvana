@@ -18,7 +18,14 @@
     commandName.startsWith('guide/') ? commandName.slice('guide/'.length) : commandName
   );
   const guide = $derived(isGuideRequest ? guides[guideId] ?? null : null);
-  const doc = $derived(!isGuideRequest ? commandDocs[commandName] ?? null : null);
+  // Extract command name from strings like "git merge <branch>" or "git commit -m"
+  const normalizedName = $derived(() => {
+    let name = commandName;
+    if (name.startsWith('git ')) name = name.slice(4);
+    name = name.split(/[\s<\-]/)[0]; // take first word before space, <, or -
+    return name;
+  });
+  const doc = $derived(!isGuideRequest ? commandDocs[commandName] ?? commandDocs[normalizedName()] ?? null : null);
   const showIndex = $derived(!doc && !guide);
   const allCommands = Object.keys(commandDocs);
 

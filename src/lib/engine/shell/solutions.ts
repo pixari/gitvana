@@ -37,6 +37,7 @@ const solutions: Record<string, string[]> = {
     'git merge good-changes',
     'git merge bad-changes',
     'git merge --abort',
+    'git branch -D bad-changes',
   ],
 
   // === Act 2: The Middle Path ===

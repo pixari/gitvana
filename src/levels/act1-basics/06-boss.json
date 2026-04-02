@@ -11,7 +11,8 @@
     "concept": "When two branches modify the same file, Git cannot automatically merge them. It creates a conflict, marking both versions in the file with <<<<<<< and >>>>>>> markers. You must manually edit the file to resolve the conflict, then stage and commit. If a merge goes wrong, git merge --abort cancels it and restores the previous state.",
     "objectives": [
       "Merge the 'good-changes' branch into main (clean merge)",
-      "Attempt to merge 'bad-changes' — see the GARBAGE conflict and abort with 'git merge --abort'",
+      "Attempt to merge 'bad-changes' — see the conflict and abort with 'git merge --abort'",
+      "Delete the bad-changes branch (git branch -d bad-changes)",
       "The final menu.txt must contain 'Pizza' but NOT 'GARBAGE'"
     ],
     "newCommands": ["git merge <branch>", "git merge --abort"]
@@ -42,7 +43,8 @@
       { "type": "file-content", "params": { "path": "menu.txt", "contains": "Pizza", "notContains": "GARBAGE" } },
       { "type": "commit-count", "params": { "min": 2 } },
       { "type": "staging-empty", "params": {} },
-      { "type": "no-conflicts", "params": {} }
+      { "type": "no-conflicts", "params": {} },
+      { "type": "branch-deleted", "params": { "name": "bad-changes" } }
     ]
   },
   "constraints": {
