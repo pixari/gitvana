@@ -13,24 +13,34 @@
     lane: number;
     row: number;
     color: string;
-    branchLabels: string[];
+    branchLabels: BranchLabel[];
     isHead: boolean;
     isMerge: boolean;
+    isCurrentBranch: boolean;
+  }
+
+  interface BranchLabel {
+    name: string;
+    color: string;
+    isCurrent: boolean;
   }
 
   interface GraphEdge {
     fromOid: string;
     toOid: string;
     color: string;
+    isMergeEdge: boolean;
   }
 
   // --- Constants ---
   const NODE_RADIUS = 6;
-  const V_SPACING = 44;
+  const NODE_RADIUS_CURRENT = 7;
+  const V_SPACING = 48;
   const H_SPACING = 32;
-  const PADDING_X = 40;
-  const PADDING_Y = 28;
+  const PADDING_X = 60;
+  const PADDING_Y = 32;
   const LABEL_OFFSET_X = 16;
+  const MESSAGE_MAX_CHARS = 30;
 
   const BRANCH_COLORS = [
     '#00e436', // main - green
@@ -47,6 +57,8 @@
   let edges = $state<GraphEdge[]>([]);
   let svgWidth = $state(200);
   let svgHeight = $state(200);
+  let isDetachedHead = $state(false);
+  let currentBranchName = $state<string | null>(null);
   let unsub: (() => void) | null = null;
 
   // --- Graph building ---
@@ -69,30 +81,31 @@
     for (const b of sorted) {
       if (!branchOrder.includes(b.name)) {
         branchOrder.push(b.name);
-        branchColorMap.set(b.name, BRANCH_COLORS[branchOrder.length - 1] || BRANCH_COLORS[0]);
+        branchColorMap.set(b.name, BRANCH_COLORS[(branchOrder.length - 1) % BRANCH_COLORS.length]);
       }
     }
 
-    // Map tip oid -> branch names
-    const tipToBranches = new Map<string, string[]>();
+    // Map tip oid -> branch info
+    const tipToBranches = new Map<string, BranchLabel[]>();
     for (const b of branches) {
       const existing = tipToBranches.get(b.oid) || [];
-      existing.push(b.name);
+      existing.push({
+        name: b.name,
+        color: branchColorMap.get(b.name) || BRANCH_COLORS[0],
+        isCurrent: b.isCurrent,
+      });
       tipToBranches.set(b.oid, existing);
     }
 
-    // Assign each commit to the "best" branch (first branch whose tip is reachable)
-    // Simple heuristic: for each commit, find the first branch that contains it
+    // Assign each commit to the "best" branch
     const commitBranch = new Map<string, string>();
     const commitMap = new Map<string, CommitInfo>();
     for (const c of commits) {
       commitMap.set(c.oid, c);
     }
 
-    // For each branch, walk its commits and claim unclaimed ones
     for (const b of sorted) {
       const branchTip = b.oid;
-      // Walk from tip down through parents
       const stack = [branchTip];
       const visited = new Set<string>();
       while (stack.length > 0) {
@@ -111,7 +124,7 @@
       }
     }
 
-    // Topological sort (newest first via timestamp, stable)
+    // Topological sort (newest first via timestamp)
     const sortedCommits = [...commits].sort((a, b) => b.author.timestamp - a.author.timestamp);
 
     // Assign lane per branch
@@ -131,11 +144,18 @@
       const lane = branchLane.get(branch) ?? 0;
       const color = branchColorMap.get(branch) || BRANCH_COLORS[0];
       const branchLabels = tipToBranches.get(c.oid) || [];
+      const isOnCurrentBranch = branch === currentBranch;
+
+      // Truncate message
+      const firstLine = c.message.split('\n')[0];
+      const message = firstLine.length > MESSAGE_MAX_CHARS
+        ? firstLine.slice(0, MESSAGE_MAX_CHARS) + '...'
+        : firstLine;
 
       const node: GraphNode = {
         oid: c.oid,
         shortOid: c.oid.slice(0, 7),
-        message: c.message.split('\n')[0].slice(0, 40),
+        message,
         parents: c.parents,
         lane,
         row: i,
@@ -143,6 +163,7 @@
         branchLabels,
         isHead: c.oid === headOid,
         isMerge: c.parents.length >= 2,
+        isCurrentBranch: isOnCurrentBranch,
       };
 
       graphNodes.push(node);
@@ -152,13 +173,16 @@
     // Build edges
     const graphEdges: GraphEdge[] = [];
     for (const node of graphNodes) {
-      for (const parentOid of node.parents) {
+      for (let pi = 0; pi < node.parents.length; pi++) {
+        const parentOid = node.parents[pi];
         const parentNode = oidToNode.get(parentOid);
         if (parentNode) {
+          // Second+ parent = merge edge
           graphEdges.push({
             fromOid: node.oid,
             toOid: parentOid,
-            color: node.color,
+            color: pi === 0 ? node.color : parentNode.color,
+            isMergeEdge: pi > 0,
           });
         }
       }
@@ -182,7 +206,6 @@
     const y2 = nodeY(toNode.row);
 
     if (x1 === x2) {
-      // Straight vertical line
       return `M ${x1} ${y1} L ${x2} ${y2}`;
     }
 
@@ -204,21 +227,24 @@
 
     initialized = true;
 
-    const [allCommits, allBranches, headOid, currentBranch] = await Promise.all([
+    const [allCommits, allBranches, headOid, curBranch] = await Promise.all([
       gitEngine.getAllCommits(20),
       gitEngine.getBranches(),
       gitEngine.getHeadOid(),
       gitEngine.getCurrentBranch(),
     ]);
 
-    const result = buildGraph(allCommits, allBranches, headOid, currentBranch);
+    currentBranchName = curBranch;
+    isDetachedHead = curBranch === null && headOid !== null;
+
+    const result = buildGraph(allCommits, allBranches, headOid, curBranch);
     nodes = result.nodes;
     edges = result.edges;
 
     // Compute SVG dimensions
     const maxLane = nodes.reduce((max, n) => Math.max(max, n.lane), 0);
     const maxRow = nodes.reduce((max, n) => Math.max(max, n.row), 0);
-    svgWidth = Math.max(200, PADDING_X * 2 + maxLane * H_SPACING + 120);
+    svgWidth = Math.max(200, PADDING_X * 2 + maxLane * H_SPACING + 340);
     svgHeight = Math.max(100, PADDING_Y * 2 + maxRow * V_SPACING);
   }
 
@@ -238,6 +264,9 @@
 <div class="graph-container">
   <div class="panel-header">
     <span class="panel-title">COMMIT GRAPH</span>
+    {#if isDetachedHead}
+      <span class="detached-badge">DETACHED HEAD</span>
+    {/if}
   </div>
 
   {#if !initialized}
@@ -254,8 +283,13 @@
     </div>
   {:else if nodes.length === 0}
     <div class="empty-state">
-      <span class="empty-text">No commits yet</span>
-      <span class="empty-hint">Make your first <code>git commit</code></span>
+      {#if isDetachedHead}
+        <span class="empty-text detached-text">Detached HEAD state</span>
+        <span class="empty-hint">No reachable commits from current HEAD</span>
+      {:else}
+        <span class="empty-text">No commits yet</span>
+        <span class="empty-hint">Make your first <code>git commit</code></span>
+      {/if}
     </div>
   {:else}
     <div class="graph-scroll">
@@ -265,6 +299,21 @@
         viewBox="0 0 {svgWidth} {svgHeight}"
         class="graph-svg"
       >
+        <!-- Lane lines (subtle background guides) -->
+        {#each nodes as node}
+          {#if node.row === 0}
+            <line
+              x1={nodeX(node.lane)}
+              y1={0}
+              x2={nodeX(node.lane)}
+              y2={svgHeight}
+              stroke={node.color}
+              stroke-width="1"
+              stroke-opacity="0.06"
+            />
+          {/if}
+        {/each}
+
         <!-- Edges -->
         {#each edges as edge}
           {@const fromNode = oidToNode.get(edge.fromOid)}
@@ -274,8 +323,9 @@
               d={edgePath(fromNode, toNode)}
               fill="none"
               stroke={edge.color}
-              stroke-width="2"
-              stroke-opacity="0.5"
+              stroke-width={edge.isMergeEdge ? 1.5 : 2}
+              stroke-opacity={edge.isMergeEdge ? 0.35 : 0.5}
+              stroke-dasharray={edge.isMergeEdge ? '4 3' : 'none'}
               class="graph-edge"
             />
           {/if}
@@ -285,106 +335,167 @@
         {#each nodes as node}
           {@const cx = nodeX(node.lane)}
           {@const cy = nodeY(node.row)}
+          {@const r = node.isCurrentBranch ? NODE_RADIUS_CURRENT : NODE_RADIUS}
 
-          <!-- HEAD glow -->
+          <!-- HEAD pulsing glow -->
           {#if node.isHead}
             <circle
               cx={cx}
               cy={cy}
-              r={NODE_RADIUS + 4}
+              r={r + 6}
               fill="none"
-              stroke="#fff"
+              stroke={isDetachedHead ? '#ffa300' : '#fff'}
               stroke-width="1.5"
-              stroke-opacity="0.4"
               class="head-glow"
+            />
+            <circle
+              cx={cx}
+              cy={cy}
+              r={r + 3}
+              fill={node.color}
+              fill-opacity="0.08"
+              stroke="none"
+              class="head-glow-inner"
             />
           {/if}
 
-          <!-- Commit node (retro square) -->
-          <rect
-            x={cx - NODE_RADIUS}
-            y={cy - NODE_RADIUS}
-            width={NODE_RADIUS * 2}
-            height={NODE_RADIUS * 2}
-            fill={node.color}
-            rx="1"
-            class="commit-node"
-            class:merge-node={node.isMerge}
-          />
-
-          <!-- Merge diamond overlay -->
+          <!-- Commit node -->
           {#if node.isMerge}
+            <!-- Merge commit: diamond shape -->
+            <g transform="translate({cx}, {cy}) rotate(45)">
+              <rect
+                x={-r + 1}
+                y={-r + 1}
+                width={(r - 1) * 2}
+                height={(r - 1) * 2}
+                fill={node.color}
+                rx="1"
+                class="commit-node merge-node"
+              />
+              <rect
+                x={-r + 2.5}
+                y={-r + 2.5}
+                width={(r - 2.5) * 2}
+                height={(r - 2.5) * 2}
+                fill="none"
+                stroke="#0a0a0a"
+                stroke-width="1"
+                rx="0"
+              />
+            </g>
+          {:else}
+            <!-- Normal commit: square -->
             <rect
-              x={cx - NODE_RADIUS + 1}
-              y={cy - NODE_RADIUS + 1}
-              width={NODE_RADIUS * 2 - 2}
-              height={NODE_RADIUS * 2 - 2}
-              fill="none"
-              stroke="#0a0a0a"
-              stroke-width="1"
-              rx="0"
+              x={cx - r}
+              y={cy - r}
+              width={r * 2}
+              height={r * 2}
+              fill={node.color}
+              fill-opacity={node.isCurrentBranch ? 1 : 0.7}
+              rx="1"
+              class="commit-node"
+              class:current-branch-node={node.isCurrentBranch}
             />
+          {/if}
+
+          <!-- HEAD label (left side) -->
+          {#if node.isHead}
+            <g class="head-label-group">
+              {#if isDetachedHead}
+                <!-- Detached HEAD badge -->
+                <rect
+                  x={cx - LABEL_OFFSET_X - 88}
+                  y={cy - 7}
+                  width={84}
+                  height={14}
+                  rx="2"
+                  fill="#ffa300"
+                  fill-opacity="0.15"
+                  stroke="#ffa300"
+                  stroke-width="1"
+                  stroke-opacity="0.6"
+                />
+                <text
+                  x={cx - LABEL_OFFSET_X - 46}
+                  y={cy + 1}
+                  class="head-label detached"
+                  dominant-baseline="middle"
+                  text-anchor="middle"
+                >
+                  HEAD (detached)
+                </text>
+              {:else}
+                <text
+                  x={cx - LABEL_OFFSET_X - 2}
+                  y={cy + 1}
+                  class="head-label"
+                  dominant-baseline="middle"
+                  text-anchor="end"
+                >
+                  HEAD
+                </text>
+                <text
+                  x={cx - LABEL_OFFSET_X + 1}
+                  y={cy + 1}
+                  class="head-arrow"
+                  dominant-baseline="middle"
+                  text-anchor="start"
+                >
+                  &#x25B6;
+                </text>
+              {/if}
+            </g>
           {/if}
 
           <!-- SHA label -->
           <text
             x={cx + LABEL_OFFSET_X}
-            y={cy + 1}
+            y={cy - 1}
             class="sha-label"
             dominant-baseline="middle"
           >
             {node.shortOid}
           </text>
 
-          <!-- Commit message (truncated) -->
+          <!-- Commit message (truncated, dimmer) -->
           <text
             x={cx + LABEL_OFFSET_X + 62}
-            y={cy + 1}
+            y={cy - 1}
             class="message-label"
             dominant-baseline="middle"
           >
             {node.message}
           </text>
 
-          <!-- Branch labels -->
+          <!-- Branch labels (right of message) -->
           {#each node.branchLabels as label, i}
+            {@const labelX = cx + LABEL_OFFSET_X + 62 + node.message.length * 5.5 + 12 + i * 8}
+            {@const tagWidth = label.name.length * 6.5 + 12}
             <g>
               <rect
-                x={cx + LABEL_OFFSET_X + 56 * i - 4}
-                y={cy - 22}
-                width={label.length * 6.5 + 10}
-                height={14}
+                x={labelX}
+                y={cy - 8}
+                width={tagWidth}
+                height={16}
                 rx="2"
-                fill={node.color}
-                fill-opacity="0.15"
-                stroke={node.color}
-                stroke-width="1"
-                stroke-opacity="0.5"
+                fill={label.color}
+                fill-opacity={label.isCurrent ? 0.25 : 0.12}
+                stroke={label.color}
+                stroke-width={label.isCurrent ? 1.5 : 1}
+                stroke-opacity={label.isCurrent ? 0.8 : 0.4}
               />
               <text
-                x={cx + LABEL_OFFSET_X + 56 * i + 1}
-                y={cy - 13}
+                x={labelX + 6}
+                y={cy + 1}
                 class="branch-label"
-                fill={node.color}
+                class:branch-label-current={label.isCurrent}
+                fill={label.color}
                 dominant-baseline="middle"
               >
-                {label}
+                {label.name}
               </text>
             </g>
           {/each}
-
-          <!-- HEAD arrow -->
-          {#if node.isHead}
-            <text
-              x={cx - LABEL_OFFSET_X - 6}
-              y={cy + 1}
-              class="head-label"
-              dominant-baseline="middle"
-              text-anchor="end"
-            >
-              HEAD
-            </text>
-          {/if}
         {/each}
       </svg>
     </div>
@@ -419,6 +530,23 @@
     letter-spacing: 2px;
   }
 
+  .detached-badge {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 6px;
+    color: #ffa300;
+    background: rgba(255, 163, 0, 0.12);
+    border: 1px solid rgba(255, 163, 0, 0.4);
+    padding: 2px 6px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+    animation: warn-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes warn-pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+
   .empty-state {
     display: flex;
     flex-direction: column;
@@ -437,6 +565,10 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
     color: #5f574f;
+  }
+
+  .detached-text {
+    color: #ffa300;
   }
 
   .empty-hint {
@@ -475,6 +607,10 @@
     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.3));
   }
 
+  .current-branch-node {
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.2));
+  }
+
   .merge-node {
     filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.15));
   }
@@ -483,9 +619,18 @@
     animation: glow-pulse 2s ease-in-out infinite;
   }
 
+  .head-glow-inner {
+    animation: glow-pulse-inner 2s ease-in-out infinite;
+  }
+
   @keyframes glow-pulse {
-    0%, 100% { stroke-opacity: 0.25; }
-    50% { stroke-opacity: 0.6; }
+    0%, 100% { stroke-opacity: 0.2; }
+    50% { stroke-opacity: 0.7; }
+  }
+
+  @keyframes glow-pulse-inner {
+    0%, 100% { fill-opacity: 0.05; }
+    50% { fill-opacity: 0.15; }
   }
 
   .sha-label {
@@ -505,15 +650,33 @@
   }
 
   .branch-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 6px;
     pointer-events: none;
     user-select: none;
+  }
+
+  .branch-label-current {
+    font-weight: bold;
+    filter: brightness(1.2);
   }
 
   .head-label {
     font-family: 'Press Start 2P', monospace;
     font-size: 6px;
+    fill: #ffa300;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .head-label.detached {
+    font-size: 5px;
+    fill: #ffa300;
+  }
+
+  .head-arrow {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 5px;
     fill: #ffa300;
     pointer-events: none;
     user-select: none;
