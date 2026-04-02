@@ -1,11 +1,13 @@
 import git from 'isomorphic-git';
 import type { GitEngine } from '../GitEngine.js';
 import type { CommandResult } from '../types.js';
+import { getFilesAtCommit } from '../ref-resolver.js';
 
 export async function logCommand(args: string[], engine: GitEngine): Promise<CommandResult> {
   const oneline = args.includes('--oneline');
   const allBranches = args.includes('--all');
   const graph = args.includes('--graph');
+  const showPatch = args.includes('-p') || args.includes('--patch');
   const depthIdx = args.indexOf('-n') !== -1 ? args.indexOf('-n') : args.indexOf('--max-count');
   const depth = depthIdx !== -1 ? parseInt(args[depthIdx + 1], 10) || 10 : 10;
 
@@ -31,7 +33,7 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
 
   // Parse ref argument: first non-flag arg that isn't a value for -n/--max-count/--author/--grep
   const flagsWithValues = new Set(['-n', '--max-count', '--author', '--grep']);
-  const knownFlags = new Set(['--oneline', '--all', '--graph', '-n', '--max-count', '--author', '--grep']);
+  const knownFlags = new Set(['--oneline', '--all', '--graph', '-p', '--patch', '-n', '--max-count', '--author', '--grep']);
   let refArg: string | null = null;
   for (let i = 0; i < args.length; i++) {
     if (flagsWithValues.has(args[i])) {
@@ -120,10 +122,74 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
         lines.push(`    ${c.commit.message.trim()}`);
         lines.push('');
       }
+
+      if (showPatch) {
+        const diff = await generateLogDiff(engine, c);
+        if (diff) {
+          lines.push(diff);
+          lines.push('');
+        }
+      }
     }
 
     return { output: lines.join('\n'), success: true };
   } catch {
     return { output: 'fatal: your current branch does not have any commits yet', success: false };
   }
+}
+
+async function generateLogDiff(
+  engine: GitEngine,
+  commit: Awaited<ReturnType<typeof git.log>>[number],
+): Promise<string> {
+  const commitFiles = await getFilesAtCommit(engine, commit.oid);
+  const parentOid = commit.commit.parent[0];
+  const parentFiles = parentOid ? await getFilesAtCommit(engine, parentOid) : new Map<string, string>();
+
+  const allPaths = new Set([...parentFiles.keys(), ...commitFiles.keys()]);
+  const diffLines: string[] = [];
+
+  for (const filepath of [...allPaths].sort()) {
+    const oldContent = parentFiles.get(filepath);
+    const newContent = commitFiles.get(filepath);
+
+    if (oldContent === newContent) continue;
+
+    if (oldContent === undefined) {
+      diffLines.push(`diff --git a/${filepath} b/${filepath}`);
+      diffLines.push('new file');
+      diffLines.push(`--- /dev/null`);
+      diffLines.push(`+++ b/${filepath}`);
+      for (const line of (newContent || '').split('\n')) {
+        diffLines.push(`+${line}`);
+      }
+    } else if (newContent === undefined) {
+      diffLines.push(`diff --git a/${filepath} b/${filepath}`);
+      diffLines.push('deleted file');
+      diffLines.push(`--- a/${filepath}`);
+      diffLines.push(`+++ /dev/null`);
+      for (const line of oldContent.split('\n')) {
+        diffLines.push(`-${line}`);
+      }
+    } else {
+      diffLines.push(`diff --git a/${filepath} b/${filepath}`);
+      diffLines.push(`--- a/${filepath}`);
+      diffLines.push(`+++ b/${filepath}`);
+      const oldLines = oldContent.split('\n');
+      const newLines = newContent.split('\n');
+      const maxLen = Math.max(oldLines.length, newLines.length);
+      for (let i = 0; i < maxLen; i++) {
+        const ol = i < oldLines.length ? oldLines[i] : undefined;
+        const nl = i < newLines.length ? newLines[i] : undefined;
+        if (ol === nl) {
+          diffLines.push(` ${ol}`);
+        } else {
+          if (ol !== undefined) diffLines.push(`-${ol}`);
+          if (nl !== undefined) diffLines.push(`+${nl}`);
+        }
+      }
+    }
+  }
+
+  return diffLines.join('\n');
 }

@@ -45,7 +45,7 @@ export async function commitCommand(args: string[], engine: GitEngine): Promise<
     fs: engine.fs,
     dir: engine.dir,
     message,
-    author: { name: 'Player', email: 'player@gitvana.dev' },
+    author: { name: engine.configStore.get('user.name') || 'Player', email: engine.configStore.get('user.email') || 'player@gitvana.dev' },
   });
 
   // If we had a merge parent, we need to amend the commit to include both parents
@@ -59,7 +59,7 @@ export async function commitCommand(args: string[], engine: GitEngine): Promise<
       fs: engine.fs,
       dir: engine.dir,
       message,
-      author: { name: 'Player', email: 'player@gitvana.dev' },
+      author: { name: engine.configStore.get('user.name') || 'Player', email: engine.configStore.get('user.email') || 'player@gitvana.dev' },
       parent: [headCommit.commit.parent[0], mergeParent],
     });
 
@@ -140,7 +140,7 @@ async function amendCommit(newMessage: string, engine: GitEngine): Promise<Comma
     fs: engine.fs,
     dir: engine.dir,
     message,
-    author: { name: 'Player', email: 'player@gitvana.dev' },
+    author: { name: engine.configStore.get('user.name') || 'Player', email: engine.configStore.get('user.email') || 'player@gitvana.dev' },
   });
 
   const shortSha = sha.slice(0, 7);

@@ -24,6 +24,10 @@ import { rebaseCommand } from './commands/rebase.js';
 import { blameCommand } from './commands/blame.js';
 import { bisectCommand } from './commands/bisect.js';
 import { updateRefCommand } from './commands/update-ref.js';
+import { configCommand } from './commands/config.js';
+import { remoteCommand, pushCommand, pullCommand, fetchCommand } from './commands/remote.js';
+import { cleanCommand } from './commands/clean.js';
+import { mvCommand } from './commands/mv.js';
 
 interface CommandHandler {
   (args: string[], engine: GitEngine): Promise<CommandResult>;
@@ -51,6 +55,10 @@ export class GitEngine {
   private commandCount = 0;
   stashStack: StashEntry[] = [];
   reflogEntries: ReflogEntry[] = [];
+  configStore: Map<string, string> = new Map([
+    ['user.name', 'Player'],
+    ['user.email', 'player@gitvana.dev'],
+  ]);
   private snapshots: { files: Map<string, string | Uint8Array>; reflog: ReflogEntry[]; stash: StashEntry[] }[] = [];
   private readonly MAX_SNAPSHOTS = 10;
 
@@ -88,6 +96,13 @@ export class GitEngine {
     this.commands.set('blame', blameCommand);
     this.commands.set('bisect', bisectCommand);
     this.commands.set('update-ref', updateRefCommand);
+    this.commands.set('config', configCommand);
+    this.commands.set('remote', remoteCommand);
+    this.commands.set('push', pushCommand);
+    this.commands.set('pull', pullCommand);
+    this.commands.set('fetch', fetchCommand);
+    this.commands.set('clean', cleanCommand);
+    this.commands.set('mv', mvCommand);
   }
 
   setAllowedCommands(commands: string[] | null): void {
@@ -412,6 +427,10 @@ export class GitEngine {
     this.stashStack = [];
     this.reflogEntries = [];
     this.snapshots = [];
+    this.configStore = new Map([
+      ['user.name', 'Player'],
+      ['user.email', 'player@gitvana.dev'],
+    ]);
     // Note: bisect and rebase state files live inside .git/ which is wiped by
     // createFreshFs(), so no explicit cleanup is needed here.
   }

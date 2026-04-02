@@ -221,13 +221,14 @@ export class ShellBridge {
     'init', 'add', 'commit', 'status', 'log', 'diff',
     'branch', 'checkout', 'switch', 'merge', 'reset', 'rm',
     'tag', 'cherry-pick', 'show', 'revert', 'stash', 'reflog',
-    'rebase', 'blame', 'bisect',
+    'rebase', 'blame', 'bisect', 'config', 'remote', 'push',
+    'pull', 'fetch', 'clean', 'mv',
   ];
 
   private static readonly GIT_FLAGS: Record<string, string[]> = {
     'add':      ['-u', '--update', '-A', '--all'],
     'commit':   ['-m', '--message'],
-    'log':      ['--oneline', '--all', '--graph', '-n', '--max-count', '--author', '--grep'],
+    'log':      ['--oneline', '--all', '--graph', '-p', '--patch', '-n', '--max-count', '--author', '--grep'],
     'diff':     ['--staged', '--cached', '--stat'],
     'reset':    ['--soft', '--mixed', '--hard'],
     'checkout': ['-b'],
@@ -238,6 +239,9 @@ export class ShellBridge {
     'rebase':   ['--continue', '--abort'],
     'merge':    ['--abort', '--no-ff'],
     'bisect':   ['start', 'good', 'bad', 'reset'],
+    'config':   ['--list', '-l'],
+    'remote':   ['add', 'remove', '-v'],
+    'clean':    ['-f', '-n', '-d', '--force', '--dry-run'],
   };
 
   private static readonly BUILTINS = [
@@ -245,7 +249,7 @@ export class ShellBridge {
     'clear', 'edit', 'help', 'hint', 'docs', 'solution', 'solve', 'skip', 'undo',
   ];
 
-  private static readonly FILE_ARG_COMMANDS = ['add', 'cat', 'edit', 'rm', 'touch'];
+  private static readonly FILE_ARG_COMMANDS = ['add', 'cat', 'edit', 'rm', 'touch', 'mv'];
 
   private async handleTab(): Promise<void> {
     const line = this.lineBuffer;
