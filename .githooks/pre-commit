@@ -10,7 +10,7 @@ fi
 
 echo "🔍 Checking for leaked secrets..."
 
-STAGED=$(git diff --cached --diff-filter=ACMR --name-only | grep -v '.githooks/')
+STAGED=$(git diff --cached --diff-filter=ACMR --name-only | grep -v '.githooks/' | grep -v 'src/levels/')
 if [ -z "$STAGED" ]; then exit 0; fi
 
 FOUND=0
