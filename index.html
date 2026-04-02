@@ -72,6 +72,19 @@
       <p><a href="https://gitvana.pixari.dev">gitvana.pixari.dev</a></p>
     </div>
     <div id="app"></div>
+    <script>
+      // Clean up stale service workers from old PWA build
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          for (var r of regs) { r.unregister(); }
+        });
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            for (var n of names) { caches.delete(n); }
+          });
+        }
+      }
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
