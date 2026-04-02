@@ -164,7 +164,12 @@ Bun.serve({
     try {
       const file = Bun.file(filePath);
       if (await file.exists()) {
-        return new Response(file);
+        const headers: Record<string, string> = {};
+        // Cache static assets with hashes for 1 year
+        if (pathname.startsWith('/assets/')) {
+          headers['Cache-Control'] = 'public, max-age=31536000, immutable';
+        }
+        return new Response(file, { headers });
       }
     } catch {
       // File not found or path error — fall through to SPA
