@@ -60,6 +60,91 @@ function splitOnChainOperators(line: string): string[] {
   return parts;
 }
 
+/**
+ * Split a command line on the first pipe operator `|` that is not inside quotes.
+ * Returns [leftCmd, rightCmd] or null if no pipe is found.
+ */
+function splitOnPipe(line: string): [string, string] | null {
+  let inQuote: string | null = null;
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+
+    if (inQuote) {
+      if (ch === inQuote) inQuote = null;
+      continue;
+    }
+
+    if (ch === '"' || ch === "'") {
+      inQuote = ch;
+      continue;
+    }
+
+    if (ch === '|') {
+      const left = line.slice(0, i).trim();
+      const right = line.slice(i + 1).trim();
+      if (left && right) return [left, right];
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Apply a pipe filter to the output of a command.
+ */
+function applyPipeFilter(cmd: string, input: string): string {
+  const tokens = cmd.split(/\s+/);
+  const command = tokens[0];
+
+  switch (command) {
+    case 'head': {
+      let n = 10;
+      if (tokens[1] && tokens[1].startsWith('-') && !isNaN(Number(tokens[1].slice(1)))) {
+        n = Number(tokens[1].slice(1));
+      } else if (tokens[1] === '-n' && tokens[2]) {
+        n = Number(tokens[2]);
+      }
+      const lines = input.split('\n');
+      return lines.slice(0, n).join('\n');
+    }
+    case 'tail': {
+      let n = 10;
+      if (tokens[1] && tokens[1].startsWith('-') && !isNaN(Number(tokens[1].slice(1)))) {
+        n = Number(tokens[1].slice(1));
+      } else if (tokens[1] === '-n' && tokens[2]) {
+        n = Number(tokens[2]);
+      }
+      const lines = input.split('\n');
+      return lines.slice(-n).join('\n');
+    }
+    case 'grep': {
+      const pattern = tokens.slice(1).join(' ').replace(/^["']|["']$/g, '');
+      if (!pattern) return 'grep: missing pattern';
+      const lines = input.split('\n');
+      return lines.filter(line => line.includes(pattern)).join('\n');
+    }
+    case 'wc': {
+      if (tokens.includes('-l')) {
+        const lines = input.split('\n');
+        const count = input.endsWith('\n') ? lines.length - 1 : lines.length;
+        return String(count);
+      }
+      const lines = input.split('\n');
+      const lineCount = input.endsWith('\n') ? lines.length - 1 : lines.length;
+      const wordCount = input.split(/\s+/).filter(Boolean).length;
+      const charCount = input.length;
+      return `  ${lineCount}  ${wordCount}  ${charCount}`;
+    }
+    case 'sort': {
+      const lines = input.split('\n');
+      return lines.sort().join('\n');
+    }
+    default:
+      return `Unsupported pipe target: ${command}`;
+  }
+}
+
 export class ShellBridge {
   private lineBuffer = '';
   private cursorPos = 0;
@@ -192,6 +277,55 @@ export class ShellBridge {
           this.writePrompt();
           break;
 
+        case '\x0c': // Ctrl+L — clear screen
+          this.terminal.clear();
+          this.writePrompt();
+          this.terminal.write(this.lineBuffer);
+          // Reposition cursor if not at end
+          if (this.cursorPos < this.lineBuffer.length) {
+            this.terminal.write(`\x1b[${this.lineBuffer.length - this.cursorPos}D`);
+          }
+          break;
+
+        case '\x15': { // Ctrl+U — clear line
+          // Move cursor to start, then clear everything
+          if (this.cursorPos > 0) {
+            this.terminal.write(`\x1b[${this.cursorPos}D`);
+          }
+          // Overwrite line with spaces, then move back
+          const lineLen = this.lineBuffer.length;
+          this.terminal.write(' '.repeat(lineLen));
+          if (lineLen > 0) {
+            this.terminal.write(`\x1b[${lineLen}D`);
+          }
+          this.lineBuffer = '';
+          this.cursorPos = 0;
+          break;
+        }
+
+        case '\x17': { // Ctrl+W — delete word before cursor
+          if (this.cursorPos === 0) break;
+          let newPos = this.cursorPos;
+          // Skip trailing spaces
+          while (newPos > 0 && this.lineBuffer[newPos - 1] === ' ') newPos--;
+          // Skip word characters
+          while (newPos > 0 && this.lineBuffer[newPos - 1] !== ' ') newPos--;
+          const deletedLen = this.cursorPos - newPos;
+          this.lineBuffer = this.lineBuffer.slice(0, newPos) + this.lineBuffer.slice(this.cursorPos);
+          // Move cursor back
+          this.terminal.write(`\x1b[${deletedLen}D`);
+          // Rewrite rest of line + clear trailing chars
+          const restW = this.lineBuffer.slice(newPos);
+          this.terminal.write(restW + ' '.repeat(deletedLen));
+          // Move cursor back to position
+          const moveBackW = restW.length + deletedLen;
+          if (moveBackW > 0) {
+            this.terminal.write(`\x1b[${moveBackW}D`);
+          }
+          this.cursorPos = newPos;
+          break;
+        }
+
         case '\t': // Tab
           await this.handleTab();
           break;
@@ -247,6 +381,7 @@ export class ShellBridge {
   private static readonly BUILTINS = [
     'git', 'ls', 'cat', 'echo', 'touch', 'mkdir', 'rm', 'pwd', 'grep', 'cd',
     'clear', 'edit', 'help', 'hint', 'docs', 'solution', 'solve', 'skip', 'undo',
+    'head', 'tail', 'wc', 'history',
   ];
 
   private static readonly FILE_ARG_COMMANDS = ['add', 'cat', 'edit', 'rm', 'touch', 'mv'];
@@ -424,6 +559,20 @@ export class ShellBridge {
 
     this.history.push(line);
 
+    // Pipe support: cmd1 | cmd2
+    // Check for pipes before chain operators. Note: pipes within chain segments
+    // are handled separately below.
+    const pipeSplit = splitOnPipe(line);
+    if (pipeSplit) {
+      const [leftCmd, rightCmd] = pipeSplit;
+      const expandedLeft = await this.expandGlobs(leftCmd);
+      const leftOutput = await this.executeAndCapture(expandedLeft);
+      const filtered = applyPipeFilter(rightCmd, leftOutput);
+      this.writeLine(filtered);
+      this.writePrompt();
+      return;
+    }
+
     // Support ; chaining (runs next command regardless of success)
     // and && chaining (stops on first failure)
     if (line.includes('&&') || line.includes(';')) {
@@ -491,6 +640,14 @@ export class ShellBridge {
           }
         } else if (parsed.command === 'restart') {
           this.restartLevel();
+        } else if (parsed.command === 'history') {
+          if (parsed.args[0] === '-c') {
+            this.history = [];
+            this.writeLine('History cleared.');
+          } else {
+            const lines = this.history.map((cmd, i) => `  ${i + 1}  ${cmd}`);
+            this.writeLine(lines.join('\n'));
+          }
         } else {
           // Need to pass the raw args for echo redirect parsing
           const rawArgs = parsed.command === 'echo'
@@ -561,6 +718,10 @@ export class ShellBridge {
       '  \x1b[36mgrep\x1b[0m "pat" file  Search file contents',
       '  \x1b[36mcd\x1b[0m [dir]           Change directory',
       '  \x1b[36mpwd\x1b[0m              Where am I?',
+      '  \x1b[36mhead\x1b[0m [-N] file    Show first N lines (default 10)',
+      '  \x1b[36mtail\x1b[0m [-N] file    Show last N lines (default 10)',
+      '  \x1b[36mwc\x1b[0m [-l] file      Count lines/words/chars',
+      '  \x1b[36mhistory\x1b[0m [-c]      Show/clear command history',
       '  \x1b[36mclear\x1b[0m            Clean the terminal',
       '  \x1b[36medit\x1b[0m <file>      Open the monastery editor',
       '  \x1b[36mhelp\x1b[0m             You are here',
@@ -656,6 +817,23 @@ export class ShellBridge {
     } else {
       this.writeLine('Restart not available.');
     }
+  }
+
+  /** Run a single command and capture its output as a string */
+  private async executeAndCapture(cmdLine: string): Promise<string> {
+    const parsed = parseCommand(cmdLine);
+    if (parsed.type === 'git') {
+      const result = await this.engine.execute(parsed.command, parsed.args);
+      this.hintEngine.recordAttempt(parsed.command, parsed.args, result.success, result.output);
+      return result.output || '';
+    } else if (parsed.type === 'builtin') {
+      const rawArgs = parsed.command === 'echo'
+        ? [cmdLine.slice(cmdLine.indexOf(' ') + 1)]
+        : parsed.args;
+      const result = await runBuiltin(parsed.command, rawArgs, this.engine.fs, this.engine.dir);
+      return result.output || '';
+    }
+    return `${parsed.command}: command not found`;
   }
 
   /** Run a single command, return true if successful */

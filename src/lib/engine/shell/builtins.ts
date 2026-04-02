@@ -34,6 +34,12 @@ export async function runBuiltin(
       return grepCommand(args, fs, cwd);
     case 'cd':
       return cdCommand(args);
+    case 'head':
+      return headCommand(args, fs, cwd);
+    case 'tail':
+      return tailCommand(args, fs, cwd);
+    case 'wc':
+      return wcCommand(args, fs, cwd);
     default:
       return { output: `${command}: command not found`, success: false };
   }
@@ -250,6 +256,90 @@ async function grepCommand(args: string[], fs: FsLike, cwd: string): Promise<Bui
     return { output: '', success: false };
   }
   return { output: results.join('\n'), success: true };
+}
+
+async function headCommand(args: string[], fs: FsLike, cwd: string): Promise<BuiltinResult> {
+  let n = 10;
+  const nonFlagArgs: string[] = [];
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i].startsWith('-') && !isNaN(Number(args[i].slice(1)))) {
+      n = Number(args[i].slice(1));
+    } else if (args[i] === '-n' && i + 1 < args.length) {
+      n = Number(args[i + 1]);
+      i++;
+    } else {
+      nonFlagArgs.push(args[i]);
+    }
+  }
+
+  if (nonFlagArgs.length === 0) {
+    return { output: 'head: missing file operand', success: false };
+  }
+
+  const filepath = resolvePath(nonFlagArgs[0], cwd);
+  try {
+    const content = await fs.promises.readFile(filepath, 'utf8') as string;
+    const lines = content.split('\n');
+    return { output: lines.slice(0, n).join('\n'), success: true };
+  } catch {
+    return { output: `head: ${nonFlagArgs[0]}: No such file or directory`, success: false };
+  }
+}
+
+async function tailCommand(args: string[], fs: FsLike, cwd: string): Promise<BuiltinResult> {
+  let n = 10;
+  const nonFlagArgs: string[] = [];
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i].startsWith('-') && !isNaN(Number(args[i].slice(1)))) {
+      n = Number(args[i].slice(1));
+    } else if (args[i] === '-n' && i + 1 < args.length) {
+      n = Number(args[i + 1]);
+      i++;
+    } else {
+      nonFlagArgs.push(args[i]);
+    }
+  }
+
+  if (nonFlagArgs.length === 0) {
+    return { output: 'tail: missing file operand', success: false };
+  }
+
+  const filepath = resolvePath(nonFlagArgs[0], cwd);
+  try {
+    const content = await fs.promises.readFile(filepath, 'utf8') as string;
+    const lines = content.split('\n');
+    return { output: lines.slice(-n).join('\n'), success: true };
+  } catch {
+    return { output: `tail: ${nonFlagArgs[0]}: No such file or directory`, success: false };
+  }
+}
+
+async function wcCommand(args: string[], fs: FsLike, cwd: string): Promise<BuiltinResult> {
+  const lineOnly = args.includes('-l');
+  const nonFlagArgs = args.filter(a => !a.startsWith('-'));
+
+  if (nonFlagArgs.length === 0) {
+    return { output: 'wc: missing file operand', success: false };
+  }
+
+  const filepath = resolvePath(nonFlagArgs[0], cwd);
+  try {
+    const content = await fs.promises.readFile(filepath, 'utf8') as string;
+    const lines = content.split('\n');
+    const lineCount = content.endsWith('\n') ? lines.length - 1 : lines.length;
+
+    if (lineOnly) {
+      return { output: `${lineCount} ${nonFlagArgs[0]}`, success: true };
+    }
+
+    const wordCount = content.split(/\s+/).filter(Boolean).length;
+    const charCount = content.length;
+    return { output: `  ${lineCount}  ${wordCount}  ${charCount} ${nonFlagArgs[0]}`, success: true };
+  } catch {
+    return { output: `wc: ${nonFlagArgs[0]}: No such file or directory`, success: false };
+  }
 }
 
 function cdCommand(args: string[]): Promise<BuiltinResult> {
