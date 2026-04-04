@@ -62,7 +62,7 @@ export class GitEngine {
     ['user.name', 'Player'],
     ['user.email', 'player@gitvana.dev'],
   ]);
-  private snapshots: { files: Map<string, string | Uint8Array>; reflog: ReflogEntry[]; stash: StashEntry[]; remotes: Map<string, { url: string; dir: string }> }[] = [];
+  private snapshots: { files: Map<string, string | Uint8Array>; reflog: ReflogEntry[]; stash: StashEntry[]; remotes: Map<string, { url: string; dir: string }>; commandCount?: number }[] = [];
   private readonly MAX_SNAPSHOTS = 10;
 
   constructor() {
@@ -439,6 +439,7 @@ export class GitEngine {
       reflog: [...this.reflogEntries],
       stash: [...this.stashStack],
       remotes: new Map(this.remotes),
+      commandCount: this.commandCount,
     });
     if (this.snapshots.length > this.MAX_SNAPSHOTS) {
       this.snapshots.shift();
@@ -464,6 +465,9 @@ export class GitEngine {
     this.reflogEntries = snapshot.reflog;
     this.stashStack = snapshot.stash;
     this.remotes = snapshot.remotes ?? new Map();
+    if (snapshot.commandCount !== undefined) {
+      this.commandCount = snapshot.commandCount;
+    }
     return true;
   }
 

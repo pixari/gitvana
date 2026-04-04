@@ -24,13 +24,11 @@
   const totalCount = $derived(results.length);
 
   async function check() {
-    if (completed) return;
     commandCount = gitEngine.getCommandCount();
     const result = await validator.validate(level.targetState.validators);
-    if (completed) return; // may have completed during async wait
     results = result.results;
 
-    if (result.passed) {
+    if (result.passed && !completed) {
       completed = true;
       soundManager.play('levelComplete');
       const maxCmds = level.rewards.stars.maxCommands;
@@ -39,6 +37,9 @@
       if (commandCount <= maxCmds.three) stars = 3;
       eventBus.emit('level:completed', { levelId: level.id, stars });
       onComplete?.(stars);
+    } else if (!result.passed && completed) {
+      // User undid after completion — allow re-validation
+      completed = false;
     }
   }
 
