@@ -23,6 +23,28 @@ export async function commitCommand(args: string[], engine: GitEngine): Promise<
     };
   }
 
+  // Parse pathspec args (non-flag, non -m value)
+  const pathspecs: string[] = [];
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '-m' || args[i] === '--message') { i++; continue; }
+    if (args[i] == null || args[i].startsWith('-')) continue;
+    pathspecs.push(args[i]);
+  }
+
+  // If pathspec given (e.g. "git commit . -m msg"), auto-stage matching files
+  if (pathspecs.length > 0) {
+    const matrix = await git.statusMatrix({ fs: engine.fs, dir: engine.dir });
+    for (const [filepath, , workdir] of matrix) {
+      const matches = pathspecs.some(p => p === '.' || filepath === p || filepath.startsWith(p + '/'));
+      if (!matches) continue;
+      if (workdir === 2) {
+        await git.add({ fs: engine.fs, dir: engine.dir, filepath });
+      } else if (workdir === 0) {
+        await git.remove({ fs: engine.fs, dir: engine.dir, filepath });
+      }
+    }
+  }
+
   // Check if there's anything staged
   const matrix = await git.statusMatrix({ fs: engine.fs, dir: engine.dir });
   const staged = matrix.filter(([, head, , stage]) => head !== stage);

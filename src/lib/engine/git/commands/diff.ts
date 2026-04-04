@@ -77,8 +77,21 @@ export async function diffCommand(args: string[], engine: GitEngine): Promise<Co
         if (workdir !== 0) {
           newContent = await engine.fs.promises.readFile(`${engine.dir}/${filepath}`, 'utf8') as string;
         }
-        // For unstaged diff, old is the staged version (approximated as working dir content before edit)
-        oldContent = '';
+        // For unstaged diff, old is the staged/committed version
+        if (head !== 0) {
+          try {
+            const headOid = await git.resolveRef({ fs: engine.fs, dir: engine.dir, ref: 'HEAD' });
+            const { blob } = await git.readBlob({
+              fs: engine.fs,
+              dir: engine.dir,
+              oid: headOid,
+              filepath,
+            });
+            oldContent = new TextDecoder().decode(blob);
+          } catch {
+            oldContent = '';
+          }
+        }
       }
 
       if (head === 0) {
@@ -91,12 +104,18 @@ export async function diffCommand(args: string[], engine: GitEngine): Promise<Co
       const oldLines = oldContent.split('\n');
       const newLines = newContent.split('\n');
 
-      lines.push(`@@ -1,${oldLines.length} +1,${newLines.length} @@`);
-      for (const l of oldLines) {
-        if (l) lines.push(`-${l}`);
+      // Filter trailing empty line from split
+      const oldTrimmed = oldContent ? oldLines : [];
+      const newTrimmed = newContent ? newLines : [];
+      if (oldTrimmed.length > 0 && oldTrimmed[oldTrimmed.length - 1] === '') oldTrimmed.pop();
+      if (newTrimmed.length > 0 && newTrimmed[newTrimmed.length - 1] === '') newTrimmed.pop();
+
+      lines.push(`@@ -1,${oldTrimmed.length} +1,${newTrimmed.length} @@`);
+      for (const l of oldTrimmed) {
+        lines.push(`-${l}`);
       }
-      for (const l of newLines) {
-        if (l) lines.push(`+${l}`);
+      for (const l of newTrimmed) {
+        lines.push(`+${l}`);
       }
     } catch {
       lines.push('(binary file or unreadable)');

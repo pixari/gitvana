@@ -13,6 +13,12 @@
 
   const entries = [
     {
+      date: '2026-04-04',
+      title: 'Bug Fixes \u2014 Rebase, Diff, Commit',
+      tags: ['fix', 'engine'],
+      content: 'Fixed rebase conflict handling crashing with a JavaScript error instead of showing conflict markers (#23). Fixed git diff showing entire file as additions instead of just changed lines (#22). git commit with pathspec (e.g. git commit . -m "msg") now auto-stages files before committing.'
+    },
+    {
       date: '2026-04-03',
       title: 'Simulated Remotes \u2014 Push, Fetch, Pull',
       tags: ['feature', 'engine'],

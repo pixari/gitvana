@@ -139,9 +139,15 @@ async function replayCommits(
         const theirCommit = await git.readCommit({ fs: engine.fs, dir: engine.dir, oid });
         const parentOid = theirCommit.commit.parent[0];
 
-        const conflictFiles = await writeConflictMarkers(
-          engine, headOid, oid, currentBranch, oid.slice(0, 7), parentOid,
-        );
+        let conflictFiles: string[];
+        try {
+          conflictFiles = await writeConflictMarkers(
+            engine, headOid, oid, currentBranch, oid.slice(0, 7), parentOid,
+          );
+        } catch {
+          // diff3 library can throw in strict mode — fall back to full-file conflict
+          conflictFiles = ['(unable to compute line-level diff)'];
+        }
 
         if (conflictFiles.length === 0) {
           // Clean merge — no conflicts. Stage all files and commit, then continue.

@@ -1,0 +1,13 @@
+diff --git a/onp.js b/onp.js
+index 1234567..abcdefg 100644
+--- a/onp.js
++++ b/onp.js
+@@ -91,7 +91,7 @@
+
+     return {
+         compose : function () {
+-            var delta, size, fp, p, r, i, k, lastStartX, lastStartY, result;
++            var delta, size, fp, p, r, i, k, lastStartX, lastStartY, result, ed;
+             delta  = n - m;
+             size   = m + n + 3;
+             fp     = {};

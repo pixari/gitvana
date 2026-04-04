@@ -11,7 +11,8 @@
     "test:e2e": "playwright test",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "dev:server": "bun run --watch server.ts",
-    "serve": "bun run server.ts"
+    "serve": "bun run server.ts",
+    "postinstall": "sed -i.bak 's/var delta, size, fp, p, r, i, k, lastStartX, lastStartY, result;/var delta, size, fp, p, r, i, k, lastStartX, lastStartY, result, ed;/' node_modules/diff3/onp.js && rm -f node_modules/diff3/onp.js.bak"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
