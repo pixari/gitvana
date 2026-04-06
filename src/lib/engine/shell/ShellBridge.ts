@@ -193,6 +193,44 @@ export class ShellBridge {
     this.terminal.write(PROMPT);
   }
 
+  /** Redraw from cursor position to end of input, clearing leftover chars. Works across line wraps. */
+  private redrawLineFromCursor(): void {
+    // Save cursor, erase from cursor to end of screen, write remaining text, restore cursor
+    this.terminal.write('\x1b[s');        // save cursor position
+    this.terminal.write('\x1b[J');        // erase from cursor to end of screen
+    this.terminal.write(this.lineBuffer.slice(this.cursorPos));
+    this.terminal.write('\x1b[u');        // restore cursor position
+  }
+
+  /** Redraw the entire line (prompt + buffer). Used after destructive edits like Ctrl+U/W. */
+  private redrawFullLine(): void {
+    // Move to the start of the prompt line. The prompt length in visible chars:
+    // "gitvana:/workspace$ " = 20 chars (ANSI codes are zero-width)
+    const promptVisibleLen = 20;
+    const totalVisible = promptVisibleLen + this.lineBuffer.length;
+    const cols = this.terminal.cols;
+    // How many rows does the current content span? Move up to the first row.
+    const currentRow = Math.floor((promptVisibleLen + this.cursorPos) / cols);
+    if (currentRow > 0) {
+      this.terminal.write(`\x1b[${currentRow}A`);
+    }
+    this.terminal.write('\r');            // go to column 0
+    this.terminal.write('\x1b[J');        // erase from cursor to end of screen
+    this.writePrompt();
+    this.terminal.write(this.lineBuffer);
+    // Now reposition cursor if not at end
+    if (this.cursorPos < this.lineBuffer.length) {
+      const endRow = Math.floor((promptVisibleLen + this.lineBuffer.length) / cols);
+      const targetRow = Math.floor((promptVisibleLen + this.cursorPos) / cols);
+      const targetCol = (promptVisibleLen + this.cursorPos) % cols;
+      const rowsBack = endRow - targetRow;
+      if (rowsBack > 0) {
+        this.terminal.write(`\x1b[${rowsBack}A`);
+      }
+      this.terminal.write(`\r\x1b[${targetCol}C`);
+    }
+  }
+
   private writeLine(text: string): void {
     if (text) {
       // Replace \n with \r\n for terminal
@@ -255,16 +293,7 @@ export class ShellBridge {
               this.lineBuffer.slice(0, this.cursorPos - 1) +
               this.lineBuffer.slice(this.cursorPos);
             this.cursorPos--;
-            // Move cursor back one position
-            this.terminal.write('\b');
-            // Rewrite everything from cursorPos to end, then erase trailing char
-            const restAfterBS = this.lineBuffer.slice(this.cursorPos);
-            this.terminal.write(restAfterBS + ' ');
-            // Move cursor back to correct position
-            const moveBackBS = restAfterBS.length + 1;
-            if (moveBackBS > 0) {
-              this.terminal.write(`\x1b[${moveBackBS}D`);
-            }
+            this.redrawFullLine();
           }
           break;
 
@@ -290,41 +319,20 @@ export class ShellBridge {
           break;
 
         case '\x15': { // Ctrl+U — clear line
-          // Move cursor to start, then clear everything
-          if (this.cursorPos > 0) {
-            this.terminal.write(`\x1b[${this.cursorPos}D`);
-          }
-          // Overwrite line with spaces, then move back
-          const lineLen = this.lineBuffer.length;
-          this.terminal.write(' '.repeat(lineLen));
-          if (lineLen > 0) {
-            this.terminal.write(`\x1b[${lineLen}D`);
-          }
           this.lineBuffer = '';
           this.cursorPos = 0;
+          this.redrawFullLine();
           break;
         }
 
         case '\x17': { // Ctrl+W — delete word before cursor
           if (this.cursorPos === 0) break;
           let newPos = this.cursorPos;
-          // Skip trailing spaces
           while (newPos > 0 && this.lineBuffer[newPos - 1] === ' ') newPos--;
-          // Skip word characters
           while (newPos > 0 && this.lineBuffer[newPos - 1] !== ' ') newPos--;
-          const deletedLen = this.cursorPos - newPos;
           this.lineBuffer = this.lineBuffer.slice(0, newPos) + this.lineBuffer.slice(this.cursorPos);
-          // Move cursor back
-          this.terminal.write(`\x1b[${deletedLen}D`);
-          // Rewrite rest of line + clear trailing chars
-          const restW = this.lineBuffer.slice(newPos);
-          this.terminal.write(restW + ' '.repeat(deletedLen));
-          // Move cursor back to position
-          const moveBackW = restW.length + deletedLen;
-          if (moveBackW > 0) {
-            this.terminal.write(`\x1b[${moveBackW}D`);
-          }
           this.cursorPos = newPos;
+          this.redrawFullLine();
           break;
         }
 
@@ -334,19 +342,12 @@ export class ShellBridge {
 
         default:
           if (char >= ' ') {
-            // Insert char at cursorPos
             this.lineBuffer =
               this.lineBuffer.slice(0, this.cursorPos) +
               char +
               this.lineBuffer.slice(this.cursorPos);
             this.cursorPos++;
-            // Write the new char plus everything after it
-            const restAfterInsert = this.lineBuffer.slice(this.cursorPos);
-            this.terminal.write(char + restAfterInsert);
-            // Move cursor back to the right position
-            if (restAfterInsert.length > 0) {
-              this.terminal.write(`\x1b[${restAfterInsert.length}D`);
-            }
+            this.redrawLineFromCursor();
           }
           break;
       }
@@ -490,23 +491,14 @@ export class ShellBridge {
     const newIndex = this.historyIndex + direction;
     if (newIndex < -1 || newIndex >= this.history.length) return;
 
-    // Move cursor to end of line first, then clear
-    if (this.cursorPos < this.lineBuffer.length) {
-      this.terminal.write(`\x1b[${this.lineBuffer.length - this.cursorPos}C`);
-    }
-    // Clear current line from the end
-    for (let i = 0; i < this.lineBuffer.length; i++) {
-      this.terminal.write('\b \b');
-    }
-
     this.historyIndex = newIndex;
     if (newIndex === -1) {
       this.lineBuffer = '';
     } else {
       this.lineBuffer = this.history[this.history.length - 1 - newIndex];
-      this.terminal.write(this.lineBuffer);
     }
     this.cursorPos = this.lineBuffer.length;
+    this.redrawFullLine();
   }
 
   /** Expand simple glob patterns (*.ext) in a command line */
