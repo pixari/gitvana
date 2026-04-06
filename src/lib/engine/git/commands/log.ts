@@ -278,11 +278,23 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
       }
     }
 
+    // ANSI color helpers
+    const Y = '\x1b[33m'; // yellow — commit hash
+    const G = '\x1b[32m'; // green — decorations
+    const C = '\x1b[36m'; // cyan — author
+    const D = '\x1b[34m'; // blue — date
+    const R = '\x1b[0m';  // reset
+
+    function colorDecoration(refs: string[] | undefined): string {
+      if (!refs || refs.length === 0) return '';
+      return ` ${G}(${refs.join(', ')})${R}`;
+    }
+
     if (oneline) {
       const prefix = graph ? '* ' : '';
       const lines = commits.map((c) => {
-        const decoration = refMap ? (refMap.get(c.oid) ? ` (${refMap.get(c.oid)!.join(', ')})` : '') : '';
-        return `${prefix}${c.oid.slice(0, 7)}${decoration} ${c.commit.message.split('\n')[0]}`;
+        const deco = refMap ? colorDecoration(refMap.get(c.oid)) : '';
+        return `${prefix}${Y}${c.oid.slice(0, 7)}${R}${deco} ${c.commit.message.split('\n')[0]}`;
       });
       return { output: lines.join('\n'), success: true };
     }
@@ -291,20 +303,20 @@ export async function logCommand(args: string[], engine: GitEngine): Promise<Com
     for (let i = 0; i < commits.length; i++) {
       const c = commits[i];
       const isLast = i === commits.length - 1;
-      const decoration = refMap ? (refMap.get(c.oid) ? ` (${refMap.get(c.oid)!.join(', ')})` : '') : '';
+      const deco = refMap ? colorDecoration(refMap.get(c.oid)) : '';
       if (graph) {
-        lines.push(`* commit ${c.oid}${decoration}`);
-        lines.push(`| Author: ${c.commit.author.name} <${c.commit.author.email}>`);
+        lines.push(`* ${Y}commit ${c.oid}${R}${deco}`);
+        lines.push(`| Author: ${C}${c.commit.author.name} <${c.commit.author.email}>${R}`);
         const date = new Date(c.commit.author.timestamp * 1000);
-        lines.push(`| Date:   ${date.toUTCString()}`);
+        lines.push(`| Date:   ${D}${date.toUTCString()}${R}`);
         lines.push('|');
         lines.push(`|     ${c.commit.message.trim()}`);
         lines.push(isLast ? '' : '|');
       } else {
-        lines.push(`commit ${c.oid}${decoration}`);
-        lines.push(`Author: ${c.commit.author.name} <${c.commit.author.email}>`);
+        lines.push(`${Y}commit ${c.oid}${R}${deco}`);
+        lines.push(`Author: ${C}${c.commit.author.name} <${c.commit.author.email}>${R}`);
         const date = new Date(c.commit.author.timestamp * 1000);
-        lines.push(`Date:   ${date.toUTCString()}`);
+        lines.push(`Date:   ${D}${date.toUTCString()}${R}`);
         lines.push('');
         lines.push(`    ${c.commit.message.trim()}`);
         lines.push('');
