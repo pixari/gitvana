@@ -2,6 +2,7 @@
   import type { LevelDefinition } from '../../levels/schema.js';
   import MountainPath from '../progression/MountainPath.svelte';
   import PixelArt from '../shared/PixelArt.svelte';
+  import { t } from '../../i18n/index.js';
 
   interface Props {
     level: LevelDefinition;
@@ -16,7 +17,7 @@
   <div class="intro-card">
     <div class="intro-top">
       <div class="intro-text">
-        <div class="level-badge">ACT {level.act} — LEVEL {level.order}</div>
+        <div class="level-badge">{t('ui.act_level', { act: level.act, order: level.order })}</div>
         <h1 class="level-title">{level.title}</h1>
         <p class="level-subtitle">{level.subtitle}</p>
       </div>
@@ -30,12 +31,12 @@
     <p class="narrative">{level.briefing.narrative}</p>
 
     <div class="concept-box">
-      <span class="concept-label">CONCEPT</span>
+      <span class="concept-label">{t('ui.concept')}</span>
       <p class="concept-text">{level.briefing.concept}</p>
     </div>
 
     <div class="objectives-preview">
-      <span class="objectives-label">OBJECTIVES</span>
+      <span class="objectives-label">{t('ui.objectives')}</span>
       {#each level.briefing.objectives as objective}
         <div class="objective-row">
           <span class="bullet">▸</span>
@@ -49,7 +50,7 @@
     </div>
 
     <button class="start-button" onclick={onStart}>
-      START LEVEL
+      {t('ui.start_level')}
     </button>
   </div>
 </div>

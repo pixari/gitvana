@@ -1,0 +1,63 @@
+{
+  "app_name": "GITVANA",
+  "alpha": "ALPHA",
+
+  "nav_play": "Play",
+  "nav_docs": "Docs",
+  "nav_changelog": "Changelog",
+  "nav_blog": "Blog",
+  "nav_stats": "Stats",
+
+  "act_level": "ACT {{act}} — LEVEL {{order}}",
+  "concept": "CONCEPT",
+  "objectives": "OBJECTIVES",
+  "start_level": "START LEVEL",
+
+  "stage_clear": "STAGE CLEAR!",
+  "commands_used": "Commands used",
+  "par_3_stars": "Par (3 stars)",
+  "retry": "RETRY",
+  "share": "SHARE",
+  "next_level": "NEXT LEVEL",
+
+  "terminal": "TERMINAL",
+  "undo": "UNDO",
+  "home": "Home",
+  "docs": "DOCS",
+  "report_bug": "BUG",
+  "mute": "Mute",
+  "unmute": "Unmute",
+  "restart": "Restart level",
+
+  "new_commands": "NEW:",
+  "progress": "{{passed}}/{{total}}",
+  "cmds": "{{count}} cmds",
+
+  "your_journey": "YOUR JOURNEY",
+  "anonymous_monk": "Anonymous Monk",
+
+  "no_commits_yet": "No commits yet",
+  "make_first_commit": "Make your first git commit",
+  "commit_graph": "COMMIT GRAPH",
+  "detached_head": "DETACHED HEAD",
+
+  "nothing_to_undo": "Nothing to undo.",
+  "undo_restored": "Undo: restored to before last command.",
+  "command_not_found": "{{cmd}}: command not found",
+
+  "mobile_title": "GITVANA",
+  "mobile_message": "Gitvana needs a keyboard and a wider screen.",
+  "mobile_hint": "Please visit on a desktop or laptop.",
+  "mobile_joke": "The monastery terminal doesn't fit in your pocket. The monks tried. It didn't end well.",
+
+  "help_title": "GITVANA — Monastery Terminal",
+  "help_git": "Git commands (the main quest):",
+  "help_shell": "Shell commands (survival kit):",
+  "help_meta": "Meta:",
+
+  "landing_tagline": "Reach git enlightenment",
+  "landing_subtitle": "Learn git by playing. A browser-based adventure game with a real terminal, 38 levels, and a judgmental cat.",
+  "landing_play": "PLAY NOW",
+  "landing_continue": "CONTINUE",
+  "landing_read_docs": "READ THE DOCS"
+}

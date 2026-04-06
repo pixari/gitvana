@@ -4,6 +4,22 @@
 
   const entries = [
     {
+      id: '2026-04-06-i18n',
+      date: '06/04/2026',
+      text: `Built the i18n infrastructure today. All UI strings (buttons, labels, headers) now go through a t() translation function that reads from JSON locale files. English is extracted as the source of truth, and any missing key in another language falls back to English automatically.
+
+The language picker only shows up when there are 2+ locales available, so right now it's invisible. But the plumbing is there. Someone on GitHub asked for pt-BR support and I want to make it easy for the community to contribute translations.
+
+The hard part isn't the code — it's the content. 38 levels of monastery humor, a judgmental cat, Monkey Island-style dialogue. You can't run that through a translator and expect it to land. This needs people who get the vibe. Wrote a CONTRIBUTING_TRANSLATIONS.md to make it as easy as possible to help out.`,
+    },
+    {
+      id: '2026-04-06-bugfixes',
+      date: '06/04/2026',
+      text: `Big bug fix day. A user named rorar filed like 8 issues in one sitting — incredible feedback. Fixed most of them: the terminal was breaking on long inputs that wrap past the screen width (cursor math didn't account for line wrapping), chaining nano with && was returning "command not found", git diff with commit hashes wasn't implemented at all, and a level was penalizing you for using git status even though the objective told you to.
+
+Also added color-coded git log output (yellow hashes, green decorations, cyan author) and a man command that aliases to docs. Small things but they make it feel more like a real terminal.`,
+    },
+    {
       id: '2026-04-03-remotes',
       date: '03/04/2026',
       text: `Added git push, fetch, and pull. Since everything runs in the browser there's no actual remote server, so I fake it — a second git repo living at /remote/origin on the same IndexedDB filesystem. Push copies objects one way, fetch the other. isomorphic-git doesn't care, it just reads and writes content-addressed blobs.

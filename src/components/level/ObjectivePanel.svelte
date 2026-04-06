@@ -5,6 +5,7 @@
   import { LevelValidator } from '../../lib/engine/level/LevelValidator.js';
   import type { LevelDefinition, ValidatorConfig } from '../../levels/schema.js';
   import { soundManager } from '../../lib/audio/SoundManager.js';
+  import { t } from '../../i18n/index.js';
 
   interface Props {
     level: LevelDefinition;
@@ -55,7 +56,7 @@
 
 <div class="objective-panel">
   <div class="objective-header">
-        <span class="objective-title">OBJECTIVES</span>
+        <span class="objective-title">{t('ui.objectives')}</span>
         <span class="progress">{passedCount}/{totalCount}</span>
         <span class="command-count">{commandCount} cmds</span>
       </div>
@@ -82,7 +83,7 @@
 
     {#if level.briefing.newCommands.length > 0}
       <div class="new-commands">
-        <span class="new-commands-label">NEW:</span>
+        <span class="new-commands-label">{t('ui.new_commands')}</span>
         {#each level.briefing.newCommands as cmd}
           <code class="command-badge">{cmd}</code>
         {/each}

@@ -14,6 +14,18 @@
   const entries = [
     {
       date: '2026-04-06',
+      title: 'i18n Infrastructure',
+      tags: ['feature'],
+      content: 'Internationalization support is here. UI strings are now translatable via JSON locale files. Language picker ready (shows when 2+ locales available). English extracted as source of truth. Community translations welcome \u2014 see CONTRIBUTING_TRANSLATIONS.md.'
+    },
+    {
+      date: '2026-04-06',
+      title: 'Bug Fixes \u2014 Terminal, Diff, Levels',
+      tags: ['fix'],
+      content: 'Fixed: chained nano/edit commands (#36), git diff with commit refs (#29), level 4 star threshold (#31), Ctrl+L clear (#24), long input line wrapping (#34), repo state sync after undo (#27). Added man command (#32) and color-coded git log (#35).'
+    },
+    {
+      date: '2026-04-06',
       title: 'Tablet Support',
       tags: ['feature'],
       content: 'Gitvana now works on tablets in landscape mode. Panels stack vertically on narrower screens. The mobile fallback only triggers on phone-sized viewports now.'

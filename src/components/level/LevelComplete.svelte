@@ -4,6 +4,7 @@
   import MountainPath from '../progression/MountainPath.svelte';
   import ShareCard from '../shared/ShareCard.svelte';
   import { getStage } from '../../lib/engine/progression/stages.js';
+  import { t } from '../../i18n/index.js';
 
   interface Props {
     level: LevelDefinition;
@@ -24,7 +25,7 @@
 
 <div class="complete-overlay">
   <div class="complete-card">
-    <div class="stage-clear">STAGE CLEAR!</div>
+    <div class="stage-clear">{t('ui.stage_clear')}</div>
 
     <h2 class="level-name">{level.title}</h2>
 
@@ -38,11 +39,11 @@
 
     <div class="stats">
       <div class="stat-row">
-        <span class="stat-label">Commands used</span>
+        <span class="stat-label">{t('ui.commands_used')}</span>
         <span class="stat-value">{commandCount}</span>
       </div>
       <div class="stat-row">
-        <span class="stat-label">Par (3 stars)</span>
+        <span class="stat-label">{t('ui.par_3_stars')}</span>
         <span class="stat-value">{level.rewards.stars.maxCommands.three}</span>
       </div>
     </div>
@@ -54,11 +55,11 @@
 
     <div class="buttons">
       {#if onRetry}
-        <button class="btn btn-retry" onclick={onRetry}>RETRY</button>
+        <button class="btn btn-retry" onclick={onRetry}>{t('ui.retry')}</button>
       {/if}
-      <button class="btn btn-share" onclick={() => showShare = true}>SHARE</button>
+      <button class="btn btn-share" onclick={() => showShare = true}>{t('ui.share')}</button>
       {#if onNext}
-        <button class="btn btn-next" onclick={onNext}>NEXT LEVEL</button>
+        <button class="btn btn-next" onclick={onNext}>{t('ui.next_level')}</button>
       {/if}
     </div>
 
