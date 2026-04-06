@@ -22,7 +22,7 @@
         <p class="level-subtitle">{level.subtitle}</p>
       </div>
       <div class="intro-art">
-        <PixelArt id={level.id} size={96} />
+        <PixelArt id={level.id} size={64} />
       </div>
     </div>
 
@@ -75,10 +75,10 @@
   .intro-card {
     background: #1a1a2e;
     border: 2px solid #2a2a4e;
-    border-radius: 10px;
-    padding: 36px 44px;
-    max-width: 820px;
-    max-height: 90vh;
+    border-radius: 8px;
+    padding: 20px 28px;
+    max-width: 720px;
+    max-height: 92vh;
     overflow-y: auto;
     width: 94%;
     animation: slideUp 0.4s ease;
@@ -94,8 +94,8 @@
   .intro-top {
     display: flex;
     align-items: flex-start;
-    gap: 24px;
-    margin-bottom: 4px;
+    gap: 16px;
+    margin-bottom: 0;
   }
 
   .intro-text {
@@ -115,23 +115,23 @@
 
   .level-badge {
     font-family: 'Press Start 2P', monospace;
-    font-size: 8px;
+    font-size: 7px;
     color: #ffa300;
-    letter-spacing: 3px;
-    margin-bottom: 14px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
   }
 
   .level-title {
     font-family: 'Press Start 2P', monospace;
-    font-size: 18px;
+    font-size: 14px;
     color: #00ff41;
-    margin: 0 0 10px;
-    line-height: 1.5;
+    margin: 0 0 6px;
+    line-height: 1.4;
   }
 
   .level-subtitle {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
+    font-size: 11px;
     color: #5f574f;
     margin: 0;
   }
@@ -139,63 +139,63 @@
   .divider {
     height: 1px;
     background: #2a2a4e;
-    margin: 24px 0;
+    margin: 14px 0;
   }
 
   .narrative {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-size: 11px;
     color: #c2c3c7;
-    line-height: 1.7;
-    margin: 0 0 24px;
+    line-height: 1.6;
+    margin: 0 0 14px;
   }
 
   .concept-box {
     background: #29adff08;
     border: 1px solid #29adff22;
-    border-radius: 6px;
-    padding: 16px 20px;
-    margin-bottom: 24px;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
   }
 
   .concept-label {
     font-family: 'Press Start 2P', monospace;
-    font-size: 7px;
+    font-size: 6px;
     color: #29adff;
     letter-spacing: 2px;
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
   }
 
   .concept-text {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-size: 11px;
     color: #b0b0b0;
-    line-height: 1.6;
+    line-height: 1.5;
     margin: 0;
   }
 
   .objectives-preview {
-    margin-bottom: 28px;
+    margin-bottom: 14px;
   }
 
   .objectives-label {
     font-family: 'Press Start 2P', monospace;
-    font-size: 7px;
+    font-size: 6px;
     color: #ffa300;
     letter-spacing: 2px;
     display: block;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   .objective-row {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-size: 11px;
     color: #c2c3c7;
-    margin-bottom: 8px;
-    line-height: 1.5;
+    margin-bottom: 4px;
+    line-height: 1.4;
   }
 
   .bullet {
@@ -204,19 +204,19 @@
   }
 
   .path-section {
-    margin-bottom: 24px;
-    padding: 16px;
+    margin-bottom: 14px;
+    padding: 10px;
     background: #0a0a0a66;
-    border-radius: 6px;
+    border-radius: 4px;
     border: 1px solid #2a2a4e;
   }
 
   .start-button {
     display: block;
     width: 100%;
-    padding: 16px;
+    padding: 12px;
     font-family: 'Press Start 2P', monospace;
-    font-size: 12px;
+    font-size: 11px;
     color: #0a0a0a;
     background: linear-gradient(135deg, #00ff41, #00e436);
     border: none;
