@@ -19,6 +19,8 @@
   "retry": "RETRY",
   "share": "SHARE",
   "next_level": "NEXT LEVEL",
+  "review_steps": "Review my steps",
+  "show_results": "RESULTS",
 
   "terminal": "TERMINAL",
   "undo": "UNDO",

@@ -21,63 +21,87 @@
   const stage = $derived(getStage(completedLevels));
 
   let showShare = $state(false);
+  let minimized = $state(false);
 </script>
 
-<div class="complete-overlay">
-  <div class="complete-card">
-    <div class="stage-clear">{t('ui.stage_clear')}</div>
-
-    <h2 class="level-name">{level.title}</h2>
-
-    <div class="stars-display">
+{#if minimized}
+  <div class="minimized-bar">
+    <div class="minimized-stars">
       {#each [1, 2, 3] as star}
-        <span class="star" class:earned={star <= stars}>
+        <span class="mini-star" class:earned={star <= stars}>
           {star <= stars ? '★' : '☆'}
         </span>
       {/each}
     </div>
-
-    <div class="stats">
-      <div class="stat-row">
-        <span class="stat-label">{t('ui.commands_used')}</span>
-        <span class="stat-value">{commandCount}</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">{t('ui.par_3_stars')}</span>
-        <span class="stat-value">{level.rewards.stars.maxCommands.three}</span>
-      </div>
-    </div>
-
-    <div class="stage-info">
-      <span class="stage-label" style="color: {stage.glowColor}">{stage.name}</span>
-      <span class="stage-desc">{stage.description}</span>
-    </div>
-
-    <div class="buttons">
-      {#if onRetry}
-        <button class="btn btn-retry" onclick={onRetry}>{t('ui.retry')}</button>
-      {/if}
-      <button class="btn btn-share" onclick={() => showShare = true}>{t('ui.share')}</button>
+    <span class="minimized-title">{t('ui.stage_clear')}</span>
+    <div class="minimized-actions">
+      <button class="minimized-btn minimized-expand" onclick={() => minimized = false}>{t('ui.show_results')}</button>
       {#if onNext}
-        <button class="btn btn-next" onclick={onNext}>{t('ui.next_level')}</button>
+        <button class="minimized-btn minimized-next" onclick={onNext}>{t('ui.next_level')}</button>
       {/if}
     </div>
-
-    {#if showShare}
-      <ShareCard
-        levelTitle={level.title}
-        levelOrder={level.order}
-        act={level.act}
-        {stars}
-        {commandCount}
-        {stage}
-        {completedLevels}
-        {playerName}
-        onClose={() => showShare = false}
-      />
-    {/if}
   </div>
-</div>
+{:else}
+  <div class="complete-overlay">
+    <div class="complete-card">
+      <button class="minimize-btn" onclick={() => minimized = true} title={t('ui.review_steps')}>
+        {t('ui.review_steps')} ▾
+      </button>
+
+      <div class="stage-clear">{t('ui.stage_clear')}</div>
+
+      <h2 class="level-name">{level.title}</h2>
+
+      <div class="stars-display">
+        {#each [1, 2, 3] as star}
+          <span class="star" class:earned={star <= stars}>
+            {star <= stars ? '★' : '☆'}
+          </span>
+        {/each}
+      </div>
+
+      <div class="stats">
+        <div class="stat-row">
+          <span class="stat-label">{t('ui.commands_used')}</span>
+          <span class="stat-value">{commandCount}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">{t('ui.par_3_stars')}</span>
+          <span class="stat-value">{level.rewards.stars.maxCommands.three}</span>
+        </div>
+      </div>
+
+      <div class="stage-info">
+        <span class="stage-label" style="color: {stage.glowColor}">{stage.name}</span>
+        <span class="stage-desc">{stage.description}</span>
+      </div>
+
+      <div class="buttons">
+        {#if onRetry}
+          <button class="btn btn-retry" onclick={onRetry}>{t('ui.retry')}</button>
+        {/if}
+        <button class="btn btn-share" onclick={() => showShare = true}>{t('ui.share')}</button>
+        {#if onNext}
+          <button class="btn btn-next" onclick={onNext}>{t('ui.next_level')}</button>
+        {/if}
+      </div>
+
+      {#if showShare}
+        <ShareCard
+          levelTitle={level.title}
+          levelOrder={level.order}
+          act={level.act}
+          {stars}
+          {commandCount}
+          {stage}
+          {completedLevels}
+          {playerName}
+          onClose={() => showShare = false}
+        />
+      {/if}
+    </div>
+  </div>
+{/if}
 
 <style>
   .complete-overlay {
@@ -234,6 +258,104 @@
   }
 
   .btn-next {
+    color: #0a0a0a;
+    background: #00ff41;
+  }
+
+  /* Minimize button inside the card */
+  .minimize-btn {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #5f574f;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    padding: 3px 8px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .minimize-btn:hover {
+    color: #c2c3c7;
+    border-color: #5f574f;
+  }
+
+  .complete-card {
+    position: relative;
+  }
+
+  /* Minimized floating bar */
+  .minimized-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: #1a1a2e;
+    border-top: 2px solid #00ff41;
+    animation: slideUp 0.25s ease;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .minimized-stars {
+    display: flex;
+    gap: 4px;
+  }
+
+  .mini-star {
+    font-size: 16px;
+    color: #5f574f;
+  }
+
+  .mini-star.earned {
+    color: #ffa300;
+  }
+
+  .minimized-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: #ffa300;
+    letter-spacing: 2px;
+  }
+
+  .minimized-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+  }
+
+  .minimized-btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 14px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: transform 0.1s;
+  }
+
+  .minimized-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .minimized-expand {
+    color: #c2c3c7;
+    background: #2a2a4e;
+  }
+
+  .minimized-next {
     color: #0a0a0a;
     background: #00ff41;
   }

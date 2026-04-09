@@ -12,6 +12,7 @@
   import ShareWidget from './components/shared/ShareWidget.svelte';
 
   import DocPopup from './components/shared/DocPopup.svelte';
+  import TipBanner from './components/shared/TipBanner.svelte';
   import { soundManager } from './lib/audio/SoundManager.js';
   import { gitEngine } from './lib/engine/git/GitEngine.js';
   import { LevelLoader } from './lib/engine/level/LevelLoader.js';
@@ -297,6 +298,10 @@
 
 {#if import.meta.env.DEV || import.meta.env.VITE_DEV_TOOLS === 'true'}
   <DevPanel level={currentLevel} onSolve={handleSolve} onSkip={handleSkip} onReset={() => { clearProgress(); location.reload(); }} />
+{/if}
+
+{#if screen === 'playing' && currentLevel.tips?.length}
+  <TipBanner tips={currentLevel.tips} levelId={currentLevel.id} />
 {/if}
 
 {#if screen === 'intro'}

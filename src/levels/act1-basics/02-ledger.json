@@ -36,6 +36,10 @@
   "constraints": {
     "maxCommands": 5
   },
+  "tips": [
+    "Use 'git status' to see which files are tracked, staged, or untracked",
+    "You can stage multiple files at once: git add file1.txt file2.txt"
+  ],
   "hints": [
     {
       "trigger": "after-attempts",
