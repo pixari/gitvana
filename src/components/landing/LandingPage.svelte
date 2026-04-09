@@ -41,11 +41,11 @@
     <div class="hero-content">
       <h1 class="title">GITVANA</h1>
       <p class="subtitle">Reach git enlightenment</p>
-      <p class="tagline">Learn git by playing. 35 levels. Real terminal. Free.</p>
+      <p class="tagline">Learn git by playing. 38 levels. Real terminal. Free.</p>
       <button class="play-btn" onclick={onPlay}>
         <span>{isReturning ? 'CONTINUE' : 'PLAY NOW'}</span>
       </button>
-      <p class="meta">35 levels &middot; 6 acts &middot; 21 git commands &middot; Free forever</p>
+      <p class="meta">38 levels &middot; 6 acts &middot; 21 git commands &middot; Free forever</p>
     </div>
     <div class="scroll-hint">
       <span class="scroll-text">SCROLL</span>
@@ -71,7 +71,7 @@
           </div>
         {/each}
       </div>
-      <p class="journey-caption">35 levels across 6 acts. From git init to git mastery.</p>
+      <p class="journey-caption">38 levels across 6 acts. From git init to git mastery.</p>
     </div>
   </section>
 
