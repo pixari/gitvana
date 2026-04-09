@@ -18,11 +18,20 @@ export function parseCommand(input: string): ParsedCommand {
 
   const first = tokens[0];
 
-  if (first === 'git' && tokens.length >= 2) {
+  if (first === 'git') {
+    if (tokens.length >= 2) {
+      return {
+        type: 'git',
+        command: tokens[1],
+        args: tokens.slice(2),
+        raw,
+      };
+    }
+    // Bare "git" with no subcommand
     return {
       type: 'git',
-      command: tokens[1],
-      args: tokens.slice(2),
+      command: '',
+      args: [],
       raw,
     };
   }

@@ -163,6 +163,14 @@ export class GitEngine {
   };
 
   async execute(command: string, args: string[]): Promise<CommandResult> {
+    // Handle bare "git" with no subcommand
+    if (!command) {
+      return {
+        output: 'usage: git <command> [<args>]\n\nAvailable commands:\n   init       Create an empty Git repository\n   add        Add file contents to the index\n   commit     Record changes to the repository\n   status     Show the working tree status\n   log        Show commit logs\n   diff       Show changes between commits\n   branch     List, create, or delete branches\n   checkout   Switch branches or restore files\n   merge      Join two or more development histories\n   reset      Reset current HEAD to a specified state\n   stash      Stash the changes in a dirty working directory\n\nType "docs <command>" for more information on a specific command.',
+        success: true,
+      };
+    }
+
     // Handle "git help [command]" as a docs alias
     if (command === 'help') {
       return { output: '__DOCS__:' + (args[0] || ''), success: true };

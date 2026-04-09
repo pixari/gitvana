@@ -347,7 +347,10 @@ export class ShellBridge {
               char +
               this.lineBuffer.slice(this.cursorPos);
             this.cursorPos++;
-            this.redrawLineFromCursor();
+            this.terminal.write(char);
+            if (this.cursorPos < this.lineBuffer.length) {
+              this.redrawLineFromCursor();
+            }
           }
           break;
       }
