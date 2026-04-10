@@ -14,6 +14,12 @@
   const entries = [
     {
       date: '2026-04-10',
+      title: 'The Way of the Terminal \u2014 Shell Basics Tutorial',
+      tags: ['feature', 'content'],
+      content: 'New optional Act 0 with 3 lessons teaching terminal basics (echo, cat, touch, grep, chaining) before the git levels. New players choose "Learn the Basics" or "Skip to Git" on first visit. Existing progress is automatically migrated (#33).'
+    },
+    {
+      date: '2026-04-10',
       title: 'UX Improvements & Bug Fixes',
       tags: ['fix', 'feature'],
       content: 'Fixed invisible terminal input \u2014 typed characters were processed but never displayed (#37, #39). Bare "git" command now shows usage info instead of "command not found" (#38). Level complete card can now be minimized so you can review your terminal steps before continuing (#30). Contextual tips appear for new players on early levels (#25). Hardcoded level counts replaced with dynamic TOTAL_LEVELS constant (#42).'

@@ -1,0 +1,65 @@
+{
+  "id": "act0-03-chains",
+  "act": 0,
+  "order": 3,
+  "title": "The Chain Master",
+  "subtitle": "True power comes from combining simple commands",
+  "difficulty": "beginner",
+  "mode": "strict",
+  "briefing": {
+    "narrative": "The monk nods approvingly at your progress. \"You're almost ready for the mountain. But there's one more art you must learn — the art of chaining.\"\n\nHe pulls out a thick scroll. \"The monastery library has a catalog of ancient texts. Your task: find the entry about 'meditation' and write it to a new file. You'll need grep to search and the ability to chain commands together.\"\n\nHe winks. \"The monks up at the monastery chain commands like breathing. You'll thank me later.\"",
+    "concept": "'grep' searches for text inside files. 'grep word file.txt' shows lines containing that word. You can chain commands with '&&' — the second command runs only if the first succeeds. For example: 'echo \"hello\" > file.txt && cat file.txt' creates a file then displays it.",
+    "objectives": [
+      "Use 'grep' to find the line about meditation in catalog.txt",
+      "Create a file called 'found.txt' containing 'meditation'",
+      "Do it in one line using && to chain commands"
+    ],
+    "newCommands": ["grep <word> <file>", "command1 && command2"]
+  },
+  "initialState": {
+    "strategy": "mount",
+    "fileTree": {
+      "catalog.txt": "history - The Founding of the Monastery (shelf A3)\ncooking - 101 Recipes for Monastery Gruel (shelf B1)\nmeditation - The Art of Inner Peace (shelf C7)\ngardens - Growing Herbs in Silence (shelf D2)\npoetry - Haikus About Merge Conflicts (shelf E5)\ncats - Why the Monastery Cat Rules Everything (shelf F1)"
+    },
+    "head": "none"
+  },
+  "targetState": {
+    "validators": [
+      { "type": "file-exists", "params": { "path": "found.txt" } },
+      { "type": "file-content", "params": { "path": "found.txt", "contains": "meditation" } }
+    ]
+  },
+  "constraints": {
+    "maxCommands": 10
+  },
+  "hints": [
+    {
+      "trigger": "after-attempts",
+      "triggerValue": 2,
+      "text": "The monk hints: 'grep meditation catalog.txt will find the line you need.'",
+      "penalty": 0
+    },
+    {
+      "trigger": "after-attempts",
+      "triggerValue": 4,
+      "text": "He draws in the sand: 'echo \"meditation\" > found.txt creates the file. Or get fancy: grep meditation catalog.txt > found.txt redirects grep output to a file!'",
+      "penalty": 0.25
+    },
+    {
+      "trigger": "manual",
+      "text": "The monastery cat types with practiced ease: grep meditation catalog.txt > found.txt",
+      "penalty": 0.5
+    }
+  ],
+  "tips": [
+    "'grep word file' searches for lines containing 'word'",
+    "Chain commands with &&: first && second",
+    "You can redirect output to a file: grep word file.txt > result.txt"
+  ],
+  "rewards": {
+    "stars": {
+      "maxCommands": { "two": 5, "three": 3 }
+    },
+    "achievement": "chain-master"
+  }
+}

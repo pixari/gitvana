@@ -9,6 +9,7 @@
   "nav_stats": "Stats",
 
   "act_level": "ACT {{act}} — LEVEL {{order}}",
+  "act_level_act0": "THE WAY OF THE TERMINAL — LESSON {{order}}",
   "concept": "CONCEPT",
   "objectives": "OBJECTIVES",
   "start_level": "START LEVEL",

@@ -121,6 +121,10 @@ export class GitEngine {
     this.commandCount = 0;
   }
 
+  incrementCommandCount(): void {
+    this.commandCount++;
+  }
+
   /** Record a reflog entry capturing the current HEAD oid. */
   async recordReflog(action: string, message: string): Promise<void> {
     try {

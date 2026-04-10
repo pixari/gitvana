@@ -17,7 +17,7 @@
   <div class="intro-card">
     <div class="intro-top">
       <div class="intro-text">
-        <div class="level-badge">{t('ui.act_level', { act: level.act, order: level.order })}</div>
+        <div class="level-badge">{level.act === 0 ? t('ui.act_level_act0', { order: level.order }) : t('ui.act_level', { act: level.act, order: level.order })}</div>
         <h1 class="level-title">{level.title}</h1>
         <p class="level-subtitle">{level.subtitle}</p>
       </div>

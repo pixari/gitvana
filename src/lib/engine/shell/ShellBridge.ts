@@ -677,14 +677,50 @@ export class ShellBridge {
           const rawArgs = parsed.command === 'echo'
             ? [line.slice(line.indexOf(' ') + 1)]
             : parsed.args;
-          const result = await runBuiltin(parsed.command, rawArgs, this.engine.fs, this.engine.dir);
-          if (result.output) {
-            this.writeLine(result.output);
+
+          // Check for output redirect (> or >>) on non-echo builtins
+          let redirectFile: string | null = null;
+          let redirectAppend = false;
+          let filteredArgs = rawArgs;
+          if (parsed.command !== 'echo') {
+            const appendIdx = rawArgs.indexOf('>>');
+            const overwriteIdx = rawArgs.indexOf('>');
+            if (appendIdx !== -1 && appendIdx < rawArgs.length - 1) {
+              redirectFile = rawArgs[appendIdx + 1];
+              redirectAppend = true;
+              filteredArgs = rawArgs.slice(0, appendIdx);
+            } else if (overwriteIdx !== -1 && overwriteIdx < rawArgs.length - 1) {
+              redirectFile = rawArgs[overwriteIdx + 1];
+              filteredArgs = rawArgs.slice(0, overwriteIdx);
+            }
           }
-          // File-modifying builtins should trigger UI refresh
-          const fileModifiers = ['touch', 'echo', 'mkdir', 'rm', 'mv'];
-          if (fileModifiers.includes(parsed.command)) {
-            eventBus.emit('state:changed', undefined as never);
+
+          const result = await runBuiltin(parsed.command, filteredArgs, this.engine.fs, this.engine.dir);
+
+          if (redirectFile && result.output && result.success) {
+            const filepath = `${this.engine.dir}/${redirectFile}`;
+            try {
+              if (redirectAppend) {
+                const existing = await this.engine.fs.promises.readFile(filepath, 'utf8').catch(() => '') as string;
+                await this.engine.fs.promises.writeFile(filepath, existing + result.output + '\n', 'utf8');
+              } else {
+                await this.engine.fs.promises.writeFile(filepath, result.output + '\n', 'utf8');
+              }
+              this.engine.incrementCommandCount();
+              eventBus.emit('state:changed', undefined as never);
+            } catch {
+              this.writeLine(`${parsed.command}: cannot write to '${redirectFile}'`);
+            }
+          } else {
+            if (result.output) {
+              this.writeLine(result.output);
+            }
+            // File-modifying builtins should trigger UI refresh and count as commands
+            const fileModifiers = ['touch', 'echo', 'mkdir', 'rm', 'mv'];
+            if (fileModifiers.includes(parsed.command)) {
+              this.engine.incrementCommandCount();
+              eventBus.emit('state:changed', undefined as never);
+            }
           }
         }
         break;

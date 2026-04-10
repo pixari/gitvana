@@ -1,4 +1,19 @@
 const solutions: Record<string, string[]> = {
+  // === Act 0: The Way of the Terminal ===
+  'act0-01-terminal': [
+    'cat welcome.txt',
+    'echo "My journey begins" > journal.txt',
+    'ls',
+  ],
+  'act0-02-scrolls': [
+    'cat supplies.txt',
+    'echo "candles: 50" >> supplies.txt',
+    'touch notes.txt',
+  ],
+  'act0-03-chains': [
+    'grep meditation catalog.txt > found.txt',
+  ],
+
   // === Act 1: Awakening ===
   'act1-01-spark': [
     'git init',
