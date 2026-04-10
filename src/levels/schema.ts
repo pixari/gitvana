@@ -33,6 +33,8 @@ export interface LevelDefinition {
 
   hints: Hint[];
 
+  tips?: string[];
+
   rewards: {
     stars: { maxCommands: { two: number; three: number } };
     achievement?: string;

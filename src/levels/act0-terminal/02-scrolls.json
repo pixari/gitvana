@@ -1,0 +1,65 @@
+{
+  "id": "act0-02-scrolls",
+  "act": 0,
+  "order": 2,
+  "title": "The Scroll Keeper",
+  "subtitle": "Files are the scrolls of the digital monastery",
+  "difficulty": "beginner",
+  "mode": "strict",
+  "briefing": {
+    "narrative": "The Scroll Keeper, an elderly monk with ink-stained fingers, maintains the monastery's archives.\n\n\"Every monk must know how to handle scrolls,\" he says, adjusting his spectacles. \"You need to create new ones, read existing ones, and — this is important — add to them without erasing what's already there.\"\n\nHe points to a dusty shelf. \"There's an inventory of supplies that needs updating. Read it first, then add the missing item. And for the love of all that is versioned, don't overwrite the existing entries.\"",
+    "concept": "'touch' creates an empty file. 'echo \"text\" >> file' appends text to an existing file (note the double >>). A single > overwrites the file, but >> adds to the end. This is a crucial difference!",
+    "objectives": [
+      "Read the supplies list with 'cat supplies.txt'",
+      "Append 'candles: 50' to supplies.txt using >>",
+      "Create a new empty file called 'notes.txt' using touch"
+    ],
+    "newCommands": ["touch <file>", "echo \"text\" >> file (append)"]
+  },
+  "initialState": {
+    "strategy": "mount",
+    "fileTree": {
+      "supplies.txt": "ink: 12 bottles\nparchment: 200 sheets\nquills: 45"
+    },
+    "head": "none"
+  },
+  "targetState": {
+    "validators": [
+      { "type": "file-content", "params": { "path": "supplies.txt", "contains": "ink: 12 bottles" } },
+      { "type": "file-content", "params": { "path": "supplies.txt", "contains": "candles: 50" } },
+      { "type": "file-exists", "params": { "path": "notes.txt" } }
+    ]
+  },
+  "constraints": {
+    "maxCommands": 10
+  },
+  "hints": [
+    {
+      "trigger": "after-attempts",
+      "triggerValue": 2,
+      "text": "The Scroll Keeper adjusts his spectacles: 'echo \"candles: 50\" >> supplies.txt adds a line. Double arrows >> mean append!'",
+      "penalty": 0
+    },
+    {
+      "trigger": "after-attempts",
+      "triggerValue": 4,
+      "text": "He taps the shelf: 'touch notes.txt creates an empty file. Simple as that.'",
+      "penalty": 0.25
+    },
+    {
+      "trigger": "manual",
+      "text": "The monastery cat demonstrates: cat supplies.txt && echo \"candles: 50\" >> supplies.txt && touch notes.txt",
+      "penalty": 0.5
+    }
+  ],
+  "tips": [
+    ">> appends to a file, > overwrites it — be careful!",
+    "'touch' creates an empty file if it doesn't exist"
+  ],
+  "rewards": {
+    "stars": {
+      "maxCommands": { "two": 6, "three": 4 }
+    },
+    "achievement": "scroll-keeper"
+  }
+}

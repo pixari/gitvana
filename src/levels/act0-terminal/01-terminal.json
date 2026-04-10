@@ -1,0 +1,65 @@
+{
+  "id": "act0-01-terminal",
+  "act": 0,
+  "order": 1,
+  "title": "The Terminal Awakens",
+  "subtitle": "Every journey begins with a single command",
+  "difficulty": "beginner",
+  "mode": "strict",
+  "briefing": {
+    "narrative": "At the foot of the Gitvana mountain, you meet a monk sitting cross-legged beside a glowing terminal.\n\n\"Ah, a new seeker! Before you climb to the Monastery of Version Control, you must learn the Way of the Terminal. The monks up there assume you already know this stuff, and trust me, you don't want to look clueless in front of the Head Monk.\"\n\nHe gestures at the screen. \"Let's start simple. Read the welcome scroll, then create a file. Every great journey starts with writing something down.\"",
+    "concept": "The terminal is a text-based way to interact with your computer. 'cat' displays the contents of a file. 'echo \"text\" > file.txt' creates a new file with the given text. 'ls' lists all files in the current directory.",
+    "objectives": [
+      "Read the welcome scroll with 'cat welcome.txt'",
+      "Create a file called 'journal.txt' with any content",
+      "Verify your file exists with 'ls'"
+    ],
+    "newCommands": ["cat <file>", "echo \"text\" > file", "ls"]
+  },
+  "initialState": {
+    "strategy": "mount",
+    "fileTree": {
+      "welcome.txt": "Welcome, seeker.\n\nYou stand at the base of the Gitvana mountain.\nTo proceed, you must prove you can wield the terminal.\n\nYour first task: create a file called journal.txt.\nWrite anything you like inside it.\n\nUse: echo \"your text\" > journal.txt"
+    },
+    "head": "none"
+  },
+  "targetState": {
+    "validators": [
+      { "type": "file-exists", "params": { "path": "journal.txt" } },
+      { "type": "file-exists", "params": { "path": "welcome.txt" } }
+    ]
+  },
+  "constraints": {
+    "maxCommands": 10
+  },
+  "hints": [
+    {
+      "trigger": "after-attempts",
+      "triggerValue": 2,
+      "text": "The monk whispers: 'Type cat welcome.txt to read the scroll. It has instructions.'",
+      "penalty": 0
+    },
+    {
+      "trigger": "after-attempts",
+      "triggerValue": 4,
+      "text": "The monk sighs gently: 'echo \"hello\" > journal.txt will create the file. Just type it!'",
+      "penalty": 0.25
+    },
+    {
+      "trigger": "manual",
+      "text": "The monastery cat walks across the keyboard: cat welcome.txt && echo \"My journey begins\" > journal.txt && ls",
+      "penalty": 0.5
+    }
+  ],
+  "tips": [
+    "Type a command and press Enter to run it",
+    "Use 'cat filename' to read what's inside a file",
+    "Use 'echo \"text\" > filename' to create a file with content"
+  ],
+  "rewards": {
+    "stars": {
+      "maxCommands": { "two": 6, "three": 4 }
+    },
+    "achievement": "terminal-awakened"
+  }
+}

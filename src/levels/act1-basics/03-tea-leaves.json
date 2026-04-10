@@ -159,6 +159,11 @@
   "constraints": {
     "maxCommands": 8
   },
+  "tips": [
+    "Use 'git log --oneline' for a compact view of commit history",
+    "Edit files with: edit filename.txt",
+    "Use 'git diff' to see what changed in your working directory"
+  ],
   "hints": [
     {
       "trigger": "after-attempts",

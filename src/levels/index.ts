@@ -1,7 +1,10 @@
+import { act0Levels, ACT0_COUNT } from './act0-terminal/index.js';
 import { act1Levels } from './act1-basics/index.js';
 import type { LevelDefinition } from './schema.js';
 
-// Act 1 is always loaded (it's the starting point)
+export { ACT0_COUNT };
+
+// Act 0 (optional terminal intro) and Act 1 are always loaded
 // Other acts are lazy-loaded
 const actLoaders = {
   2: () => import('./act2-branching/index.js').then(m => m.act2Levels),
@@ -17,6 +20,7 @@ export async function getAllLevels(): Promise<LevelDefinition[]> {
   if (allLevels) return allLevels;
 
   const results = await Promise.all([
+    Promise.resolve(act0Levels),
     Promise.resolve(act1Levels),
     actLoaders[2](),
     actLoaders[3](),
@@ -31,7 +35,7 @@ export async function getAllLevels(): Promise<LevelDefinition[]> {
 
 // Sync access after first load
 export function getLevels(): LevelDefinition[] {
-  return allLevels || act1Levels;
+  return allLevels || [...act0Levels, ...act1Levels];
 }
 
-export { act1Levels };
+export { act0Levels, act1Levels };

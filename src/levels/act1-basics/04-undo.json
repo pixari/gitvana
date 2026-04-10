@@ -39,6 +39,10 @@
   "constraints": {
     "maxCommands": 4
   },
+  "tips": [
+    "git reset --soft keeps your changes staged — only the commit is removed",
+    "Use 'git log --oneline' to verify the commit was undone"
+  ],
   "hints": [
     {
       "trigger": "after-attempts",

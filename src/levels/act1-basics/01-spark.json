@@ -31,6 +31,11 @@
   "constraints": {
     "maxCommands": 6
   },
+  "tips": [
+    "Create files with: echo \"content\" > filename.txt",
+    "Type 'help' anytime to see available commands",
+    "Made a mistake? Click the UNDO button or type 'undo'"
+  ],
   "hints": [
     {
       "trigger": "after-attempts",

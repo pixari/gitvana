@@ -1,5 +1,6 @@
 <script lang="ts">
   import { loadProgress } from '../../lib/engine/progression/persistence.js';
+  import { TOTAL_LEVELS } from '../../lib/engine/progression/stages.js';
   import { onMount } from 'svelte';
   import Navbar from '../shared/Navbar.svelte';
 
@@ -41,11 +42,11 @@
     <div class="hero-content">
       <h1 class="title">GITVANA</h1>
       <p class="subtitle">Reach git enlightenment</p>
-      <p class="tagline">Learn git by playing. 38 levels. Real terminal. Free.</p>
+      <p class="tagline">Learn git by playing. {TOTAL_LEVELS} levels. Real terminal. Free.</p>
       <button class="play-btn" onclick={onPlay}>
         <span>{isReturning ? 'CONTINUE' : 'PLAY NOW'}</span>
       </button>
-      <p class="meta">38 levels &middot; 6 acts &middot; 21 git commands &middot; Free forever</p>
+      <p class="meta">{TOTAL_LEVELS} levels &middot; 6 acts &middot; 21 git commands &middot; Free forever</p>
     </div>
     <div class="scroll-hint">
       <span class="scroll-text">SCROLL</span>
@@ -71,7 +72,7 @@
           </div>
         {/each}
       </div>
-      <p class="journey-caption">38 levels across 6 acts. From git init to git mastery.</p>
+      <p class="journey-caption">{TOTAL_LEVELS} levels across 6 acts. From git init to git mastery.</p>
     </div>
   </section>
 

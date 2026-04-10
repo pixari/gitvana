@@ -12,6 +12,8 @@
   import ShareWidget from './components/shared/ShareWidget.svelte';
 
   import DocPopup from './components/shared/DocPopup.svelte';
+  import TipBanner from './components/shared/TipBanner.svelte';
+  import ShellFuChoice from './components/landing/ShellFuChoice.svelte';
   import { soundManager } from './lib/audio/SoundManager.js';
   import { gitEngine } from './lib/engine/git/GitEngine.js';
   import { LevelLoader } from './lib/engine/level/LevelLoader.js';
@@ -28,7 +30,7 @@
   import ChangelogPage from './components/changelog/ChangelogPage.svelte';
   import StatsPage from './components/stats/StatsPage.svelte';
   import DevBlogPage from './components/devblog/DevBlogPage.svelte';
-  import { getAllLevels, getLevels } from './levels/index.js';
+  import { getAllLevels, getLevels, ACT0_COUNT } from './levels/index.js';
   import { onMount } from 'svelte';
   import { trackEvent } from './lib/telemetry.js';
 
@@ -104,8 +106,29 @@
   const hasSavedProgress = !!loadProgress();
   let showLanding = $state(!isSharePage && !hasSavedProgress && !window.location.hash && !isChangelogRoute() && !isDevBlogRoute());
 
+  const TERMINAL_CHOICE_KEY = 'gitvana-terminal-choice';
+  let showTerminalChoice = $state(false);
+
   function handlePlay() {
     showLanding = false;
+    // Show terminal choice for new players who haven't seen it yet
+    if (!hasSavedProgress && !localStorage.getItem(TERMINAL_CHOICE_KEY)) {
+      showTerminalChoice = true;
+    }
+  }
+
+  function handleTerminalChoice() {
+    showTerminalChoice = false;
+    localStorage.setItem(TERMINAL_CHOICE_KEY, 'terminal');
+    levelIndex = 0; // Start at Act 0
+    persistProgress();
+  }
+
+  function handleSkipToGit() {
+    showTerminalChoice = false;
+    localStorage.setItem(TERMINAL_CHOICE_KEY, 'skip');
+    levelIndex = ACT0_COUNT; // Skip to Act 1
+    persistProgress();
   }
 
   // --- Player name ---
@@ -163,7 +186,10 @@
 
   function handleComplete(stars: number) {
     earnedStars = stars;
-    completedLevels++;
+    // Act 0 (prologue) doesn't count toward main progression
+    if (currentLevel.act > 0) {
+      completedLevels++;
+    }
     const prev = levelStars[currentLevel.id] ?? 0;
     if (stars > prev) {
       totalStars += stars - prev;
@@ -182,7 +208,7 @@
     if (levelIndex < allLevels.length - 1) {
       levelIndex++;
     } else {
-      levelIndex = 0;
+      levelIndex = ACT0_COUNT; // Wrap to Act 1, not the tutorial
     }
     screen = 'intro';
     persistProgress();
@@ -260,6 +286,10 @@
   <LandingPage onPlay={handlePlay} />
 {:else}
 
+{#if showTerminalChoice}
+  <ShellFuChoice onTerminal={handleTerminalChoice} onSkip={handleSkipToGit} />
+{/if}
+
 {#if showNamePrompt}
   <NamePrompt onComplete={handleNameComplete} />
 {/if}
@@ -297,6 +327,10 @@
 
 {#if import.meta.env.DEV || import.meta.env.VITE_DEV_TOOLS === 'true'}
   <DevPanel level={currentLevel} onSolve={handleSolve} onSkip={handleSkip} onReset={() => { clearProgress(); location.reload(); }} />
+{/if}
+
+{#if screen === 'playing' && currentLevel.tips?.length}
+  <TipBanner tips={currentLevel.tips} levelId={currentLevel.id} />
 {/if}
 
 {#if screen === 'intro'}

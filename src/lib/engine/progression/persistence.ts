@@ -7,7 +7,10 @@ export interface GameSave {
 }
 
 const SAVE_KEY = 'gitvana-save';
-const SAVE_VERSION = 1;
+const SAVE_VERSION = 2;
+
+// Number of Act 0 levels prepended in v2
+const ACT0_LEVEL_COUNT = 3;
 
 export function saveProgress(data: GameSave): void {
   try {
@@ -23,6 +26,15 @@ export function loadProgress(): GameSave | null {
     if (!raw) return null;
     const data: GameSave = JSON.parse(raw);
     if (typeof data.version !== 'number') return null;
+
+    // Migrate v1 → v2: Act 0 was prepended, shift levelIndex
+    if (data.version === 1) {
+      data.levelIndex += ACT0_LEVEL_COUNT;
+      data.version = SAVE_VERSION;
+      // Re-save with migrated data
+      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    }
+
     return data;
   } catch {
     return null;
