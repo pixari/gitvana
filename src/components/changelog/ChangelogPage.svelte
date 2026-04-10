@@ -13,6 +13,12 @@
 
   const entries = [
     {
+      date: '2026-04-10',
+      title: 'UX Improvements & Bug Fixes',
+      tags: ['fix', 'feature'],
+      content: 'Fixed invisible terminal input \u2014 typed characters were processed but never displayed (#37, #39). Bare "git" command now shows usage info instead of "command not found" (#38). Level complete card can now be minimized so you can review your terminal steps before continuing (#30). Contextual tips appear for new players on early levels (#25). Hardcoded level counts replaced with dynamic TOTAL_LEVELS constant (#42).'
+    },
+    {
       date: '2026-04-06',
       title: 'i18n Infrastructure',
       tags: ['feature'],

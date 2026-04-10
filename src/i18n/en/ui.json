@@ -58,7 +58,7 @@
   "help_meta": "Meta:",
 
   "landing_tagline": "Reach git enlightenment",
-  "landing_subtitle": "Learn git by playing. A browser-based adventure game with a real terminal, 38 levels, and a judgmental cat.",
+  "landing_subtitle": "Learn git by playing. A browser-based adventure game with a real terminal, {{levels}} levels, and a judgmental cat.",
   "landing_play": "PLAY NOW",
   "landing_continue": "CONTINUE",
   "landing_read_docs": "READ THE DOCS"
