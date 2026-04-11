@@ -31,7 +31,7 @@ You play as a monk climbing toward enlightenment. The Head Monk assigns you task
 - Every command you type (`git add`, `git rebase`, `git bisect`...) executes for real
 - 21 git commands implemented: init, add, commit, status, log, diff, branch, checkout, merge, reset, rm, tag, cherry-pick, show, revert, stash, reflog, rebase, blame, bisect, update-ref
 
-**35 levels across 6 acts**
+**38 levels across 6 acts**
 - Act 1: *Awakening* — The basics
 - Act 2: *The Middle Path* — Tags, cherry-pick, revert, stash
 - Act 3: *Rewriting Reality* — Rebase, amend, squash, secret purging
@@ -80,7 +80,7 @@ Open [http://localhost:5173](http://localhost:5173)
 bun test
 ```
 
-All 35 levels have automated tests that verify the solution works.
+All 38 levels have automated tests that verify the solution works.
 
 ## Project structure
 

@@ -23,6 +23,7 @@ let currentData: Record<string, Record<string, string>> = {};
 // Available locales (add new ones here)
 export const availableLocales: { code: string; label: string }[] = [
   { code: 'en', label: 'English' },
+  { code: 'fr', label: 'Français' },
 ];
 
 export function setLocale(code: string) {
