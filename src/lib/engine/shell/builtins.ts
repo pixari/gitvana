@@ -160,21 +160,7 @@ async function echoCommand(args: string[], fs: FsLike, cwd: string): Promise<Bui
   const escapeFlag = raw.startsWith('-e ');
   const content_raw = escapeFlag ? raw.slice(3) : raw;
 
-  // Handle redirect: echo [-e] "content" > file
-  const redirectMatch = content_raw.match(/^(.*?)\s*>\s*(.+)$/);
-  if (redirectMatch) {
-    let content = redirectMatch[1].replace(/^["']|["']$/g, '');
-    if (escapeFlag) content = interpretEscapes(content);
-    const filepath = resolvePath(redirectMatch[2].trim(), cwd);
-    try {
-      await fs.promises.writeFile(filepath, content + '\n');
-      return { output: '', success: true };
-    } catch {
-      return { output: `echo: cannot write to '${redirectMatch[2]}'`, success: false };
-    }
-  }
-
-  // Handle append: echo [-e] "content" >> file
+  // Handle append: echo [-e] "content" >> file (must check before > to avoid >> being parsed as >)
   const appendMatch = content_raw.match(/^(.*?)\s*>>\s*(.+)$/);
   if (appendMatch) {
     let content = appendMatch[1].replace(/^["']|["']$/g, '');
@@ -186,6 +172,20 @@ async function echoCommand(args: string[], fs: FsLike, cwd: string): Promise<Bui
       return { output: '', success: true };
     } catch {
       return { output: `echo: cannot write to '${appendMatch[2]}'`, success: false };
+    }
+  }
+
+  // Handle redirect: echo [-e] "content" > file
+  const redirectMatch = content_raw.match(/^(.*?)\s*>(?!>)\s*(.+)$/);
+  if (redirectMatch) {
+    let content = redirectMatch[1].replace(/^["']|["']$/g, '');
+    if (escapeFlag) content = interpretEscapes(content);
+    const filepath = resolvePath(redirectMatch[2].trim(), cwd);
+    try {
+      await fs.promises.writeFile(filepath, content + '\n');
+      return { output: '', success: true };
+    } catch {
+      return { output: `echo: cannot write to '${redirectMatch[2]}'`, success: false };
     }
   }
 
