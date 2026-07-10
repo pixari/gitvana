@@ -4,7 +4,7 @@
   import MountainPath from '../progression/MountainPath.svelte';
   import ShareCard from '../shared/ShareCard.svelte';
   import { getStage } from '../../lib/engine/progression/stages.js';
-  import { t } from '../../i18n/index.js';
+  import { translate } from '../../i18n/index.js';
 
   interface Props {
     level: LevelDefinition;
@@ -33,22 +33,22 @@
         </span>
       {/each}
     </div>
-    <span class="minimized-title">{t('ui.stage_clear')}</span>
+    <span class="minimized-title">{$translate('ui.stage_clear')}</span>
     <div class="minimized-actions">
-      <button class="minimized-btn minimized-expand" onclick={() => minimized = false}>{t('ui.show_results')}</button>
+      <button class="minimized-btn minimized-expand" onclick={() => minimized = false}>{$translate('ui.show_results')}</button>
       {#if onNext}
-        <button class="minimized-btn minimized-next" onclick={onNext}>{t('ui.next_level')}</button>
+        <button class="minimized-btn minimized-next" onclick={onNext}>{$translate('ui.next_level')}</button>
       {/if}
     </div>
   </div>
 {:else}
   <div class="complete-overlay">
     <div class="complete-card">
-      <button class="minimize-btn" onclick={() => minimized = true} title={t('ui.review_steps')}>
-        {t('ui.review_steps')} ▾
+      <button class="minimize-btn" onclick={() => minimized = true} title={$translate('ui.review_steps')}>
+        {$translate('ui.review_steps')} ▾
       </button>
 
-      <div class="stage-clear">{t('ui.stage_clear')}</div>
+      <div class="stage-clear">{$translate('ui.stage_clear')}</div>
 
       <h2 class="level-name">{level.title}</h2>
 
@@ -62,11 +62,11 @@
 
       <div class="stats">
         <div class="stat-row">
-          <span class="stat-label">{t('ui.commands_used')}</span>
+          <span class="stat-label">{$translate('ui.commands_used')}</span>
           <span class="stat-value">{commandCount}</span>
         </div>
         <div class="stat-row">
-          <span class="stat-label">{t('ui.par_3_stars')}</span>
+          <span class="stat-label">{$translate('ui.par_3_stars')}</span>
           <span class="stat-value">{level.rewards.stars.maxCommands.three}</span>
         </div>
       </div>
@@ -78,11 +78,11 @@
 
       <div class="buttons">
         {#if onRetry}
-          <button class="btn btn-retry" onclick={onRetry}>{t('ui.retry')}</button>
+          <button class="btn btn-retry" onclick={onRetry}>{$translate('ui.retry')}</button>
         {/if}
-        <button class="btn btn-share" onclick={() => showShare = true}>{t('ui.share')}</button>
+        <button class="btn btn-share" onclick={() => showShare = true}>{$translate('ui.share')}</button>
         {#if onNext}
-          <button class="btn btn-next" onclick={onNext}>{t('ui.next_level')}</button>
+          <button class="btn btn-next" onclick={onNext}>{$translate('ui.next_level')}</button>
         {/if}
       </div>
 

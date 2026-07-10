@@ -1,4 +1,4 @@
-import { writable, get } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 
 const LOCALE_KEY = 'gitvana-locale';
 
@@ -27,8 +27,8 @@ export const availableLocales: { code: string; label: string }[] = [
 
 export function setLocale(code: string) {
   localStorage.setItem(LOCALE_KEY, code);
-  locale.set(code);
   loadLocale(code);
+  locale.set(code);
 }
 
 async function loadLocale(code: string) {
@@ -64,6 +64,12 @@ function initEnglish() {
 
 initEnglish();
 
+// Load saved non-English locale on startup so F5 / page reload preserves the language
+const _initialLocale = detectLocale();
+if (_initialLocale !== 'en') {
+  loadLocale(_initialLocale);
+}
+
 /**
  * Translate a key. Format: "namespace.key" e.g. "ui.start_level"
  * Supports simple interpolation: t('ui.commands_used', { count: 5 })
@@ -85,10 +91,6 @@ export function t(key: string, params?: Record<string, string | number>): string
   return value;
 }
 
-// Reactive t() for Svelte components — re-runs when locale changes
-export function createT() {
-  return {
-    subscribe: locale.subscribe,
-    t,
-  };
-}
+// Reactive translate store for Svelte components — use as $translate('key') in templates
+// Re-evaluates when locale changes, picking up the updated currentData.
+export const translate = derived(locale, () => t);

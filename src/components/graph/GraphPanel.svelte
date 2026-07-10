@@ -3,7 +3,7 @@
   import { gitEngine } from '../../lib/engine/git/GitEngine.js';
   import { eventBus } from '../../lib/engine/events/GameEventBus.js';
   import type { CommitInfo, BranchInfo } from '../../lib/engine/git/types.js';
-  import { t } from '../../i18n/index.js';
+  import { translate } from '../../i18n/index.js';
 
   // --- Types ---
   interface GraphNode {
@@ -310,7 +310,7 @@
 
 <div class="graph-container" class:graph-flash={graphFlash}>
   <div class="panel-header">
-    <span class="panel-title">{t('ui.commit_graph')}</span>
+    <span class="panel-title">{$translate('ui.commit_graph')}</span>
     {#if isDetachedHead}
       <span class="detached-badge">DETACHED HEAD</span>
     {/if}
