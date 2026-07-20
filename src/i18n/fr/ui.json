@@ -1,0 +1,63 @@
+{
+  "app_name": "GITVANA",
+  "alpha": "ALPHA",
+
+  "nav_play": "Jouer",
+  "nav_docs": "Documentation",
+  "nav_changelog": "Changelog",
+  "nav_blog": "Blog",
+  "nav_stats": "Stats",
+
+  "act_level": "ACTE {{act}} — NIVEAU {{order}}",
+  "concept": "CONCEPT",
+  "objectives": "OBJECTIFS",
+  "start_level": "DÉBUTER LE NIVEAU",
+
+  "stage_clear": "NIVEAU TERMINÉ!",
+  "commands_used": "Commandes utilisées",
+  "par_3_stars": "Par (3 étoiles)",
+  "retry": "RECOMMENCER",
+  "share": "PARTAGER",
+  "next_level": "NIVEAU SUIVANT",
+
+  "terminal": "TERMINAL",
+  "undo": "ANNULER",
+  "home": "Accueil",
+  "docs": "DOCUMENTATION",
+  "report_bug": "BUG",
+  "mute": "Couper le son",
+  "unmute": "Rétablir le son",
+  "restart": "Recommencer le niveau",
+
+  "new_commands": "NOUVELLES:",
+  "progress": "{{passed}}/{{total}}",
+  "cmds": "{{count}} cmds",
+
+  "your_journey": "TON ÉPOPÉE",
+  "anonymous_monk": "Moine Anonyme",
+
+  "no_commits_yet": "Aucun commit pour l'instant",
+  "make_first_commit": "Réalise ton premier git commit",
+  "commit_graph": "GRAPHE DES COMMITS",
+  "detached_head": "HEAD DÉTACHÉE",
+
+  "nothing_to_undo": "Rien à annuler.",
+  "undo_restored": "Annuler: rétabli à avant la dernière commande.",
+  "command_not_found": "{{cmd}}: commande introuvable",
+
+  "mobile_title": "GITVANA",
+  "mobile_message": "Gitvana nécessite un clavier et un écran plus large.",
+  "mobile_hint": "Merci de visiter le site sur un ordinateur.",
+  "mobile_joke": "Le terminal du monastère ne rentre pas dans ta poche. Les moines ont essayé. Cela a mal fini.",
+
+  "help_title": "GITVANA — Terminal du Monastère",
+  "help_git": "Commandes Git (quête principale):",
+  "help_shell": "Commandes Shell (kit de survie):",
+  "help_meta": "Meta:",
+
+  "landing_tagline": "Atteins l'éveil de/l'illumination git",
+  "landing_subtitle": "Apprends git en jouant. Une aventure sur navigateur avec un vrai terminal, {{levels}} niveaux, et un chat qui juge.",
+  "landing_play": "JOUER MAINTENANT",
+  "landing_continue": "CONTINUER",
+  "landing_read_docs": "LIRE LA DOCUMENTATION"
+}
