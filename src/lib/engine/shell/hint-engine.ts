@@ -1,4 +1,5 @@
 import type { LevelDefinition, Hint } from '../../../levels/schema.js';
+import { t } from '../../../i18n/index.js';
 
 export interface CommandAttempt {
   command: string;
@@ -8,32 +9,23 @@ export interface CommandAttempt {
 }
 
 /**
- * Error pattern → friendly explanation mapping.
- * Keys are substrings matched against command output.
+ * Error pattern → hints.json key mapping.
+ * Keys (patterns) are substrings matched against raw command output and must
+ * stay literal English — they match GitEngine/builtins error text, which is
+ * intentionally not translated (see CONTRIBUTING_TRANSLATIONS.md).
  */
-const ERROR_HINTS: Record<string, string> = {
-  'not a git repository':
-    "You need to initialize a git repository first. Try: git init",
-  'pathspec':
-    "The file you specified doesn't exist. Check the filename with: ls",
-  'nothing to commit':
-    "All your changes are already committed. Check: git status",
-  'CONFLICT':
-    "There's a merge conflict. Use 'edit <file>' to resolve it, then 'git add <file>' and 'git commit'",
-  'not a valid object':
-    "That commit hash doesn't exist. Use 'git log' to see available commits.",
-  'Could not find':
-    "That branch or ref doesn't exist. Use 'git branch' to see available branches.",
-  'detached HEAD':
-    "You're in detached HEAD state. Create a branch to save your work: git checkout -b <name>",
-  'did not match any file':
-    "That file doesn't match anything. Check available files with: ls",
-  'not something we can merge':
-    "The branch you're trying to merge doesn't exist. Use 'git branch' to list branches.",
-  'already exists':
-    "That name is already taken. Pick a different name or delete the existing one first.",
-  'is not a commit':
-    "That doesn't point to a valid commit. Use 'git log' to find the right reference.",
+const ERROR_HINT_KEYS: Record<string, string> = {
+  'not a git repository': 'error_not_a_git_repository',
+  'pathspec': 'error_pathspec',
+  'nothing to commit': 'error_nothing_to_commit',
+  'CONFLICT': 'error_conflict',
+  'not a valid object': 'error_not_a_valid_object',
+  'Could not find': 'error_could_not_find',
+  'detached HEAD': 'error_detached_head',
+  'did not match any file': 'error_did_not_match_any_file',
+  'not something we can merge': 'error_not_something_we_can_merge',
+  'already exists': 'error_already_exists',
+  'is not a commit': 'error_is_not_a_commit',
 };
 
 export class HintEngine {
@@ -74,7 +66,7 @@ export class HintEngine {
     if (this.autoHintShown) return null;
     if (this.consecutiveFailures >= 3) {
       this.autoHintShown = true;
-      return "\x1b[2m\x1b[33mStuck? Type 'hint' for guidance or 'docs' to read the manual.\x1b[0m";
+      return `\x1b[2m\x1b[33m${t('hints.stuck')}\x1b[0m`;
     }
     return null;
   }
@@ -87,7 +79,7 @@ export class HintEngine {
     this.hintCallCount++;
 
     if (!this.level) {
-      return 'No hints available for this level.';
+      return t('hints.no_hints_for_level');
     }
 
     // --- Priority 1: Context-aware hints ---
@@ -112,9 +104,7 @@ export class HintEngine {
       const newCmds = this.level.briefing.newCommands;
       if (newCmds.length > 0) {
         const cmdName = newCmds[0].split(' ')[1] || newCmds[0];
-        return this.formatHint(
-          `You've been at it a while. Type \`docs ${cmdName}\` to read about the commands you need.`,
-        );
+        return this.formatHint(t('hints.been_at_it_a_while', { cmd: cmdName }));
       }
     }
 
@@ -123,9 +113,7 @@ export class HintEngine {
       (a) => a.command !== 'hint' && a.command !== 'help' && a.command !== 'docs',
     );
     if (gitAttempts.length === 0) {
-      return this.formatHint(
-        "Try looking at the repository state first. Type `git status` or `git log` to understand what you're working with.",
-      );
+      return this.formatHint(t('hints.look_at_repo_state'));
     }
 
     // Rule: last command errored — explain the error
@@ -160,15 +148,15 @@ export class HintEngine {
       attempt.command +
       (attempt.args.length > 0 ? ' ' + attempt.args.join(' ') : '');
 
-    for (const [pattern, explanation] of Object.entries(ERROR_HINTS)) {
+    for (const [pattern, key] of Object.entries(ERROR_HINT_KEYS)) {
       if (output.includes(pattern)) {
-        return `Your last command \`${fullCmd}\` failed. ${explanation}`;
+        return t('hints.error_prefix', { cmd: fullCmd, explanation: t(`hints.${key}`) });
       }
     }
 
     // Generic error explanation
     if (output.startsWith('error:') || output.startsWith('fatal:')) {
-      return `Your last command \`${fullCmd}\` failed: ${output.split('\n')[0]}. Check the objectives and try a different approach.`;
+      return t('hints.generic_error', { cmd: fullCmd, output: output.split('\n')[0] });
     }
 
     return null;
@@ -190,33 +178,18 @@ export class HintEngine {
       .map((a) => a.command);
 
     // Approach mismatches
-    const APPROACH_CONFLICTS: Record<string, { instead: string; hint: string }> = {
-      merge: {
-        instead: 'rebase',
-        hint: "You're on the right track with git merge, but this level needs a different approach. Check the objectives again.",
-      },
-      rebase: {
-        instead: 'merge',
-        hint: "You're on the right track with git rebase, but this level wants you to use a different strategy. Re-read the objectives.",
-      },
-      reset: {
-        instead: 'revert',
-        hint: "git reset changes history, but this level might want you to preserve it. Consider git revert instead.",
-      },
-      revert: {
-        instead: 'reset',
-        hint: "git revert creates a new commit to undo changes, but this level might want you to rewrite history. Consider git reset.",
-      },
-      checkout: {
-        instead: 'switch',
-        hint: "git checkout works, but try using git switch — it's the modern way to change branches.",
-      },
+    const APPROACH_CONFLICTS: Record<string, { instead: string; hintKey: string }> = {
+      merge: { instead: 'rebase', hintKey: 'approach_merge' },
+      rebase: { instead: 'merge', hintKey: 'approach_rebase' },
+      reset: { instead: 'revert', hintKey: 'approach_reset' },
+      revert: { instead: 'reset', hintKey: 'approach_revert' },
+      checkout: { instead: 'switch', hintKey: 'approach_checkout' },
     };
 
     for (const cmd of recentGitCmds) {
       const conflict = APPROACH_CONFLICTS[cmd];
       if (conflict && newCommands.includes(conflict.instead)) {
-        return conflict.hint;
+        return t(`hints.${conflict.hintKey}`);
       }
     }
 
@@ -258,27 +231,23 @@ export class HintEngine {
   }
 
   private getFallbackHint(): string {
-    if (!this.level) return 'No hints available.';
+    if (!this.level) return t('hints.no_hints_available');
 
     const newCmds = this.level.briefing.newCommands;
     if (newCmds.length > 0) {
       const cmdName = newCmds[0].split(' ')[1] || newCmds[0];
-      return this.formatHint(
-        `Check the docs for guidance. Type \`docs ${cmdName}\` to read the manual.`,
-      );
+      return this.formatHint(t('hints.fallback_check_docs', { cmd: cmdName }));
     }
 
-    return this.formatHint(
-      "Review the objectives panel and try re-reading the level briefing for clues.",
-    );
+    return this.formatHint(t('hints.fallback_review_objectives'));
   }
 
   private formatHint(text: string): string {
-    return `\x1b[33mHint:\x1b[0m ${text}`;
+    return `\x1b[33m${t('hints.hint_label')}\x1b[0m ${text}`;
   }
 
   private formatStaticHint(hint: Hint): string {
-    let result = `\x1b[33mHint:\x1b[0m ${hint.text}`;
+    let result = `\x1b[33m${t('hints.hint_label')}\x1b[0m ${hint.text}`;
     if (hint.command) {
       result += `\n\x1b[36m  ${hint.command}\x1b[0m`;
     }

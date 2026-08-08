@@ -1,0 +1,376 @@
+{
+  "init": {
+    "description": "\"git init\" crea el directorio .git dentro de tu proyecto, que es donde git almacena todo el historial de versiones: cada commit, rama y objeto. Este directorio contiene objects/ (el almacén direccionado por contenido), refs/ (los punteros de ramas y etiquetas), HEAD (el puntero a la rama actual) y el índice (el área de preparación). Sin este directorio, los comandos de git no tienen con qué trabajar. Ejecutar \"git init\" es declarar que este directorio ahora es un repositorio.",
+    "options": [
+      "Crea un repositorio bare (sin directorio de trabajo, usado para remotos)"
+    ],
+    "examples": [
+      "Inicializa un nuevo repositorio en el directorio actual",
+      "Crea un nuevo directorio \"my-project\" e inicializa un repositorio dentro de él"
+    ],
+    "tip": "Casi nunca necesitas \"git init\" en la práctica. La mayoría de las veces harás \"git clone\" de un repositorio existente. Pero cuando empiezas algo realmente nuevo, aquí es donde comienza."
+  },
+
+  "add": {
+    "description": "\"git add\" copia el contenido actual de los archivos especificados al área de preparación (el índice). Esto no es \"rastrear\" un archivo, sino tomar una instantánea de su estado actual en una zona de preparación para el próximo commit. Si modificas un archivo después de ejecutar \"git add\", el área de preparación sigue teniendo la versión anterior. Debes volver a agregarlo para actualizarla. Este diseño te permite controlar exactamente qué entra en cada commit, incluso preparando partes de un archivo con \"git add -p\".",
+    "options": [
+      "Prepara todos los cambios (nuevos, modificados, eliminados) en todo el árbol de trabajo",
+      "Elige de forma interactiva qué fragmentos de cambios preparar",
+      "Prepara todos los cambios en el directorio actual y sus subdirectorios"
+    ],
+    "examples": [
+      "Prepara un solo archivo",
+      "Prepara todo en el directorio actual",
+      "Prepara todos los cambios en todo el repositorio",
+      "Prepara todos los archivos TypeScript del directorio src"
+    ],
+    "tip": "Usa \"git add -p\" para preparar partes de un archivo. Es el arma secreta para hacer commits limpios y enfocados en lugar de volcar todo de una vez."
+  },
+
+  "commit": {
+    "description": "\"git commit\" toma todo lo que hay en el área de preparación y crea una instantánea permanente: un objeto commit que contiene un árbol (todos los archivos), puntero(s) al padre, información de autor/committer y tu mensaje. El hash del commit se calcula a partir de todos estos campos, por eso no puedes editar un commit: cualquier cambio produce un hash diferente. Cada commit forma un eslabón en la cadena del historial, apuntando hacia atrás a su padre.",
+    "options": [
+      "Proporciona el mensaje del commit en línea",
+      "Prepara automáticamente todos los archivos modificados/eliminados antes de hacer el commit (omite los no rastreados)",
+      "Reemplaza el último commit por uno nuevo (reescribe el historial: usa con cuidado)"
+    ],
+    "examples": [
+      "Hace commit de los cambios preparados con un mensaje",
+      "Prepara todos los cambios rastreados y hace commit en un solo paso",
+      "Reemplaza el mensaje del último commit (¡solo si no lo has subido con push!)"
+    ],
+    "tip": "Escribe los mensajes de commit en modo imperativo: \"Add feature\" en lugar de \"Added feature\". Piénsalo como completar la frase: \"Si se aplica, este commit hará ___\".",
+    "advanced": "## commit --amend\n\n¿Cometiste un error de tipeo en el mensaje del commit? ¿Olvidaste agregar un archivo? \"--amend\" te permite reescribir el commit más reciente. Reemplaza el último commit por completo: mismo padre, nueva instantánea.\n\n**Importante:** Solo modifica commits que aún no hayas subido (push). Modificar un commit ya subido reescribe el historial y les causará problemas a quienes ya descargaron el original.\n\n```\ngit commit --amend -m \"Corrected message\"\ngit add forgotten-file.ts && git commit --amend --no-edit\n```\n\nLa segunda forma agrega un archivo olvidado al último commit sin cambiar el mensaje."
+  },
+
+  "status": {
+    "description": "\"git status\" compara las tres áreas de git de a pares y reporta las diferencias. \"Changes to be committed\" muestra lo que difiere entre el área de preparación y el último commit. \"Changes not staged for commit\" muestra lo que difiere entre tu directorio de trabajo y el área de preparación. \"Untracked files\" muestra archivos que existen en el disco pero no en el índice. Es de solo lectura y completamente seguro: nunca cambia nada.",
+    "options": [
+      "Muestra una salida de estado compacta (una línea por archivo)",
+      "Muestra información de rama y seguimiento incluso en modo corto"
+    ],
+    "examples": [
+      "Ve el estado completo de tu directorio de trabajo",
+      "Vista compacta: M=modificado, A=agregado, ??=no rastreado"
+    ],
+    "tip": "Ante la duda, \"git status\". Es gratis, no cambia nada y te dice exactamente lo que ve git. Es el comando más inofensivo y útil que puedes ejecutar."
+  },
+
+  "log": {
+    "description": "\"git log\" recorre el grafo de commits comenzando desde HEAD, siguiendo los punteros al padre hacia atrás en el historial. Cada entrada muestra el hash del commit, el autor, la fecha y el mensaje. Con \"--graph\", visualiza la estructura DAG de ramas y fusiones como arte ASCII. Con \"--oneline\", condensa cada commit a una sola línea. El log es una vista de solo lectura de la cadena de commits: tu máquina del tiempo para inspeccionar qué pasó y cuándo.",
+    "options": [
+      "Muestra cada commit en una sola línea (hash corto + mensaje)",
+      "Dibuja un gráfico basado en texto de la estructura de ramas",
+      "Muestra solo los últimos n commits",
+      "Muestra commits de todas las ramas, no solo la actual"
+    ],
+    "examples": [
+      "Vista rápida de los commits recientes",
+      "La hermosa visualización de ramas que todos capturan en pantalla",
+      "Muestra solo los últimos 3 commits"
+    ],
+    "tip": "Crea un alias de \"git log --oneline --graph --all\" a algo corto como \"git lg\". Lo usarás cien veces al día."
+  },
+
+  "diff": {
+    "description": "\"git diff\" calcula las diferencias línea por línea entre dos estados de tus archivos. Sin argumentos, compara el directorio de trabajo con el área de preparación (cambios no preparados). Con \"--staged\", compara el área de preparación con el último commit (lo que se va a confirmar). Con \"HEAD\", muestra todos los cambios respecto al último commit. Git calcula los diffs sobre la marcha a partir de instantáneas: no almacena diffs como su modelo de datos.",
+    "options": [
+      "Muestra los cambios que están preparados (listos para confirmar)",
+      "Muestra un resumen de los cambios (archivos modificados, inserciones, eliminaciones)",
+      "Compara el directorio de trabajo con el último commit"
+    ],
+    "examples": [
+      "Muestra los cambios no preparados en el directorio de trabajo",
+      "Muestra lo que está preparado y a punto de confirmarse",
+      "Muestra todos los cambios (preparados + no preparados) respecto al último commit",
+      "Compara dos ramas"
+    ],
+    "tip": "Ejecuta siempre \"git diff --staged\" antes de confirmar. Es tu última oportunidad para detectar ese console.log de depuración que dejaste sin querer."
+  },
+
+  "branch": {
+    "description": "Una rama es un archivo de 41 bytes en .git/refs/heads/ que contiene un hash de commit, nada más. \"git branch\" lista, crea o elimina estos punteros. Crear una rama es casi instantáneo porque git solo escribe un hash en un archivo. Cuando haces un commit, el puntero de la rama actual avanza al nuevo commit. Las demás ramas permanecen sin cambios. Por eso las ramas en git son tan económicas y por eso funciona la filosofía de \"ramificar seguido\".",
+    "options": [
+      "Lista tanto las ramas locales como las remotas",
+      "Elimina una rama (seguro: no eliminará trabajo sin fusionar)",
+      "Fuerza la eliminación de una rama (incluso si no está fusionada: ¡peligroso!)",
+      "Crea una nueva rama en el commit o referencia especificado en lugar de HEAD"
+    ],
+    "examples": [
+      "Lista todas las ramas locales (la actual tiene un asterisco)",
+      "Crea una nueva rama llamada \"feature-login\" en HEAD",
+      "Crea una rama que comienza en un commit específico",
+      "Elimina la rama después de fusionarla"
+    ],
+    "tip": "¡Crear una rama no te cambia a ella! Usa \"git switch\" o \"git checkout\" después de crearla. O usa \"git checkout -b <name>\" para crear y cambiar en un solo paso."
+  },
+
+  "checkout": {
+    "description": "\"git checkout\" cumple dos propósitos distintos: cambiar de rama y restaurar archivos. Cuando recibe el nombre de una rama, mueve HEAD a esa rama y actualiza el directorio de trabajo. Cuando recibe un hash de commit, te coloca en estado de \"HEAD separado\" (detached HEAD): HEAD apunta directamente a un commit, no a una rama. Con la forma \"<ref> -- <file>\", restaura un archivo específico desde cualquier commit sin salir de tu rama actual. El git moderno divide estas funciones en \"switch\" (ramas) y \"restore\" (archivos) para mayor claridad.",
+    "options": [
+      "Crea una nueva rama y cámbiate a ella",
+      "Restaura un archivo desde un commit específico (requiere tanto una referencia como una ruta)",
+      "Hace checkout de la N-ésima posición anterior de HEAD desde el reflog"
+    ],
+    "examples": [
+      "Cambia a la rama main",
+      "Crea y cambia a una nueva rama",
+      "Restaura README.md desde el último commit (sobrescribe la copia de trabajo y la prepara)",
+      "Restaura config.ts tal como estaba en el commit abc1234",
+      "Salta a donde estaba HEAD dos movimientos atrás (desde el reflog)"
+    ],
+    "tip": "Prefiere \"git switch\" para cambiar de rama. La forma \"checkout <ref> -- <file>\" es poderosa para restaurar archivos individuales desde cualquier punto del historial sin salir de tu rama actual."
+  },
+
+  "switch": {
+    "description": "\"git switch\" hace una sola cosa: mover HEAD a una rama diferente y actualizar el directorio de trabajo para que coincida. Se separó de \"checkout\" para eliminar la confusión entre cambiar de rama y restaurar archivos. Usa \"-b\" para crear una nueva rama y cambiar en un solo paso. Por debajo, actualiza la referencia simbólica de HEAD para que apunte a la nueva rama.",
+    "options": [
+      "Cambia a una rama existente",
+      "Crea una nueva rama y cámbiate a ella"
+    ],
+    "examples": [
+      "Cambia a la rama main",
+      "Crea y cambia a \"feature-auth\""
+    ],
+    "tip": "En Gitvana, \"git switch\" es un alias de \"git checkout\", así que ambos comandos se comportan de forma idéntica. Usa el que te resulte más natural."
+  },
+
+  "merge": {
+    "description": "\"git merge\" integra los cambios de otra rama en tu rama actual. Si las ramas no se han bifurcado, git realiza un \"fast-forward\": simplemente adelanta el puntero de la rama. Si se han bifurcado, git crea un commit de fusión con dos padres, combinando ambos historiales. Cuando se cambiaron las mismas líneas en ambos lados, git no puede resolver automáticamente y reporta un conflicto de fusión para que lo arregles manualmente.",
+    "options": [
+      "Fuerza un commit de fusión incluso si es posible hacer fast-forward (conserva el historial de la rama)",
+      "Aborta una fusión en curso y vuelve al estado previo a la fusión",
+      "Aplasta todos los commits en uno antes de fusionar (sin commit de fusión)"
+    ],
+    "examples": [
+      "Fusiona \"feature-login\" en la rama actual",
+      "Fusiona con un commit de fusión (muestra en el historial que existió una rama)",
+      "Sal de una fusión en conflicto"
+    ],
+    "tip": "Fusiona siempre desde una rama main actualizada. Ejecuta \"git pull\" en main primero y luego fusiona. De lo contrario, estarás fusionando sobre una versión desactualizada y generando conflictos innecesarios."
+  },
+
+  "rm": {
+    "description": "\"git rm\" elimina un archivo tanto del directorio de trabajo como del área de preparación en un solo paso. Esto es diferente de simplemente borrar un archivo con tu sistema operativo: si borras un archivo manualmente, git lo ve como \"eliminado pero no preparado\". \"git rm\" prepara la eliminación para que el próximo commit registre la eliminación del archivo. Con \"--cached\", elimina el archivo solo del área de preparación, manteniéndolo en el disco: útil para dejar de rastrear archivos que confirmaste por error.",
+    "options": [
+      "Elimina solo del área de preparación / índice: mantiene el archivo en el disco (útil para dejar de rastrear archivos)",
+      "Fuerza la eliminación incluso si el archivo tiene modificaciones locales",
+      "Elimina de forma recursiva un directorio y todo su contenido"
+    ],
+    "examples": [
+      "Borra el archivo del disco y prepara la eliminación",
+      "Deja de rastrear .env pero lo mantiene en el disco (combínalo con .gitignore)",
+      "Elimina recursivamente un directorio de git",
+      "Elimina todos los archivos .log (entrecomilla el patrón para que tu shell no lo expanda)"
+    ],
+    "tip": "El uso más común de \"git rm --cached\" es cuando confirmaste por accidente un archivo que debería estar en .gitignore (como .env o node_modules). Quítalo del rastreo con --cached, agrégalo a .gitignore y luego confirma. El archivo permanece en tu máquina, pero git lo olvida."
+  },
+
+  "reset": {
+    "description": "\"git reset\" mueve el puntero de la rama actual a un commit diferente. Los tres modos controlan qué sucede con los cambios entre la posición anterior y la nueva. \"--soft\" los mantiene preparados. \"--mixed\" (por defecto) los quita del área de preparación pero mantiene los archivos modificados. \"--hard\" descarta todo. Cuando se usa con una ruta de archivo en lugar de un commit, no mueve el puntero de la rama: simplemente copia ese archivo desde el commit especificado (o HEAD) al área de preparación, lo que en la práctica lo deja sin preparar.",
+    "options": [
+      "Mueve HEAD hacia atrás pero mantiene los cambios preparados (deshacer suave)",
+      "Mueve HEAD hacia atrás y quita los cambios del área de preparación (por defecto: mantiene los archivos intactos)",
+      "Mueve HEAD hacia atrás y ELIMINA todos los cambios (destructivo: ¡sin deshacer!)",
+      "Objetivo: N commits antes del HEAD actual",
+      "Quita un archivo específico del área de preparación (sin mover HEAD)"
+    ],
+    "examples": [
+      "Quita del área de preparación todos los cambios preparados (mantiene las modificaciones del archivo)",
+      "Quita README.md del área de preparación (mantiene los cambios del archivo)",
+      "Quita app.ts del área de preparación sin el prefijo HEAD",
+      "Deshace el último commit pero mantiene los cambios preparados",
+      "Deshace los últimos 3 commits, mantiene los archivos pero los quita de la preparación",
+      "Deshace por completo el último commit y descarta todos los cambios"
+    ],
+    "tip": "Si accidentalmente haces \"git reset --hard\" y pierdes trabajo, no entres en pánico. \"git reflog\" muestra las posiciones recientes de HEAD, y a menudo puedes recuperarlo con \"git reset --hard <hash>\". El reflog conserva las entradas durante unos 90 días."
+  },
+
+  "tag": {
+    "description": "Una etiqueta (tag) es un puntero con nombre a un commit específico, como una rama que nunca se mueve. Las etiquetas ligeras son simples punteros: un archivo en .git/refs/tags/ que contiene un hash de commit. Las etiquetas anotadas son objetos completos de git que almacenan el nombre del creador, el correo, la fecha y un mensaje, además de la referencia al commit. Las etiquetas se usan típicamente para marcar puntos de lanzamiento (v1.0, v2.3.1) para que puedas encontrar fácilmente commits importantes sin memorizar hashes.",
+    "options": [
+      "Crea una etiqueta ligera en HEAD",
+      "Crea una etiqueta ligera en un commit específico",
+      "Crea una etiqueta anotada con un mensaje (incluye información del creador y la fecha)",
+      "Elimina una etiqueta",
+      "Lista todas las etiquetas"
+    ],
+    "examples": [
+      "Lista todas las etiquetas existentes",
+      "Crea una etiqueta ligera \"v1.0\" en el commit actual",
+      "Etiqueta el commit de tres pasos atrás",
+      "Crea una etiqueta anotada con un mensaje",
+      "Elimina una etiqueta que ya no necesitas"
+    ],
+    "tip": "Usa etiquetas anotadas (-a) para lanzamientos y etiquetas ligeras para marcadores temporales o personales. Las etiquetas anotadas guardan quién las creó y cuándo, lo cual importa cuando estás lanzando software."
+  },
+
+  "cherry-pick": {
+    "description": "\"git cherry-pick\" toma un solo commit de cualquier parte del repositorio y reproduce su diff sobre tu rama actual, creando un nuevo commit. El nuevo commit tiene los mismos cambios pero un hash diferente (padre diferente, marca de tiempo diferente). Cherry-pick duplica el trabajo en lugar de moverlo, así que úsalo con moderación: es ideal para tomar una corrección de errores específica de otra rama sin fusionar la rama completa.",
+    "options": [
+      "El hash del commit (completo o corto) que se aplicará sobre la rama actual"
+    ],
+    "examples": [
+      "Aplica el commit abc1234 sobre la rama actual",
+      "Aplica cherry-pick al commit dos pasos antes de HEAD"
+    ],
+    "tip": "Cherry-pick es ideal para hotfixes: corrige un error en una rama de funcionalidad y luego aplica ese único arreglo con cherry-pick sobre main sin fusionar toda la funcionalidad. Pero recuerda: el commit al que se le hizo cherry-pick obtiene un hash nuevo, es una copia, no un movimiento."
+  },
+
+  "show": {
+    "description": "\"git show\" muestra los detalles completos de un commit: hash, autor, fecha, mensaje y el diff calculado respecto a su padre. Con la sintaxis \"<commit>:<file>\", muestra el contenido de un archivo específico tal como existía en ese commit, sin hacerle checkout ni modificar tu directorio de trabajo. Es una herramienta de inspección de solo lectura para examinar cualquier punto del historial de tu repositorio.",
+    "options": [
+      "Muestra los detalles y el diff de un commit específico (por defecto HEAD)",
+      "Muestra el contenido de un archivo en un commit específico"
+    ],
+    "examples": [
+      "Muestra el último commit con su diff",
+      "Muestra el commit de dos pasos atrás",
+      "Muestra un commit específico por su hash",
+      "Muestra README.md tal como existe en el último commit"
+    ],
+    "tip": "Usa \"git show <commit>:<file>\" cuando necesites ver cómo lucía un archivo en un commit pasado sin hacerle checkout. Es de solo lectura y completamente seguro."
+  },
+
+  "revert": {
+    "description": "\"git revert\" crea un NUEVO commit que deshace los cambios de un commit anterior especificado. A diferencia de \"reset\", que mueve el puntero de la rama hacia atrás (reescribiendo el historial), \"revert\" avanza el historial hacia adelante: el commit original permanece en el log. Esto hace que revert sea seguro para commits que ya se subieron y compartieron, porque no reescribe nada de lo que otros dependan.",
+    "options": [
+      "El hash del commit o referencia (p. ej., HEAD~1) cuyos cambios se deben deshacer"
+    ],
+    "examples": [
+      "Deshace el commit más reciente creando un nuevo commit de reversión",
+      "Deshace el commit de tres pasos atrás (solo ese commit específico)",
+      "Deshace un commit específico por su hash"
+    ],
+    "tip": "Usa \"revert\" en lugar de \"reset\" cuando el commit ya se subió a un repositorio compartido. Revert agrega historial; reset lo borra."
+  },
+
+  "stash": {
+    "description": "\"git stash\" guarda tus cambios sin confirmar (tanto preparados como no preparados) en una pila de almacenamiento temporal y restaura un directorio de trabajo limpio. Esto te permite cambiar de rama o traer actualizaciones sin confirmar trabajo a medio terminar. \"git stash pop\" vuelve a aplicar el stash más reciente y lo elimina de la pila. El stash es una pila (LIFO): puedes tener múltiples entradas, listadas con \"git stash list\" y referenciadas como stash@{0}, stash@{1}, etc.",
+    "options": [
+      "Guarda tus cambios sin confirmar en el stash (por defecto cuando no se indica un subcomando)",
+      "Aplica la entrada de stash más reciente y la elimina del stash",
+      "Muestra todas las entradas del stash",
+      "Elimina una entrada del stash sin aplicarla"
+    ],
+    "examples": [
+      "Guarda en el stash todos los cambios sin confirmar",
+      "Restaura los cambios guardados más recientemente en el stash",
+      "Ve todas las entradas del stash",
+      "Descarta la entrada más reciente del stash",
+      "Descarta una entrada específica del stash"
+    ],
+    "tip": "El stash es tu botón de \"guardado rápido\". Úsalo antes de cambiar de rama cuando tienes trabajo en progreso. Pero no dejes que se acumulen los stashes: están pensados para ser temporales."
+  },
+
+  "reflog": {
+    "description": "El reflog registra cada vez que HEAD se mueve: cada commit, checkout, reset, merge y rebase. Incluso si un commit se vuelve inalcanzable desde cualquier rama (después de un reset duro o una rama eliminada), sigue apareciendo en el reflog durante unos 90 días. Esto hace que el reflog sea tu principal herramienta de recuperación: encuentra el hash de un commit perdido en el reflog, y luego crea una rama ahí o resetea hacia él.",
+    "options": [],
+    "examples": [
+      "Muestra el historial completo de movimientos de HEAD"
+    ],
+    "tip": "¿Perdiste un commit después de un reset duro? Ejecuta \"git reflog\", encuentra el hash del commit que quieres y usa \"git reset --hard <hash>\" para recuperarlo. El reflog generalmente conserva las entradas durante 90 días."
+  },
+
+  "rebase": {
+    "description": "\"git rebase\" reproduce los commits de tu rama sobre otra rama, uno a la vez. Cada commit reproducido obtiene un hash nuevo porque su padre cambió. El resultado es un historial lineal, como si hubieras comenzado tu trabajo desde la punta de la rama de destino. Esto produce logs más limpios que merge, pero reescribe los hashes de los commits, lo que lo hace inseguro para commits compartidos/subidos. Haz rebase de tu rama de funcionalidad local; fusiona (merge) hacia las ramas compartidas.",
+    "options": [
+      "Reproduce los commits de la rama actual sobre la rama especificada",
+      "Continúa el rebase después de resolver conflictos",
+      "Aborta el rebase y regresa al estado original"
+    ],
+    "examples": [
+      "Reproduce los commits de la rama actual sobre main",
+      "Continúa después de arreglar un conflicto durante el rebase",
+      "Desiste y vuelve a donde empezaste"
+    ],
+    "tip": "La regla de oro: nunca hagas rebase de commits que ya se subieron a una rama compartida. Rebase reescribe los hashes de los commits, lo cual confunde a todos los que ya tienen los antiguos.",
+    "advanced": "## Rebase vs Merge\n\nAmbos integran cambios, pero cuentan historias distintas:\n- **Merge** conserva el historial completo de ramificación (un commit de fusión con dos padres).\n- **Rebase** reescribe el historial para que sea lineal (como si hubieras comenzado tu trabajo desde la punta de la rama de destino).\n\nRebase es más limpio para ramas de funcionalidad antes de fusionarlas. El flujo de trabajo: haz rebase de tu funcionalidad sobre main, luego haz un merge fast-forward hacia main. El resultado es una línea recta de commits."
+  },
+
+  "blame": {
+    "description": "\"git blame\" anota cada línea de un archivo con el commit que la modificó por última vez, incluyendo el hash del commit, el autor y la fecha. Es una herramienta forense para entender la historia detrás de cualquier línea de código: quién la escribió, cuándo y (a través del mensaje del commit) por qué. A pesar del nombre, es para entender el contexto, no para asignar culpas.",
+    "options": [
+      "El archivo a anotar con información de commit por línea"
+    ],
+    "examples": [
+      "Muestra quién cambió por última vez cada línea de README.md",
+      "Rastrea el origen de cada línea en config.ts"
+    ],
+    "tip": "Cuando \"git blame\" muestra un commit que fue solo un cambio de formato, usa \"git log\" en ese archivo para profundizar más. El autor real de una línea podría estar varios commits atrás. En git real, \"git blame -w\" ignora los cambios de espacios en blanco para ayudar con esto."
+  },
+
+  "bisect": {
+    "description": "\"git bisect\" realiza una búsqueda binaria a través del historial de commits para encontrar cuál introdujo un error. Marcas un commit como \"bad\" (tiene el error) y uno como \"good\" (no lo tiene), y git hace checkout del punto medio para que lo pruebes. Después de cada prueba, reportas good o bad, y git elimina la mitad del rango restante. En O(log n) pasos, unos 10 para 1000 commits, se identifica al commit culpable. También se puede automatizar por completo con \"git bisect run <test-script>\".",
+    "options": [
+      "Inicia una sesión de bisect",
+      "Marca el commit actual (o el especificado) como bad (tiene el error)",
+      "Marca el commit actual (o el especificado) como good (sin error)",
+      "Termina la sesión de bisect y regresa a la rama original"
+    ],
+    "examples": [
+      "Inicia el proceso de bisect",
+      "Marca el commit actual como que tiene el error",
+      "Marca un commit pasado conocido como bueno",
+      "Termina el bisect y vuelve a tu rama"
+    ],
+    "tip": "El flujo típico de bisect: inicia, marca el actual como bad, marca un commit antiguo conocido como bueno (good), luego prueba cada checkout y reporta good/bad. Con 1000 commits, bisect encuentra al culpable en unos 10 pasos."
+  },
+
+  "remote": {
+    "description": "\"git remote\" gestiona las conexiones a otras copias de tu repositorio. Un remoto es un marcador: guarda un nombre (generalmente \"origin\") y una URL para que no tengas que escribir la dirección completa cada vez que haces push o fetch. El remoto en sí no contiene ningún código; es solo una referencia. La transferencia de datos real ocurre a través de \"push\", \"fetch\" y \"pull\".",
+    "options": [
+      "Muestra las URLs de los remotos junto a sus nombres",
+      "Registra un nuevo remoto con el nombre y la URL indicados",
+      "Elimina el registro de un remoto y limpia sus referencias de seguimiento"
+    ],
+    "examples": [
+      "Lista todos los nombres de remotos configurados",
+      "Muestra los nombres de los remotos con sus URLs",
+      "Agrega un remoto llamado \"origin\"",
+      "Elimina un remoto llamado \"upstream\""
+    ],
+    "tip": "\"origin\" es solo una convención: es el nombre predeterminado del remoto desde el que clonaste. Puedes nombrar los remotos como quieras y tener varios remotos (por ejemplo, \"origin\" para tu fork y \"upstream\" para el repositorio original)."
+  },
+
+  "push": {
+    "description": "\"git push\" sube tus commits locales a un repositorio remoto. Envía los nuevos objetos commit y actualiza la referencia de la rama remota para que apunte a tu commit más reciente. Por defecto, hace push a \"origin\" y a la rama actual. Push solo funciona si la rama remota puede avanzarse con fast-forward hasta tus commits; si alguien más hizo push primero, necesitas hacer pull y fusionar antes de hacer push.",
+    "options": [
+      "Establece la rama de seguimiento upstream (para que futuros \"git push\" funcionen sin argumentos)",
+      "Fuerza el push incluso si el remoto se ha bifurcado (PELIGRO: sobrescribe el historial remoto)"
+    ],
+    "examples": [
+      "Sube la rama actual a su remoto upstream",
+      "Sube la rama \"main\" al remoto \"origin\"",
+      "Sube \"feature\" y establece el seguimiento upstream",
+      "Fuerza el push (¡úsalo con extrema precaución!)"
+    ],
+    "tip": "Nunca hagas force-push a una rama compartida a menos que sepas lo que haces. Reescribe el historial remoto y puede destruir el trabajo de otras personas. Si \"git push\" es rechazado, haz pull primero para integrar los cambios remotos."
+  },
+
+  "fetch": {
+    "description": "\"git fetch\" descarga nuevos commits de un remoto sin cambiar tu directorio de trabajo ni tu rama actual. Actualiza tus referencias de seguimiento remoto (por ejemplo, \"origin/main\") para que puedas ver qué cambió en el remoto. Fetch es seguro: solo descarga, nunca modifica tus ramas locales. Después de hacer fetch, puedes inspeccionar los cambios con \"git log origin/main\" y decidir si fusionarlos.",
+    "options": [
+      "Trae cambios de todos los remotos configurados"
+    ],
+    "examples": [
+      "Trae cambios del remoto por defecto (origin)",
+      "Trae nuevos commits de \"origin\"",
+      "Trae cambios de todos los remotos",
+      "Después de hacer fetch, inspecciona los cambios remotos"
+    ],
+    "tip": "Prefiere \"git fetch\" + \"git merge\" en lugar de \"git pull\" cuando quieras inspeccionar los cambios antes de integrarlos. Fetch siempre es seguro; nunca cambia tu trabajo local."
+  },
+
+  "pull": {
+    "description": "\"git pull\" es una forma abreviada de \"git fetch\" seguido de \"git merge\". Descarga nuevos commits del remoto y los fusiona inmediatamente en tu rama actual. Si tu rama no se ha bifurcado del remoto, la fusión es un fast-forward (solo mueve el puntero). Si ambos lados tienen commits nuevos, git crea un commit de fusión. Si ambos cambiaron las mismas líneas, obtendrás un conflicto de fusión para resolver.",
+    "options": [
+      "Hace rebase en lugar de merge (reproduce tus commits sobre el remoto)"
+    ],
+    "examples": [
+      "Trae del remoto upstream y fusiona",
+      "Trae la rama \"main\" desde \"origin\" y la fusiona"
+    ],
+    "tip": "Si quieres más control, usa \"git fetch\" + \"git merge\" por separado. \"git pull\" es conveniente, pero puede sorprenderte con conflictos de fusión si no esperas un historial bifurcado."
+  }
+}

@@ -2,13 +2,28 @@ import { writable, derived } from 'svelte/store';
 
 const LOCALE_KEY = 'gitvana-locale';
 
+// Flat key→string namespaces backed by src/i18n/<locale>/<namespace>.json.
+// All are small and loaded eagerly — `hints` in particular must be
+// synchronously available since HintEngine.getHint() calls t() outside any
+// Svelte store subscription.
+const NAMESPACES = ['ui', 'stages', 'hints'] as const;
+
+// Available locales (add new ones here)
+export const availableLocales: { code: string; label: string }[] = [
+  { code: 'en', label: 'English' },
+  { code: 'es', label: 'Español' },
+];
+
 // Detect browser language, fallback to 'en'
 function detectLocale(): string {
   const saved = localStorage.getItem(LOCALE_KEY);
   if (saved) return saved;
   const lang = navigator.language || 'en';
-  // Check for exact match first (pt-BR), then base (pt)
-  return lang;
+  if (availableLocales.some(l => l.code === lang)) return lang;
+  // Fall back from a region variant (es-MX) to its base language (es)
+  const base = lang.split('-')[0];
+  const baseMatch = availableLocales.find(l => l.code.split('-')[0] === base);
+  return baseMatch ? baseMatch.code : 'en';
 }
 
 export const locale = writable<string>(detectLocale());
@@ -20,10 +35,19 @@ const localeCache = new Map<string, Record<string, Record<string, string>>>();
 let enData: Record<string, Record<string, string>> = {};
 let currentData: Record<string, Record<string, string>> = {};
 
-// Available locales (add new ones here)
-export const availableLocales: { code: string; label: string }[] = [
-  { code: 'en', label: 'English' },
-];
+// Only the flat namespaces — NOT levels.json/docs-*.json, which have their
+// own loaders in src/i18n/content/ (levels eager, docs lazy). A broader glob
+// here would eagerly bundle those into the main chunk too.
+const localeModules = import.meta.glob('./*/{ui,stages,hints}.json', { eager: true }) as Record<string, { default: Record<string, string> }>;
+
+function loadNamespaces(code: string): Record<string, Record<string, string>> {
+  const data: Record<string, Record<string, string>> = {};
+  for (const ns of NAMESPACES) {
+    const mod = localeModules[`./${code}/${ns}.json`];
+    if (mod) data[ns] = mod.default;
+  }
+  return data;
+}
 
 export function setLocale(code: string) {
   localStorage.setItem(LOCALE_KEY, code);
@@ -37,29 +61,16 @@ async function loadLocale(code: string) {
     return;
   }
 
-  try {
-    const modules = import.meta.glob('./*/ui.json', { eager: true }) as Record<string, { default: Record<string, string> }>;
-    const uiModule = modules[`./${code}/ui.json`];
-    if (uiModule) {
-      if (!localeCache.has(code)) localeCache.set(code, {});
-      localeCache.get(code)!.ui = uiModule.default;
-    }
-  } catch { /* locale not found, will use English fallback */ }
-
-  currentData = localeCache.get(code) || {};
+  const data = loadNamespaces(code);
+  localeCache.set(code, data);
+  currentData = data;
 }
 
 // Initialize English data eagerly
 function initEnglish() {
-  try {
-    const modules = import.meta.glob('./en/ui.json', { eager: true }) as Record<string, { default: Record<string, string> }>;
-    const mod = modules['./en/ui.json'];
-    if (mod) {
-      enData = { ui: mod.default };
-      localeCache.set('en', enData);
-      currentData = enData;
-    }
-  } catch { /* fallback to empty */ }
+  enData = loadNamespaces('en');
+  localeCache.set('en', enData);
+  currentData = enData;
 }
 
 initEnglish();

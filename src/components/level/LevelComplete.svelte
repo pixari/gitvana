@@ -72,8 +72,8 @@
       </div>
 
       <div class="stage-info">
-        <span class="stage-label" style="color: {stage.glowColor}">{stage.name}</span>
-        <span class="stage-desc">{stage.description}</span>
+        <span class="stage-label" style="color: {stage.glowColor}">{$translate(`stages.stage_${stage.id}_name`)}</span>
+        <span class="stage-desc">{$translate(`stages.stage_${stage.id}_description`)}</span>
       </div>
 
       <div class="buttons">

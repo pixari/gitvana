@@ -1,0 +1,98 @@
+{
+  "app_name": "GITVANA",
+  "alpha": "ALFA",
+
+  "nav_play": "Jugar",
+  "nav_docs": "Docs",
+  "nav_changelog": "Cambios",
+  "nav_blog": "Blog",
+  "nav_stats": "Estadísticas",
+
+  "act_level": "ACTO {{act}} — NIVEL {{order}}",
+  "act_level_act0": "EL CAMINO DE LA TERMINAL — LECCIÓN {{order}}",
+  "concept": "CONCEPTO",
+  "objectives": "OBJETIVOS",
+  "start_level": "INICIAR NIVEL",
+
+  "stage_clear": "¡ETAPA SUPERADA!",
+  "commands_used": "Comandos usados",
+  "par_3_stars": "Par (3 estrellas)",
+  "retry": "REINTENTAR",
+  "share": "COMPARTIR",
+  "next_level": "SIGUIENTE NIVEL",
+  "review_steps": "Revisar mis pasos",
+  "show_results": "RESULTADOS",
+
+  "terminal": "TERMINAL",
+  "undo": "DESHACER",
+  "home": "Inicio",
+  "docs": "DOCS",
+  "report_bug": "BUG",
+  "mute": "Silenciar",
+  "unmute": "Activar sonido",
+  "restart": "Reiniciar nivel",
+
+  "new_commands": "NUEVO:",
+  "progress": "{{passed}}/{{total}}",
+  "cmds": "{{count}} cmds",
+
+  "your_journey": "TU CAMINO",
+  "anonymous_monk": "Monje Anónimo",
+
+  "no_commits_yet": "Aún no hay commits",
+  "make_first_commit_prefix": "Haz tu primer",
+  "commit_graph": "GRÁFICO DE COMMITS",
+  "detached_head": "HEAD DESACOPLADO",
+  "detached_head_state": "Estado de HEAD desacoplado",
+  "no_reachable_commits": "No hay commits alcanzables desde el HEAD actual",
+
+  "nothing_to_undo": "No hay nada que deshacer.",
+  "undo_restored": "Deshacer: restaurado al estado previo al último comando.",
+  "command_not_found": "{{cmd}}: comando no encontrado",
+
+  "mobile_title": "GITVANA",
+  "mobile_message": "Gitvana necesita un teclado y una pantalla más ancha.",
+  "mobile_hint": "Por favor visita desde una computadora de escritorio o portátil.",
+  "mobile_joke": "La terminal del monasterio no cabe en tu bolsillo. Los monjes lo intentaron. No terminó bien.",
+
+  "help_title": "GITVANA — Terminal del Monasterio",
+  "help_git": "Comandos de git (la misión principal):",
+  "help_shell": "Comandos de shell (kit de supervivencia):",
+  "help_meta": "Meta:",
+
+  "landing_tagline": "Alcanza la iluminación de git",
+  "landing_subtitle": "Aprende git jugando. Una aventura en el navegador con una terminal real, {{levels}} niveles y un gato que te juzga.",
+  "landing_play": "JUGAR AHORA",
+  "landing_continue": "CONTINUAR",
+  "landing_read_docs": "LEER LOS DOCS",
+  "landing_scroll_hint": "DESPLÁZATE",
+  "landing_meta": "{{levels}} niveles · 6 actos · 21 comandos de git · Gratis para siempre",
+
+  "landing_journey_caption": "{{levels}} niveles a lo largo de 6 actos. De git init a la maestría en git.",
+  "landing_tier1_name": "Perdido",
+  "landing_tier1_desc": "Acabas de llegar.",
+  "landing_tier2_name": "Estudiante",
+  "landing_tier2_desc": "Ya sabes crear ramas.",
+  "landing_tier3_name": "Adepto",
+  "landing_tier3_desc": "Haces rebase sin miedo.",
+  "landing_tier4_name": "Iluminado",
+  "landing_tier4_desc": "TÚ ERES el repositorio.",
+
+  "landing_master_title": "LO QUE DOMINARÁS",
+  "landing_col_basics": "Básicos",
+  "landing_col_power_tools": "Herramientas Avanzadas",
+  "landing_col_mastery": "Maestría",
+
+  "landing_docs_cta_title": "¿Aún no listo para jugar?",
+  "landing_docs_cta_subtitle": "Explora la referencia completa de git — 21 comandos, 9 guías conceptuales, todo gratis.",
+
+  "landing_final_cta_title": "¿Listo para comenzar tu camino?",
+
+  "landing_author_heading": "Creado por",
+  "landing_author_aka": "alias",
+  "landing_author_bio": "Ingeniero de software y entusiasta del pixel art. Creó Gitvana porque aprender git no debería sentirse como leer un manual.",
+  "landing_buy_coffee": "Invítame un café",
+
+  "landing_github_star": "Dale una estrella en GitHub",
+  "landing_github_desc": "código abierto, licencia MIT"
+}

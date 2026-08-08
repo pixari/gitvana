@@ -2,6 +2,7 @@
   import type { Stage } from '../../lib/engine/progression/stages.js';
   import { TOTAL_LEVELS } from '../../lib/engine/progression/stages.js';
   import { generateShareImage } from './ShareImage.js';
+  import { t } from '../../i18n/index.js';
 
   interface Props {
     levelTitle: string;
@@ -23,8 +24,10 @@
   let imageUrl: string | null = $state(null);
   let generating = $state(true);
 
+  const stageName = $derived(t(`stages.stage_${stage.id}_name`));
+
   const shareUrl = $derived(
-    `https://gitvana.pixari.dev/#/share?name=${encodeURIComponent(playerName || 'Anonymous Monk')}&level=${levelOrder}&title=${encodeURIComponent(levelTitle)}&stars=${stars}&cmds=${commandCount}&stage=${encodeURIComponent(stage.name)}&completed=${completedLevels}`
+    `https://gitvana.pixari.dev/#/share?name=${encodeURIComponent(playerName || 'Anonymous Monk')}&level=${levelOrder}&title=${encodeURIComponent(levelTitle)}&stars=${stars}&cmds=${commandCount}&stage=${encodeURIComponent(stageName)}&completed=${completedLevels}`
   );
 
   const starsEmoji = $derived('⭐'.repeat(stars));
@@ -43,7 +46,7 @@
       act,
       stars,
       commandCount,
-      stageName: stage.name,
+      stageName,
       stageColor: stage.color,
       completedLevels,
       totalLevels: TOTAL_LEVELS,

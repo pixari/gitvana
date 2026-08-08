@@ -90,7 +90,7 @@
         <button
           class="docs-btn"
           onclick={() => onDocRequest?.(level.briefing.newCommands[0])}
-        >DOCS</button>
+        >{$translate('ui.docs')}</button>
       </div>
     {/if}
 </div>

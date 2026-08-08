@@ -2,6 +2,7 @@
   import { loadProgress } from '../../lib/engine/progression/persistence.js';
   import { TOTAL_LEVELS } from '../../lib/engine/progression/stages.js';
   import { onMount } from 'svelte';
+  import { translate } from '../../i18n/index.js';
   import Navbar from '../shared/Navbar.svelte';
 
   interface Props {
@@ -20,10 +21,10 @@
   });
 
   const monkTiers = [
-    { sprite: '/sprites/monk-tier1.png', label: 'Lost', desc: 'You just arrived.', color: '#5f574f' },
-    { sprite: '/sprites/monk-tier2.png', label: 'Student', desc: 'You can branch.', color: '#29adff' },
-    { sprite: '/sprites/monk-tier3.png', label: 'Adept', desc: 'You rebase fearlessly.', color: '#00e436' },
-    { sprite: '/sprites/monk-tier4.png', label: 'Enlightened', desc: 'You ARE the repo.', color: '#ffa300' },
+    { sprite: '/sprites/monk-tier1.png', nameKey: 'ui.landing_tier1_name', descKey: 'ui.landing_tier1_desc', color: '#5f574f' },
+    { sprite: '/sprites/monk-tier2.png', nameKey: 'ui.landing_tier2_name', descKey: 'ui.landing_tier2_desc', color: '#29adff' },
+    { sprite: '/sprites/monk-tier3.png', nameKey: 'ui.landing_tier3_name', descKey: 'ui.landing_tier3_desc', color: '#00e436' },
+    { sprite: '/sprites/monk-tier4.png', nameKey: 'ui.landing_tier4_name', descKey: 'ui.landing_tier4_desc', color: '#ffa300' },
   ];
 </script>
 
@@ -41,15 +42,15 @@
     <div class="hero-overlay"></div>
     <div class="hero-content">
       <h1 class="title">GITVANA</h1>
-      <p class="subtitle">Reach git enlightenment</p>
-      <p class="tagline">Learn git by playing. {TOTAL_LEVELS} levels. Real terminal. Free.</p>
+      <p class="subtitle">{$translate('ui.landing_tagline')}</p>
+      <p class="tagline">{$translate('ui.landing_subtitle', { levels: TOTAL_LEVELS })}</p>
       <button class="play-btn" onclick={onPlay}>
-        <span>{isReturning ? 'CONTINUE' : 'PLAY NOW'}</span>
+        <span>{isReturning ? $translate('ui.landing_continue') : $translate('ui.landing_play')}</span>
       </button>
-      <p class="meta">{TOTAL_LEVELS} levels &middot; 6 acts &middot; 21 git commands &middot; Free forever</p>
+      <p class="meta">{$translate('ui.landing_meta', { levels: TOTAL_LEVELS })}</p>
     </div>
     <div class="scroll-hint">
-      <span class="scroll-text">SCROLL</span>
+      <span class="scroll-text">{$translate('ui.landing_scroll_hint')}</span>
       <span class="scroll-arrow">▼</span>
     </div>
   </section>
@@ -57,7 +58,7 @@
   <!-- Section 2: Your Journey -->
   <section class="journey-section">
     <div class="section-inner">
-      <h2 class="section-title">YOUR JOURNEY</h2>
+      <h2 class="section-title">{$translate('ui.your_journey')}</h2>
       <div class="tiers-row">
         {#each monkTiers as tier, i}
           {#if i > 0}
@@ -66,23 +67,23 @@
             </div>
           {/if}
           <div class="tier-item">
-            <img src={tier.sprite} alt={tier.label} class="tier-sprite" />
-            <h3 class="tier-name" style="color: {tier.color}">{tier.label}</h3>
-            <p class="tier-desc">{tier.desc}</p>
+            <img src={tier.sprite} alt={$translate(tier.nameKey)} class="tier-sprite" />
+            <h3 class="tier-name" style="color: {tier.color}">{$translate(tier.nameKey)}</h3>
+            <p class="tier-desc">{$translate(tier.descKey)}</p>
           </div>
         {/each}
       </div>
-      <p class="journey-caption">{TOTAL_LEVELS} levels across 6 acts. From git init to git mastery.</p>
+      <p class="journey-caption">{$translate('ui.landing_journey_caption', { levels: TOTAL_LEVELS })}</p>
     </div>
   </section>
 
   <!-- Section 4: What You'll Master -->
   <section class="master-section">
     <div class="section-inner">
-      <h2 class="section-title">WHAT YOU'LL MASTER</h2>
+      <h2 class="section-title">{$translate('ui.landing_master_title')}</h2>
       <div class="commands-grid">
         <div class="commands-col">
-          <h3 class="col-title">Basics</h3>
+          <h3 class="col-title">{$translate('ui.landing_col_basics')}</h3>
           <ul class="cmd-list">
             <li>init</li>
             <li>add</li>
@@ -92,7 +93,7 @@
           </ul>
         </div>
         <div class="commands-col">
-          <h3 class="col-title">Power Tools</h3>
+          <h3 class="col-title">{$translate('ui.landing_col_power_tools')}</h3>
           <ul class="cmd-list">
             <li>cherry-pick</li>
             <li>rebase</li>
@@ -102,7 +103,7 @@
           </ul>
         </div>
         <div class="commands-col">
-          <h3 class="col-title">Mastery</h3>
+          <h3 class="col-title">{$translate('ui.landing_col_mastery')}</h3>
           <ul class="cmd-list">
             <li>reflog</li>
             <li>bisect</li>
@@ -118,9 +119,9 @@
   <!-- Section 5: Docs CTA -->
   <section class="docs-cta">
     <div class="section-inner">
-      <h2 class="docs-title">Not ready to play yet?</h2>
-      <p class="docs-subtitle">Browse the complete git reference — 21 commands, 9 conceptual guides, all free.</p>
-      <a href="#/docs" class="docs-btn-large">READ THE DOCS</a>
+      <h2 class="docs-title">{$translate('ui.landing_docs_cta_title')}</h2>
+      <p class="docs-subtitle">{$translate('ui.landing_docs_cta_subtitle')}</p>
+      <a href="#/docs" class="docs-btn-large">{$translate('ui.landing_read_docs')}</a>
     </div>
   </section>
 
@@ -128,9 +129,9 @@
   <section class="final-cta">
     <div class="section-inner">
       <img src="/sprites/landing-monk.png" alt="Meditating monk" class="cta-monk" />
-      <h2 class="cta-title">Ready to begin your journey?</h2>
+      <h2 class="cta-title">{$translate('ui.landing_final_cta_title')}</h2>
       <button class="play-btn" onclick={onPlay}>
-        <span>{isReturning ? 'CONTINUE' : 'PLAY NOW'}</span>
+        <span>{isReturning ? $translate('ui.landing_continue') : $translate('ui.landing_play')}</span>
       </button>
     </div>
   </section>
@@ -140,12 +141,12 @@
     <div class="section-inner">
       <div class="author-card">
         <div class="author-info">
-          <h3 class="author-heading">Built by</h3>
+          <h3 class="author-heading">{$translate('ui.landing_author_heading')}</h3>
           <p class="author-name"><a href="https://pixari.dev" target="_blank" rel="noopener noreferrer">Raffaele Pizzari</a></p>
-          <p class="author-aka">aka pixari</p>
-          <p class="author-bio">Software engineer and pixel art enthusiast. Built Gitvana because learning git shouldn't feel like reading a manual.</p>
+          <p class="author-aka">{$translate('ui.landing_author_aka')} pixari</p>
+          <p class="author-bio">{$translate('ui.landing_author_bio')}</p>
           <a href="https://buymeacoffee.com/pixari" target="_blank" rel="noopener noreferrer" class="coffee-btn">
-            ☕ Buy me a coffee
+            ☕ {$translate('ui.landing_buy_coffee')}
           </a>
         </div>
       </div>
@@ -158,8 +159,8 @@
       <a href="https://github.com/pixari/gitvana" target="_blank" rel="noopener noreferrer" class="github-banner">
         <svg width="32" height="32" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
         <div class="github-text">
-          <span class="github-title">Star on GitHub</span>
-          <span class="github-subtitle">pixari/gitvana — open source, MIT licensed</span>
+          <span class="github-title">{$translate('ui.landing_github_star')}</span>
+          <span class="github-subtitle">pixari/gitvana — {$translate('ui.landing_github_desc')}</span>
         </div>
       </a>
     </div>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { generateShareImage } from './ShareImage.js';
   import { getStage, TOTAL_LEVELS } from '../../lib/engine/progression/stages.js';
+  import { t } from '../../i18n/index.js';
 
   interface ShareParams {
     name: string;
@@ -19,6 +20,7 @@
   let { params }: Props = $props();
 
   const stageObj = $derived(getStage(params.completed));
+  const stageName = $derived(t(`stages.stage_${stageObj.id}_name`));
 
   let imageUrl: string | null = $state(null);
   let imageBlob: Blob | null = $state(null);
@@ -30,7 +32,7 @@
       act: 1,
       stars: params.stars,
       commandCount: params.cmds,
-      stageName: params.stage || stageObj.name,
+      stageName: params.stage || stageName,
       stageColor: stageObj.color,
       completedLevels: params.completed,
       totalLevels: TOTAL_LEVELS,
@@ -81,7 +83,7 @@
 <div class="share-page">
   <div class="share-content">
     <div class="brand">GITVANA</div>
-    <h1 class="achievement-text">{params.name} achieved {params.stage || stageObj.name} on Gitvana!</h1>
+    <h1 class="achievement-text">{params.name} achieved {params.stage || stageName} on Gitvana!</h1>
 
     <div class="card-container">
       {#if imageUrl}

@@ -312,7 +312,7 @@
   <div class="panel-header">
     <span class="panel-title">{$translate('ui.commit_graph')}</span>
     {#if isDetachedHead}
-      <span class="detached-badge">DETACHED HEAD</span>
+      <span class="detached-badge">{$translate('ui.detached_head')}</span>
     {/if}
   </div>
 
@@ -325,17 +325,17 @@
         <line x1="16" y1="23" x2="24" y2="28" stroke="#5f574f" stroke-width="2" />
         <circle cx="24" cy="28" r="2" fill="none" stroke="#5f574f" stroke-width="2" />
       </svg>
-      <span class="empty-text">No commits yet</span>
-      <span class="empty-hint">Make your first <code>git commit</code></span>
+      <span class="empty-text">{$translate('ui.no_commits_yet')}</span>
+      <span class="empty-hint">{$translate('ui.make_first_commit_prefix')} <code>git commit</code></span>
     </div>
   {:else if nodes.length === 0}
     <div class="empty-state">
       {#if isDetachedHead}
-        <span class="empty-text detached-text">Detached HEAD state</span>
-        <span class="empty-hint">No reachable commits from current HEAD</span>
+        <span class="empty-text detached-text">{$translate('ui.detached_head_state')}</span>
+        <span class="empty-hint">{$translate('ui.no_reachable_commits')}</span>
       {:else}
-        <span class="empty-text">No commits yet</span>
-        <span class="empty-hint">Make your first <code>git commit</code></span>
+        <span class="empty-text">{$translate('ui.no_commits_yet')}</span>
+        <span class="empty-hint">{$translate('ui.make_first_commit_prefix')} <code>git commit</code></span>
       {/if}
     </div>
   {:else}

@@ -2,6 +2,8 @@
   import { commandDocs } from '../../docs/commands/index.js';
   import { guides } from '../../docs/guides/index.js';
   import type { CommandDoc, GuideDoc } from '../../docs/types.js';
+  import { locale } from '../../i18n/index.js';
+  import { loadCommandOverrides, loadGuideOverrides, mergeCommandDoc, mergeGuide } from '../../i18n/content/docs.js';
   import Navbar from '../shared/Navbar.svelte';
 
   interface Props {
@@ -13,8 +15,26 @@
   // Determine if we're viewing a guide or a command
   const isGuideRoute = $derived(commandName?.startsWith('guide/') ?? false);
   const guideId = $derived(isGuideRoute ? commandName!.slice('guide/'.length) : null);
-  const guide = $derived(guideId ? guides[guideId] ?? null : null);
-  const doc = $derived(!isGuideRoute && commandName ? commandDocs[commandName] ?? null : null);
+
+  let commandOverrides: Record<string, { description?: string; tip?: string; advanced?: string; options?: string[]; examples?: string[] }> = $state({});
+  let guideOverrides: Record<string, { title?: string; content?: string }> = $state({});
+
+  $effect(() => {
+    loadCommandOverrides($locale).then(o => { commandOverrides = o; });
+    loadGuideOverrides($locale).then(o => { guideOverrides = o; });
+  });
+
+  // Localized views of the full docs/guides maps — used everywhere in this
+  // component instead of the raw English `guides`/`commandDocs` imports.
+  const localizedGuides = $derived(
+    Object.fromEntries(Object.entries(guides).map(([id, g]) => [id, mergeGuide(g, guideOverrides[id])]))
+  );
+  const localizedCommandDocs = $derived(
+    Object.fromEntries(Object.entries(commandDocs).map(([key, d]) => [key, mergeCommandDoc(d, commandOverrides[key])]))
+  );
+
+  const guide = $derived(guideId ? localizedGuides[guideId] ?? null : null);
+  const doc = $derived(!isGuideRoute && commandName ? localizedCommandDocs[commandName] ?? null : null);
 
   // Guide categories for sidebar
   const guideCategories = [
@@ -24,7 +44,7 @@
   ];
 
   function getGuidesByCategory(category: GuideDoc['category']): GuideDoc[] {
-    return Object.values(guides)
+    return Object.values(localizedGuides)
       .filter(g => g.category === category)
       .sort((a, b) => a.order - b.order);
   }
@@ -166,7 +186,7 @@
         <div class="sidebar-category">
           <span class="category-label">{cat.label}</span>
           {#each cat.commands as cmd}
-            {#if commandDocs[cmd]}
+            {#if localizedCommandDocs[cmd]}
               <button
                 class="sidebar-item"
                 class:active={!isGuideRoute && commandName === cmd}
@@ -215,7 +235,7 @@
               <h2 class="section-label">RELATED COMMANDS</h2>
               <div class="related-list">
                 {#each guide.relatedCommands as rel}
-                  {#if commandDocs[rel]}
+                  {#if localizedCommandDocs[rel]}
                     <button class="related-badge" onclick={() => navigate(rel)}>git {rel}</button>
                   {:else}
                     <span class="related-badge related-badge-inactive">git {rel}</span>
@@ -323,10 +343,10 @@
               <h2 class="section-label">LEARN MORE</h2>
               <div class="see-also-list">
                 {#each doc.seeAlso as gId}
-                  {#if guides[gId]}
+                  {#if localizedGuides[gId]}
                     <button class="see-also-card" onclick={() => navigateGuide(gId)}>
-                      <span class="see-also-category">{guides[gId].category.toUpperCase()}</span>
-                      <span class="see-also-title">{guides[gId].title}</span>
+                      <span class="see-also-category">{localizedGuides[gId].category.toUpperCase()}</span>
+                      <span class="see-also-title">{localizedGuides[gId].title}</span>
                     </button>
                   {/if}
                 {/each}
@@ -340,7 +360,7 @@
               <h2 class="section-label">RELATED COMMANDS</h2>
               <div class="related-list">
                 {#each doc.related as rel}
-                  {#if commandDocs[rel]}
+                  {#if localizedCommandDocs[rel]}
                     <button class="related-badge" onclick={() => navigate(rel)}>git {rel}</button>
                   {:else}
                     <span class="related-badge related-badge-inactive">git {rel}</span>
@@ -390,10 +410,10 @@
                 <h3 class="index-category-title">{cat.label}</h3>
                 <div class="command-grid">
                   {#each cat.commands as cmd}
-                    {#if commandDocs[cmd]}
+                    {#if localizedCommandDocs[cmd]}
                       <button class="command-card" onclick={() => navigate(cmd)}>
                         <span class="card-name">git {cmd}</span>
-                        <span class="card-desc">{commandDocs[cmd].description.split('.')[0]}.</span>
+                        <span class="card-desc">{localizedCommandDocs[cmd].description.split('.')[0]}.</span>
                       </button>
                     {/if}
                   {/each}

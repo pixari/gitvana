@@ -21,6 +21,8 @@
   import { runBuiltin } from './lib/engine/shell/builtins.js';
   import { getLevelSolution } from './lib/engine/shell/solutions.js';
   import { eventBus } from './lib/engine/events/GameEventBus.js';
+  import { locale } from './i18n/index.js';
+  import { localizeLevel } from './i18n/content/levels.js';
   import { saveProgress, loadProgress, clearProgress, getPlayerName, savePlayerName } from './lib/engine/progression/persistence.js';
   import MountainPath from './components/progression/MountainPath.svelte';
   import NamePrompt from './components/shared/NamePrompt.svelte';
@@ -164,6 +166,7 @@
   let levelKey = $state(0);
 
   const currentLevel = $derived(allLevels[Math.min(levelIndex, allLevels.length - 1)]);
+  const localizedLevel = $derived(localizeLevel(currentLevel, $locale));
   const levelLoader = new LevelLoader(gitEngine);
 
   function persistProgress() {
@@ -302,7 +305,7 @@
         onDocRequest={handleDocRequest}
         onAbout={() => showLanding = true}
         onRestart={handleRetry}
-        level={currentLevel}
+        level={localizedLevel}
         onSkip={handleNext}
         {playerName}
       />
@@ -318,8 +321,8 @@
 
     {#snippet hudSlot()}
       <div style="display: flex; gap: 6px; align-items: stretch;">
-        <div style="flex: 1;"><MountainPath completedLevels={completedLevels} levelId={currentLevel.id} levelTitle={currentLevel.title} levelAct={currentLevel.act} levelOrder={currentLevel.order} {playerName} onNameChange={(name) => playerName = name} compact /></div>
-        <div style="flex: 1;"><ObjectivePanel level={currentLevel} onComplete={handleComplete} onDocRequest={handleDocRequest} /></div>
+        <div style="flex: 1;"><MountainPath completedLevels={completedLevels} levelId={currentLevel.id} levelTitle={localizedLevel.title} levelAct={currentLevel.act} levelOrder={currentLevel.order} {playerName} onNameChange={(name) => playerName = name} compact /></div>
+        <div style="flex: 1;"><ObjectivePanel level={localizedLevel} onComplete={handleComplete} onDocRequest={handleDocRequest} /></div>
       </div>
     {/snippet}
   </GameLayout>
@@ -329,12 +332,12 @@
   <DevPanel level={currentLevel} onSolve={handleSolve} onSkip={handleSkip} onReset={() => { clearProgress(); location.reload(); }} />
 {/if}
 
-{#if screen === 'playing' && currentLevel.tips?.length}
-  <TipBanner tips={currentLevel.tips} levelId={currentLevel.id} />
+{#if screen === 'playing' && localizedLevel.tips?.length}
+  <TipBanner tips={localizedLevel.tips} levelId={currentLevel.id} />
 {/if}
 
 {#if screen === 'intro'}
-  <LevelIntro level={currentLevel} {completedLevels} onStart={startLevel} />
+  <LevelIntro level={localizedLevel} {completedLevels} onStart={startLevel} />
 {/if}
 
 {#if editingFile}
@@ -355,7 +358,7 @@
 
 {#if screen === 'complete'}
   <LevelComplete
-    level={currentLevel}
+    level={localizedLevel}
     stars={earnedStars}
     {completedLevels}
     {playerName}

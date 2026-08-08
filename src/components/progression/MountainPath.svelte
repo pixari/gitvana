@@ -1,6 +1,7 @@
 <script lang="ts">
   import { stages, getStage, getNextStage, TOTAL_LEVELS } from '../../lib/engine/progression/stages.js';
   import { savePlayerName } from '../../lib/engine/progression/persistence.js';
+  import { translate } from '../../i18n/index.js';
   import PixelArt from '../shared/PixelArt.svelte';
 
   interface Props {
@@ -68,7 +69,7 @@
         {/if}
       </div>
       <div class="monk-stage-badge" style="background: {currentStage.glowColor}22; border-color: {currentStage.glowColor}44; color: {currentStage.glowColor}">
-        {currentStage.name}
+        {$translate(`stages.stage_${currentStage.id}_name`)}
       </div>
     </div>
 
@@ -99,9 +100,9 @@
       </div>
 
       <div class="hud-bottom">
-        <span class="hud-desc">{currentStage.description}</span>
+        <span class="hud-desc">{$translate(`stages.stage_${currentStage.id}_description`)}</span>
         {#if nextStage}
-          <span class="hud-next">{nextStage.minLevels - completedLevels} to {nextStage.name}</span>
+          <span class="hud-next">{nextStage.minLevels - completedLevels} to {$translate(`stages.stage_${nextStage.id}_name`)}</span>
         {/if}
       </div>
 
@@ -131,7 +132,7 @@
 
     <!-- Fade hint: more stages above -->
     {#if hasAbove}
-      <div class="fade-hint top">▲ {stages[windowEnd]?.name ?? 'Enlightened'}</div>
+      <div class="fade-hint top">▲ {stages[windowEnd] ? $translate(`stages.stage_${stages[windowEnd].id}_name`) : $translate('stages.stage_20_name')}</div>
     {/if}
 
     <!-- Visible stages (reversed: top = further along) -->
@@ -169,15 +170,15 @@
             <div class="stage-info">
               <div class="stage-name-row">
                 <span class="stage-num">{stage.id}</span>
-                <span class="stage-name" style="color: {completed || isCurrent ? stage.glowColor : '#5f574f'}">{stage.name}</span>
+                <span class="stage-name" style="color: {completed || isCurrent ? stage.glowColor : '#5f574f'}">{$translate(`stages.stage_${stage.id}_name`)}</span>
                 {#if completed && !isCurrent}
                   <span class="check">✓</span>
                 {/if}
               </div>
               {#if isCurrent}
-                <div class="stage-desc">{stage.description}</div>
+                <div class="stage-desc">{$translate(`stages.stage_${stage.id}_description`)}</div>
                 {#if nextStage}
-                  <div class="stage-next">{nextStage.minLevels - completedLevels} more level{nextStage.minLevels - completedLevels === 1 ? '' : 's'} to {nextStage.name}</div>
+                  <div class="stage-next">{nextStage.minLevels - completedLevels} more level{nextStage.minLevels - completedLevels === 1 ? '' : 's'} to {$translate(`stages.stage_${nextStage.id}_name`)}</div>
                 {/if}
               {/if}
             </div>
@@ -188,7 +189,7 @@
 
     <!-- Fade hint: more stages below -->
     {#if hasBelow}
-      <div class="fade-hint bottom">▼ {stages[windowStart - 1]?.name ?? 'Lost'}</div>
+      <div class="fade-hint bottom">▼ {stages[windowStart - 1] ? $translate(`stages.stage_${stages[windowStart - 1].id}_name`) : $translate('stages.stage_1_name')}</div>
     {/if}
   </div>
 {/if}

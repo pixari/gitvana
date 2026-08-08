@@ -1,0 +1,814 @@
+{
+  "act0-01-terminal": {
+    "title": "La Terminal Despierta",
+    "subtitle": "Todo viaje comienza con un solo comando",
+    "briefing": {
+      "narrative": "Al pie de la montaña Gitvana, te encuentras con un monje sentado con las piernas cruzadas junto a una terminal resplandeciente.\n\n\"¡Ah, un nuevo buscador! Antes de subir al Monasterio del Control de Versiones, debes aprender el Camino de la Terminal. Los monjes de allá arriba dan por hecho que ya sabes todo esto, y créeme, no querrás quedar como un despistado frente al Monje Mayor.\"\n\nHace un gesto hacia la pantalla. \"Empecemos con algo simple. Lee el pergamino de bienvenida y luego crea un archivo. Todo gran viaje comienza escribiendo algo.\"",
+      "concept": "La terminal es una forma basada en texto de interactuar con tu computadora. 'cat' muestra el contenido de un archivo. 'echo \"text\" > file.txt' crea un archivo nuevo con el texto indicado. 'ls' lista todos los archivos del directorio actual.",
+      "objectives": [
+        "Lee el pergamino de bienvenida con 'cat welcome.txt'",
+        "Crea un archivo llamado 'journal.txt' con cualquier contenido",
+        "Verifica que tu archivo existe con 'ls'"
+      ]
+    },
+    "tips": [
+      "Escribe un comando y presiona Enter para ejecutarlo",
+      "Usa 'cat filename' para leer lo que hay dentro de un archivo",
+      "Usa 'echo \"text\" > filename' para crear un archivo con contenido"
+    ],
+    "hints": [
+      "El monje susurra: 'Escribe cat welcome.txt para leer el pergamino. Tiene instrucciones.'",
+      "El monje suspira suavemente: 'echo \"hello\" > journal.txt creará el archivo. ¡Solo escríbelo!'",
+      "El gato del monasterio camina sobre el teclado: cat welcome.txt && echo \"My journey begins\" > journal.txt && ls"
+    ]
+  },
+  "act0-02-scrolls": {
+    "title": "El Guardián de los Pergaminos",
+    "subtitle": "Los archivos son los pergaminos del monasterio digital",
+    "briefing": {
+      "narrative": "El Guardián de los Pergaminos, un monje anciano de dedos manchados de tinta, mantiene los archivos del monasterio.\n\n\"Todo monje debe saber manejar pergaminos\", dice mientras se ajusta los anteojos. \"Necesitas crear otros nuevos, leer los existentes y —esto es importante— añadirles contenido sin borrar lo que ya hay.\"\n\nSeñala un estante polvoriento. \"Hay un inventario de suministros que necesita actualizarse. Léelo primero y luego agrega el artículo que falta. Y por el amor de todo lo versionado, no sobrescribas las entradas existentes.\"",
+      "concept": "'touch' crea un archivo vacío. 'echo \"text\" >> file' añade texto a un archivo existente (fíjate en el doble >>). Un solo > sobrescribe el archivo, pero >> agrega al final. ¡Esta diferencia es crucial!",
+      "objectives": [
+        "Lee la lista de suministros con 'cat supplies.txt'",
+        "Agrega 'candles: 50' a supplies.txt usando >>",
+        "Crea un archivo vacío nuevo llamado 'notes.txt' usando touch"
+      ]
+    },
+    "tips": [
+      ">> agrega contenido a un archivo, > lo sobrescribe. ¡Ten cuidado!",
+      "'touch' crea un archivo vacío si no existe"
+    ],
+    "hints": [
+      "El Guardián de los Pergaminos se ajusta los anteojos: 'echo \"candles: 50\" >> supplies.txt agrega una línea. ¡Las flechas dobles >> significan añadir al final!'",
+      "Golpea el estante con el dedo: 'touch notes.txt crea un archivo vacío. Así de simple.'",
+      "El gato del monasterio hace una demostración: cat supplies.txt && echo \"candles: 50\" >> supplies.txt && touch notes.txt"
+    ]
+  },
+  "act0-03-chains": {
+    "title": "El Maestro de las Cadenas",
+    "subtitle": "El verdadero poder viene de combinar comandos simples",
+    "briefing": {
+      "narrative": "El monje asiente, aprobando tu progreso. \"Estás casi listo para la montaña. Pero hay un arte más que debes aprender: el arte de encadenar comandos.\"\n\nSaca un pergamino grueso. \"La biblioteca del monasterio tiene un catálogo de textos antiguos. Tu tarea: encuentra la entrada sobre 'meditation' y escríbela en un archivo nuevo. Vas a necesitar grep para buscar y la capacidad de encadenar comandos.\"\n\nTe guiña el ojo. \"Los monjes de allá arriba encadenan comandos como quien respira. Luego me lo agradecerás.\"",
+      "concept": "'grep' busca texto dentro de archivos. 'grep word file.txt' muestra las líneas que contienen esa palabra. Puedes encadenar comandos con '&&': el segundo comando se ejecuta solo si el primero tiene éxito. Por ejemplo: 'echo \"hello\" > file.txt && cat file.txt' crea un archivo y luego lo muestra.",
+      "objectives": [
+        "Usa 'grep' para encontrar la línea sobre meditation en catalog.txt",
+        "Crea un archivo llamado 'found.txt' que contenga 'meditation'",
+        "Hazlo en una sola línea usando && para encadenar comandos"
+      ]
+    },
+    "tips": [
+      "'grep word file' busca líneas que contengan 'word'",
+      "Encadena comandos con &&: first && second",
+      "Puedes redirigir la salida a un archivo: grep word file.txt > result.txt"
+    ],
+    "hints": [
+      "El monje te da una pista: 'grep meditation catalog.txt encontrará la línea que necesitas.'",
+      "Dibuja en la arena: 'echo \"meditation\" > found.txt crea el archivo. O, si quieres lucirte, grep meditation catalog.txt > found.txt ¡redirige la salida de grep a un archivo!'",
+      "El gato del monasterio teclea con destreza practicada: grep meditation catalog.txt > found.txt"
+    ]
+  },
+  "act1-01-spark": {
+    "title": "La Chispa",
+    "subtitle": "Algo de la nada",
+    "briefing": {
+      "narrative": "Llegas al Monasterio del Control de Versiones un martes lluvioso. El Monje Mayor, una figura curtida que asegura haber inventado el punto y coma, te bloquea la entrada.\n\n\"Antes de que puedas entrar\", entona, \"debes demostrar que puedes crear Algo de la Nada. Inicializa un repositorio, escribe un archivo y confírmalo. El universo comenzó con menos.\"\n\nHace una pausa. \"Además, la cocina necesita desesperadamente una lista de compras. Es una larga historia. No preguntes.\"",
+      "concept": "git init crea un nuevo repositorio de Git en el directorio actual. Piénsalo como fundar un monasterio: nada se rastrea hasta que alguien da el primer paso. git add prepara un archivo, marcándolo para incluirlo en el próximo commit. git commit guarda una instantánea permanente de todo lo que está preparado.",
+      "objectives": [
+        "Inicializa un nuevo repositorio git con 'git init'",
+        "Crea un archivo (cualquier nombre, cualquier contenido)",
+        "Prepara el archivo con 'git add'",
+        "Crea tu primer commit"
+      ]
+    },
+    "tips": [
+      "Crea archivos con: echo \"content\" > filename.txt",
+      "Escribe 'help' en cualquier momento para ver los comandos disponibles",
+      "¿Cometiste un error? Haz clic en el botón UNDO o escribe 'undo'"
+    ],
+    "hints": [
+      "El Monje Mayor se inclina en tono cómplice: 'Empieza con git init. Luego crea un archivo. Cualquier archivo. echo \"hello\" > hello.txt funciona bien.'",
+      "Un monje que pasa deja caer un pergamino a tus pies: 'git add <file> lo prepara. git commit -m \"message\" lo guarda. Ese es el camino.'",
+      "El gato del monasterio camina sobre tu teclado y de alguna manera escribe: git init && echo \"hello\" > hello.txt && git add hello.txt && git commit -m \"First commit\""
+    ]
+  },
+  "act1-02-ledger": {
+    "title": "El Libro Mayor del Monasterio",
+    "subtitle": "No todo pertenece a los pergaminos sagrados",
+    "briefing": {
+      "narrative": "El contable del monasterio —un monje nervioso que verifica todo tres veces— te entrega tres archivos y una expresión preocupada.\n\n\"Tenemos data.txt y config.txt, que DEBEN ir al repositorio. ¿Pero ese archivo temp.log? Es basura. Salida de depuración. Desecho digital. Si lo confirmas, el Monje Mayor te hará limpiar la sala de meditación con un cepillo de dientes.\"\n\nMira a su alrededor. \"Su cepillo de dientes. Es muy particular con ese castigo.\"",
+      "concept": "git add te permite elegir exactamente qué archivos incluir en tu próximo commit. Esto se llama 'preparación selectiva'. No tienes que confirmar todo lo que hay en tu directorio de trabajo, solo los archivos que agregas explícitamente. Así es como mantienes los archivos temporales, los registros y otra basura fuera del historial de tu repositorio.",
+      "objectives": [
+        "Prepara data.txt y config.txt (pero NO temp.log)",
+        "Confirma los archivos preparados",
+        "temp.log debe permanecer en el directorio de trabajo pero sin rastrear"
+      ]
+    },
+    "tips": [
+      "Usa 'git status' para ver qué archivos están rastreados, preparados o sin rastrear",
+      "Puedes preparar varios archivos a la vez: git add file1.txt file2.txt"
+    ],
+    "hints": [
+      "El contable susurra: 'Usa git status para ver qué es qué. Luego usa git add solo con los archivos que quieres. No temp.log. Nunca temp.log.'",
+      "Una nota pegada en el tablón de anuncios del monasterio dice: 'git add data.txt config.txt: puedes agregar varios archivos a la vez. Luego confirma.'",
+      "El gato del monasterio, con aire de suficiencia, escribe: git add data.txt config.txt && git commit -m \"Add monastery records\""
+    ]
+  },
+  "act1-03-tea-leaves": {
+    "title": "Leyendo las Hojas de Té",
+    "subtitle": "La historia guarda la verdad",
+    "briefing": {
+      "narrative": "El intendente del monasterio irrumpe en el scriptorium con los ojos desorbitados. \"¡Alguien ARRUINÓ la lista de precios! ¡El pan costaba 10 monedas y ahora dice 1000! ¡Los monjes de la cocina están en franca rebelión!\"\n\nDeja caer el libro mayor sobre tu escritorio. \"La lista de precios ha sido modificada a lo largo de cuatro commits. Necesitas encontrar cuál commit introdujo el error, arreglar el archivo para que el pan vuelva a costar 10 monedas, y confirmar la corrección.\"\n\nEl gato del monasterio se sienta sobre la lista de precios. No le importan los precios del pan. Come pescado.",
+      "concept": "git log muestra el historial de todos los commits: quién cambió qué y cuándo. git diff te permite comparar los cambios entre commits. Juntos, son tu equipo de herramientas de detective. Cuando algo se rompe, puedes rastrear el historial para encontrar exactamente cuándo y dónde se introdujo el problema.",
+      "objectives": [
+        "Usa 'git log' para examinar el historial de commits",
+        "Encuentra el commit que cambió el pan de 10 a 1000",
+        "Corrige prices.txt para que el pan vuelva a costar 10",
+        "Confirma la corrección con un mensaje que contenga 'Fix'"
+      ]
+    },
+    "tips": [
+      "Usa 'git log --oneline' para una vista compacta del historial de commits",
+      "Edita archivos con: edit filename.txt",
+      "Usa 'git diff' para ver qué cambió en tu directorio de trabajo"
+    ],
+    "hints": [
+      "El intendente camina nervioso de un lado a otro: 'Prueba git log --oneline para ver todos los commits. Luego git diff HEAD~2 HEAD~1 para comparar qué cambió en el commit sospechoso.'",
+      "Un monje que pasa murmura: 'El tercer commit —\"Update prices\"— ahí está la corrupción. Edita el archivo, cambia 1000 de vuelta a 10, luego agrega y confirma con un mensaje que contenga Fix.'",
+      "El gato del monasterio derriba un tintero, que milagrosamente deletrea: Edita prices.txt para corregir \"bread: 1000\" de vuelta a \"bread: 10\", luego git add prices.txt && git commit -m \"Fix bread price\""
+    ]
+  },
+  "act1-04-undo": {
+    "title": "La Escalera del Deshacer",
+    "subtitle": "Los errores son solo commits esperando ser deshechos",
+    "briefing": {
+      "narrative": "El Hermano Manoslocas lo ha hecho de nuevo. Confirmó las reglas del monasterio con el mensaje \"WRONG\" en lugar de algo con sentido. El Monje Mayor no está nada divertido.\n\n\"El commit existe\", dice el Monje Mayor, apretándose el puente de la nariz. \"Los cambios están bien. El MENSAJE es una vergüenza para esta orden. Necesito que deshagas ese commit —suavemente, eso sí, queremos mantener los cambios preparados— y vuelvas a confirmar con un mensaje adecuado.\"\n\nMira fulminante al Hermano Manoslocas, que intenta esconderse detrás de una planta en maceta.",
+      "concept": "git reset --soft HEAD~1 deshace el último commit pero mantiene todos los cambios preparados. Es como decir 'quiero repetir ese commit, pero no quiero perder mi trabajo'. Los cambios permanecen en el área de preparación, listos para confirmarse de nuevo con un mejor mensaje (o archivos diferentes).",
+      "objectives": [
+        "Usa 'git reset --soft HEAD~1' para deshacer el commit erróneo",
+        "Verifica que tus cambios sigan preparados (git status)",
+        "Vuelve a confirmar con el mensaje 'Add monastery rules'"
+      ]
+    },
+    "tips": [
+      "git reset --soft mantiene tus cambios preparados: solo se elimina el commit",
+      "Usa 'git log --oneline' para verificar que el commit fue deshecho"
+    ],
+    "hints": [
+      "El Monje Mayor suspira: 'git reset --soft HEAD~1 deshará el último commit pero mantendrá tus cambios preparados. Luego solo confirma de nuevo con el mensaje correcto.'",
+      "El Hermano Manoslocas articula sin voz desde detrás de la planta: 'Reset soft, luego commit -m \"Add monastery rules\". Por favor. Mi reputación depende de ello.'",
+      "El gato del monasterio escribe con una sola pata: git reset --soft HEAD~1 && git commit -m \"Add monastery rules\""
+    ]
+  },
+  "act1-05-branching": {
+    "title": "Realidades Ramificadas",
+    "subtitle": "Un repo, muchas líneas temporales",
+    "briefing": {
+      "narrative": "El instructor de filosofía del monasterio —un monje que habla enteramente en metáforas— te convoca al jardín de los senderos que se bifurcan.\n\n\"Imagina\", dice, señalando un bonsái, \"que pudieras vivir dos vidas al mismo tiempo. En una, te conviertes en panadero. En la otra, en poeta. Las ramas de Git son exactamente esto: realidades paralelas donde ocurre trabajo distinto sin interferir entre sí.\"\n\nPoda una rama del bonsái. \"Crea dos ramas de funcionalidad. Haz commits diferentes en cada una. Luego regresa a main. Observa cómo cada rama sostiene su propia verdad.\"\n\nEl gato del monasterio está sentado en el bonsái. Nadie sabe cómo llegó ahí.",
+      "concept": "Las ramas te permiten trabajar en cosas distintas sin que se afecten entre sí. git branch <name> crea una nueva rama. git checkout <name> cambia a ella. Cada rama tiene su propio historial de commits que diverge desde el punto donde fue creada. Puedes cambiar entre ramas libremente.",
+      "objectives": [
+        "Crea una rama llamada 'feature-a'",
+        "Cambia a feature-a y haz al menos un commit",
+        "Crea una rama llamada 'feature-b' (desde main)",
+        "Cambia a feature-b y haz al menos un commit",
+        "Regresa a main y fusiona una de las ramas de funcionalidad"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El monje de filosofía se acaricia la barba: 'git branch feature-a crea la rama. git checkout feature-a cambia a ella. Luego crea un archivo y confírmalo.'",
+      "Un monje que pasa dibuja en la arena: 'Después de confirmar en feature-a, regresa a main con git checkout main. Luego git branch feature-b, git checkout feature-b, confirma algo, y git checkout main de nuevo.'",
+      "El gato del monasterio maúlla la solución: git checkout -b feature-a && echo \"feature a\" > a.txt && git add a.txt && git commit -m \"Add feature a\" && git checkout main && git checkout -b feature-b && echo \"feature b\" > b.txt && git add b.txt && git commit -m \"Add feature b\" && git checkout main"
+    ]
+  },
+  "act1-06-boss": {
+    "title": "El Crisol de la Fusión",
+    "subtitle": "La prueba final del Monje Mayor",
+    "briefing": {
+      "narrative": "El Monje Mayor está de pie ante la Puerta Interior, con los brazos cruzados. Detrás de él, dos pergaminos cuelgan de la pared: el menú semanal del monasterio, editado por dos monjes que aparentemente nunca se comunican.\n\n\"El Hermano Lunes actualizó la comida del lunes a Pizza en la rama 'good-changes'. Mientras tanto, la Hermana Lunes se rebeló en la rama 'bad-changes' y escribió BASURA en el espacio del lunes.\"\n\nTe clava la mirada. \"Fusiona los buenos cambios en main; ese debería salir sin problemas. Luego... la rama mala. Fusiónala también, pero cuando veas el horror que contiene, ABORTA. No todas las fusiones están destinadas a existir.\"\n\nEl gato del monasterio está comiendo de ambos menús. No tiene conflictos.",
+      "concept": "Cuando dos ramas modifican el mismo archivo, Git no puede fusionarlas automáticamente. Crea un conflicto, marcando ambas versiones en el archivo con los marcadores <<<<<<< y >>>>>>>. Debes editar manualmente el archivo para resolver el conflicto, luego prepararlo y confirmarlo. Si una fusión sale mal, git merge --abort la cancela y restaura el estado anterior.",
+      "objectives": [
+        "Fusiona la rama 'good-changes' en main (fusión limpia)",
+        "Intenta fusionar 'bad-changes' — observa el conflicto y aborta con 'git merge --abort'",
+        "Elimina la rama bad-changes (git branch -d bad-changes)",
+        "El menu.txt final debe contener 'Pizza' pero NO 'GARBAGE'"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El Monje Mayor asiente hacia los pergaminos: 'Fusiona con sabiduría. Algunas ramas merecen ser fusionadas. Otras merecen ser abandonadas. Tienes todas las herramientas que necesitas.'"
+    ]
+  },
+  "act2-07-detached": {
+    "title": "Cirugía de HEAD Separado",
+    "subtitle": "Perdido en el tiempo, pero no por mucho",
+    "briefing": {
+      "narrative": "Despiertas en la enfermería del monasterio. La hermana enfermera —que insiste en que la llamen 'Doctora' pese a no tener absolutamente ninguna formación médica— está inclinada sobre ti.\n\n\"Malas noticias\", dice. \"Te han hecho checkout a un commit antiguo. Tu HEAD está separado. No entres en pánico, es cosa de git, no algo médico.\"\n\nConsulta su portapapeles. \"Estás tres commits por detrás del presente. Cualquier trabajo que hagas aquí se perderá a menos que crees una rama para guardarlo. Piénsalo como construir un bote salvavidas en medio de una paradoja temporal.\"\n\nEl gato del monasterio de algún modo está tanto en el pasado como en el presente. Los gatos son raros así.",
+      "concept": "Cuando haces checkout de un commit específico (no de una rama), entras en el estado de 'HEAD separado'. Puedes mirar alrededor e incluso hacer commits, pero esos commits no pertenecen a ninguna rama: se perderán cuando cambies a otro lado. Para guardar tu trabajo, crea una rama nueva con git checkout -b <name>, que ancla tus commits a un nombre de rama.",
+      "objectives": [
+        "Estás en estado de HEAD separado: haz un nuevo commit aquí",
+        "Crea una rama llamada 'rescue' para guardar tu trabajo",
+        "Asegúrate de que HEAD esté en la rama 'rescue'"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "La Doctora Monja revisa sus notas: 'Estás en estado de HEAD separado. Haz un commit, cualquier commit. Luego crea una rama con git checkout -b rescue para anclarte.'",
+      "Un monje que pasa por ahí deja una receta: 'Crea un archivo, añádelo, haz commit, y luego git checkout -b rescue. La rama salva tu commit de que lo recoja el recolector de basura.'",
+      "El gato del monasterio garabatea en el recetario: echo \"rescued\" > rescued.txt && git add rescued.txt && git commit -m \"Emergency commit\" && git checkout -b rescue"
+    ]
+  },
+  "act2-08-tags": {
+    "title": "Marcando Hitos",
+    "subtitle": "Algunos commits merecen un nombre",
+    "briefing": {
+      "narrative": "El gestor de versiones del monasterio —un monje que usa una túnica de color distinto para cada número de versión— está en estado de angustia.\n\n\"¡Tenemos SEIS commits en este repositorio!\", dice, aferrado a una carta de colores, \"¡y NI UN SOLO TAG! ¿Cómo se supone que los monjes del futuro sepan cuál commit fue el lanzamiento de v1.0? ¿O el de v2.0? ¿Somos ANIMALES?\"\n\nSe calma. \"Etiqueta el tercer commit como v1.0: fue cuando se lanzó por primera vez el sitio web del monasterio. Luego etiqueta HEAD como v2.0 con un tag anotado y un mensaje. Los tags anotados son los formales. Tienen historia. Gravedad.\"\n\nEl gato del monasterio lleva puesta una pequeña insignia de versión. Dice 'v9.0'. Nadie le dio esa insignia.",
+      "concept": "Los tags son etiquetas permanentes para commits específicos, como marcadores en la historia. Los tags ligeros (git tag v1.0 <commit>) son simples punteros. Los tags anotados (git tag -a v2.0 -m 'message') incluyen metadatos como el nombre de quien etiqueta y la fecha. Usa tags para lanzamientos e hitos.",
+      "objectives": [
+        "Usa 'git log --oneline' para encontrar los commits",
+        "Etiqueta el tercer commit desde HEAD (HEAD~3) como 'v1.0'",
+        "Etiqueta el HEAD actual como 'v2.0' con un tag anotado"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El gestor de versiones se ajusta la túnica: 'Usa git log --oneline para ver los commits. El tercero desde arriba es HEAD~3. Etiquétalo con git tag v1.0 HEAD~3.'",
+      "Un monje que pasa levanta dos dedos: 'Tag ligero: git tag v1.0 HEAD~3. Tag anotado: git tag -a v2.0 -m \"Release 2.0\". Dos comandos, dos tags, dos versiones de la iluminación.'",
+      "El gato del monasterio le da zarpazos a una insignia de versión y escribe: git tag v1.0 HEAD~3 && git tag -a v2.0 -m \"Release 2.0\""
+    ]
+  },
+  "act2-09-cherry-pick": {
+    "title": "La Cereza del Pastel",
+    "subtitle": "Elige solo lo que necesitas",
+    "briefing": {
+      "narrative": "El desarrollador principal del monasterio —un monje que insiste en que el 'desarrollo guiado por monjes' es una metodología válida— tiene un problema.\n\n\"La rama hotfix es un desastre\", dice mientras revisa los commits. \"Tres commits: registros de depuración, el arreglo DE VERDAD, y luego MÁS registros de depuración. Necesito el arreglo en main, pero si esos archivos de depuración tocan main, el Monje Superior me asignará a limpiar las letrinas durante un mes.\"\n\nTe mira con ojos desesperados. \"Haz cherry-pick SOLO del commit del arreglo. Deja la basura de depuración en la rama hotfix, que es donde pertenece.\"\n\nEl gato del monasterio está depurando código mirando fijamente la pantalla. Su metodología también es válida.",
+      "concept": "git cherry-pick <commit> copia un solo commit de una rama a otra. A diferencia de un merge (que trae TODOS los commits), el cherry-pick te permite elegir exactamente qué commits quieres. Usa git log en la rama de origen para encontrar el hash correcto.",
+      "objectives": [
+        "Revisa el log de la rama hotfix para encontrar el commit del arreglo",
+        "Haz cherry-pick SOLO del commit que arregla app.js (el que tiene 'return 42')",
+        "NO lleves los archivos de depuración a main"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El desarrollador principal susurra: 'Usa git log hotfix --oneline para ver los commits de esa rama. Busca el que dice \"Fix: return correct value\" y anota su hash.'",
+      "Un monje desliza una nota bajo la puerta: 'git cherry-pick <hash>: usa el hash del commit del arreglo que obtuviste de git log hotfix. Solo ese. Los commits de depuración deben quedarse donde están.'",
+      "El gato del monasterio, que aparentemente entiende los hashes SHA, escribe: git log hotfix --oneline (encuentra el hash del commit Fix), y luego git cherry-pick <ese-hash>"
+    ]
+  },
+  "act2-10-revert": {
+    "title": "Dar Marcha Atrás",
+    "subtitle": "Deshaz sin reescribir la historia",
+    "briefing": {
+      "narrative": "El monje de seguridad del monasterio —un individuo paranoico que pone candados sobre candados— camina de un lado a otro en la sala de servidores.\n\n\"Alguien hizo commit de nuestro SECRETO en el archivo de configuración. Y luego alguien MÁS hizo commit de un readme perfectamente bueno encima. No podemos simplemente hacer reset, eso destruiría el commit del readme. Necesitamos DESHACER quirúrgicamente el cambio de configuración malo sin tocar nada más.\"\n\nGolpea la mesa con el puño. \"Por esto quería usar palomas mensajeras en vez de git. Las palomas no filtran secretos.\"\n\nEl gato del monasterio no está de acuerdo. Ha interceptado muchas palomas.",
+      "concept": "git revert <commit> crea un commit NUEVO que deshace los cambios de un commit específico. A diferencia de reset, revert no reescribe la historia: la amplía. Esto lo hace seguro para ramas compartidas o publicadas, donde no puedes reescribir commits que otros ya han descargado.",
+      "objectives": [
+        "Usa 'git log' para encontrar el commit que filtró el secreto",
+        "Revierte el cambio de configuración malo (el commit 'Oops') usando git revert",
+        "El archivo config.txt debe quedar restaurado (debug: false, sin SECRET)",
+        "El archivo readme.txt debe seguir existiendo (no pierdas los commits posteriores)"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El monje de seguridad revisa sus candados: 'Usa git log --oneline para encontrar el commit malo. Dice \"Oops: bad config change\". Anota su hash, o usa HEAD~1 ya que es el penúltimo commit.'",
+      "Un monje que pasa vestido con gabardina susurra: 'git revert HEAD~1 creará un nuevo commit que deshace los cambios de ese commit específico. El readme queda a salvo.'",
+      "El gato del monasterio escribe mientras mira por encima del hombro: git revert HEAD~1 --no-edit"
+    ]
+  },
+  "act2-11-stash": {
+    "title": "Guarda y Corre",
+    "subtitle": "Esconde tu trabajo, apaga el incendio, vuelve",
+    "briefing": {
+      "narrative": "Estás a mitad de escribir una nueva función: app.txt tiene cambios sin confirmar, un trabajo en progreso. De repente, suena la campana de alarma del monasterio.\n\n\"¡BUG CRÍTICO EN PRODUCCIÓN!\", grita un monje que pasa corriendo con la túnica en llamas (metafóricamente). \"¡Deja todo y arréglalo! ¡Pero NO pierdas el trabajo de tu función!\"\n\nEl Monje Superior aparece junto a ti. \"Guarda tus cambios sin confirmar con stash. Cambia a una rama nueva, arregla el bug, vuelve y recupera tu trabajo. Un buen monje nunca pierde ni una sola línea de código.\"\n\nEl gato del monasterio ya escondió tres ratones bajo el cojín de meditación. Entiende el concepto de forma intuitiva.",
+      "concept": "git stash guarda temporalmente tus cambios sin confirmar y limpia tu directorio de trabajo. Es como guardar tu trabajo en progreso en un cajón. Luego puedes cambiar de rama, hacer otro trabajo y más tarde usar git stash pop para restaurar tus cambios exactamente donde los dejaste.",
+      "objectives": [
+        "Guarda tus cambios actuales sin confirmar con 'git stash'",
+        "Crea y cambia a una nueva rama llamada 'bugfix'",
+        "Haz un commit en la rama bugfix (arregla algo)",
+        "Vuelve a main y restaura tus cambios guardados con 'git stash pop'",
+        "Tus cambios en progreso ('new feature WIP') deben estar de vuelta en app.txt"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El Monje Superior hace un gesto calmado: 'git stash guarda tu trabajo sin confirmar. Luego, git checkout -b bugfix para crear y cambiar a la rama del arreglo.'",
+      "Un monje con hollín en la cara (el incendio metafórico se salió de control) grita: '¡En bugfix, crea un archivo y haz commit! ¡Luego git checkout main && git stash pop para recuperar tu trabajo!'",
+      "El gato del monasterio escribe entre siesta y siesta: git stash && git checkout -b bugfix && echo \"fixed\" > fix.txt && git add fix.txt && git commit -m \"Fix critical bug\" && git checkout main && git stash pop"
+    ]
+  },
+  "act2-12-boss": {
+    "title": "El Triaje",
+    "subtitle": "La prueba de fuego del Monje Superior",
+    "briefing": {
+      "narrative": "El Monje Superior está sentado con las piernas cruzadas en el Gran Repositorio, rodeado de pergaminos y tres diagramas de ramificación dibujados con tinta.\n\n\"Tres ramas de funciones\", dice. \"Cada una es una mezcla de brillantez y catástrofe. La rama 'auth' tiene un buen sistema de inicio de sesión, pero también un commit que elimina la base de datos. La rama 'ui' tiene un CSS hermoso, pero también un commit que reemplaza todo el texto con símbolos wingdings. La rama 'api'... bueno, esa en realidad está bien, solo haz merge.\"\n\nDespliega un último pergamino. \"Haz cherry-pick de lo bueno, revierte lo malo, usa stash si es necesario, y cuando se asiente el polvo, etiqueta el resultado como v3.0. Esta es tu prueba. El gato juzgará tu trabajo.\"\n\nEl gato del monasterio se pone los lentes de lectura. Está listo para juzgar.",
+      "concept": "El trabajo real con git requiere combinar varias habilidades: hacer cherry-pick de commits específicos, revertir los malos, gestionar stashes y etiquetar lanzamientos. Este nivel pone a prueba tu capacidad de hacer triaje en un repositorio desordenado y producir un lanzamiento limpio y etiquetado.",
+      "objectives": [
+        "Haz merge de la rama 'api' en main",
+        "Haz cherry-pick del commit bueno de 'auth' (el sistema de inicio de sesión, NO la eliminación de la base de datos)",
+        "Haz cherry-pick del commit bueno de 'ui' (el CSS, NO los wingdings)",
+        "Etiqueta el resultado final como 'v3.0' (tag anotado con un mensaje)"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El Monje Superior ofrece una pista: 'No todos los commits de una rama valen la pena. Examina cada rama con git log. Haz cherry-pick solo de lo bueno. Etiqueta cuando termines.'"
+    ]
+  },
+  "act3-13-amend": {
+    "title": "El Kata del Amend",
+    "subtitle": "Un commit, tres errores, cero excusas",
+    "briefing": {
+      "narrative": "Acabas de hacer tu primer commit en el nuevo proyecto del monasterio. Te sientes orgulloso. Te reclinas. Tomas un sorbo de té de hierbas.\n\nEntonces notas tres cosas a la vez:\n1. El mensaje del commit dice \"Intial setup.\" INTIAL.\n2. Olvidaste crear el readme.md que el Monje Superior pidió específicamente.\n3. Hay un console.log('debug') en app.js como una mancha espiritual.\n\nEl Monje Superior todavía no ha hecho pull. Todavía hay tiempo. Puedes arreglar los tres problemas en UN solo amend. Los textos antiguos llaman a esto \"El Kata del Amend\" -- corregir tus errores antes de que nadie se dé cuenta.\n\nRespira. Concéntrate. Haz el amend.",
+      "concept": "git commit --amend es más poderoso que solo corregir un mensaje. También puedes agregar archivos nuevos y modificar los existentes -- todo se incorpora al mismo commit como si el error nunca hubiera ocurrido. Primero agrega tus cambios al stage, luego haz el amend.",
+      "objectives": [
+        "Crea un archivo readme.md",
+        "Corrige la línea de depuración en app.js",
+        "Haz amend del commit para corregir el mensaje, incluir readme.md y actualizar app.js"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El gato del monasterio se estira sobre un pergamino que dice: 'Primero corrige los archivos y agrégalos con git add. LUEGO haz el amend.'",
+      "Un monje susurra: 'Crea readme.md, edita app.js para eliminar la línea de depuración, haz git add de ambos archivos, y luego git commit --amend -m \"Initial setup\".'",
+      "El gato lo hace por ti: echo '# Readme' > readme.md && edit app.js to remove the debug line && git add app.js readme.md && git commit --amend -m \"Initial setup\""
+    ]
+  },
+  "act3-14-squash": {
+    "title": "La Ceremonia del Squash",
+    "subtitle": "Cinco commits desordenados se convierten en una sola verdad limpia",
+    "briefing": {
+      "narrative": "El Hermano Linus ha estado trabajando en la rama feature. Hizo commit cinco veces:\n\n\"wip\"\n\"fix\"\n\"oops\"\n\"actually fix\"\n\"ok done\"\n\nEl Monje Superior mira el git log una sola vez y cierra los ojos durante un buen rato. Cuando los abre, habla con la furia serena de alguien que ha visto demasiados commits WIP.\n\n\"Squash. A todos. En uno. Solo uno. Commit. Limpio.\"\n\nTe entrega la rama. \"Y que diga algo con sentido. Algo que los futuros monjes puedan leer sin llorar.\"\n\nLa ceremonia del squash ha comenzado.",
+      "concept": "Hacer squash combina varios commits en uno solo. Usar git reset --soft HEAD~N mueve HEAD N commits hacia atrás, pero mantiene todos los cambios en el área de stage. Luego puedes crear un único commit limpio con todos esos cambios. Esto mantiene el historial legible.",
+      "objectives": [
+        "Cambia a la rama feature",
+        "Haz squash de los 5 commits de feature en uno solo con el mensaje 'Add complete feature'",
+        "Cambia a main y haz merge de la rama feature"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "Al Monje Superior le tiembla el ojo: 'En la rama feature, git reset --soft HEAD~5 deshará 5 commits pero mantendrá los cambios en stage. Luego vuelve a hacer commit.'",
+      "Un pergamino cae del estante: 'git reset --soft HEAD~5, luego git commit -m \"Add complete feature\", luego git checkout main && git merge feature.'",
+      "El gato se apiada: git reset --soft HEAD~5 && git commit -m \"Add complete feature\" && git checkout main && git merge feature"
+    ]
+  },
+  "act3-15-rebase": {
+    "title": "Rebase: La Línea Recta",
+    "subtitle": "Linealiza tu historial como un monje como es debido",
+    "briefing": {
+      "narrative": "El git log del monasterio parece un plato de espagueti. Las ramas divergen, se fusionan, se cruzan y regresan en formas que harían llorar a Escher.\n\nEl Monje Superior convoca una reunión. Proyecta el gráfico de git en la pared del salón de meditación. Varios monjes novicios se desmayan.\n\n\"De ahora en adelante,\" anuncia, \"haremos rebase. Se acabaron los merge commits ensuciando nuestro historial. Líneas rectas. Historial limpio. Como un jardín zen bien rastrillado.\"\n\nSe vuelve hacia ti. \"Tu rama feature se quedó atrás de main. Llegaron dos commits nuevos. Haz rebase de tu trabajo encima, luego haz un fast-forward merge. Muéstrales la línea recta.\"\n\nEl gato asiente con aprobación. Hasta los gatos prefieren el historial lineal.",
+      "concept": "git rebase reproduce los commits de tu rama encima de otra rama, creando un historial lineal. A diferencia de merge, no crea un merge commit. Después de hacer rebase de feature sobre main, puedes hacer un fast-forward merge para lograr una línea de historial perfectamente recta.",
+      "objectives": [
+        "Haz rebase de la rama feature sobre main",
+        "Cambia a main",
+        "Haz un fast-forward merge de feature en main"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El rastrillador del jardín zen hace una pausa: 'Estando en feature, ejecuta git rebase main para reproducir tus commits encima de lo último de main.'",
+      "Un pergamino en el jardín dice: 'git rebase main, luego git checkout main, luego git merge feature. Tres pasos hacia la iluminación lineal.'",
+      "El gato rastrilla el jardín por ti: git rebase main && git checkout main && git merge feature"
+    ]
+  },
+  "act3-16-rebase-conflict": {
+    "title": "Conflicto de Rebase",
+    "subtitle": "La línea recta tiene un bache",
+    "briefing": {
+      "narrative": "Pensabas que hacer rebase sería todo tranquilo después del nivel anterior. El Monje Superior esboza esa sonrisa de quien sabe algo que tú no.\n\n\"Ahora hazlo de nuevo,\" dice, \"pero esta vez, ambas ramas tocaron config.txt.\"\n\nSe te hiela la sangre. Cambiaste el puerto a 8080. Alguien en main lo cambió a 4000. Cuando hagas rebase, Git no sabrá qué puerto conservar. Se detendrá a mitad del rebase, dejará marcadores de conflicto en el archivo y esperará a que decidas.\n\nEsto es el conflicto de rebase. Es como un conflicto de merge, pero ocurre commit por commit mientras Git reproduce tu trabajo. Resuélvelo y luego continúa el rebase.\n\nEl servidor del monasterio está esperando el número de puerto correcto. Sin presión.",
+      "concept": "Durante un rebase, si un commit reproducido entra en conflicto con la rama de destino, Git se pausa y te pide que lo resuelvas. Después de corregir el archivo: haz git add del archivo resuelto, y luego git rebase --continue para reanudar la reproducción de los commits restantes.",
+      "objectives": [
+        "Intenta hacer rebase de feature sobre main",
+        "Resuelve el conflicto en config.txt",
+        "Agrega el archivo resuelto al stage y continúa el rebase"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El monje de la sala de servidores murmura: 'Empieza con git rebase main. Cuando se detenga por un conflicto, edita config.txt para elegir el puerto correcto.'",
+      "Una nota en el servidor dice: 'Después de resolver config.txt, ejecuta git add config.txt && git rebase --continue.'"
+    ]
+  },
+  "act3-17-secret-purge": {
+    "title": "La Purga del Secreto",
+    "subtitle": "Borra la clave prohibida de toda la línea del tiempo",
+    "briefing": {
+      "narrative": "Código rojo. CÓDIGO ROJO.\n\nAlguien -- y el registro de seguridad del monasterio DEFINITIVAMENTE sabe quién -- hizo commit de la clave API del monasterio directamente en el repositorio. Commit número dos de cinco. Ha estado ahí en .env como un letrero de neón que dice \"HACKÉAME\".\n\nEl Monje Superior está haciendo esa cosa en la que está tan tranquilo que da miedo. \"Elimínala,\" dice en voz baja. \"No solo del árbol actual. De TODO el historial. Como si nunca hubiera existido.\"\n\nNecesitas viajar en el tiempo, reconstruir el historial sin el commit contaminado, y hacer cherry-pick del trabajo bueno hacia adelante. La clave API debe desaparecer de la existencia.\n\nLa seguridad del monasterio depende de ti. Además, el monje que la subió te dejó una galleta de disculpa en el escritorio.",
+      "concept": "A veces necesitas eliminar por completo un archivo del historial de Git -- no basta con borrarlo en un commit nuevo (seguiría estando en los commits antiguos). Un enfoque: haz reset hasta antes del commit problemático, vuelve a hacer commit limpio, y luego haz cherry-pick de los commits buenos que vinieron después.",
+      "objectives": [
+        "Identifica el commit que agregó .env",
+        "Retrocede hasta antes de ese commit",
+        "Reconstruye el historial sin el archivo .env",
+        "Haz cherry-pick de los commits buenos restantes hacia adelante",
+        "Crea un .gitignore para evitar que .env se vuelva a subir en un commit"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El monje de seguridad susurra: 'Usa git log para encontrar los hashes de los commits. Necesitas hacer reset hasta antes del commit de .env, y luego hacer cherry-pick de los commits que vinieron después.'",
+      "Un pergamino clasificado dice: 'Haz reset hasta antes del commit contaminado. Luego reconstruye el historial haciendo cherry-pick únicamente de los commits limpios hacia adelante.'"
+    ]
+  },
+  "act3-18-boss": {
+    "title": "El Dilema del Historiador",
+    "subtitle": "Cherry-pick, squash, rebase, purga -- todo antes del amanecer",
+    "briefing": {
+      "narrative": "La campana del monasterio marca la medianoche. Has sido convocado a la oficina del Monje Superior.\n\nDesliza una laptop sobre el escritorio. En la pantalla: la rama feature más desordenada que hayas visto jamás. Cinco commits, cada uno peor que el anterior:\n\n1. Un buen commit de feature\n2. Un commit WIP que debería fusionarse (squash) con el #1\n3. Un commit que contiene una clave API secreta\n4. Otro buen commit de feature\n5. Un commit que en realidad estaba destinado a la rama 'hotfix'\n\nEl Monje Superior junta las manos. \"Límpialo. Todo. Esto. Haz cherry-pick del commit 5 hacia la rama hotfix. Elimina el secreto. Haz squash del WIP. Haz rebase sobre main. Haz el merge limpio.\"\n\nSe detiene en la puerta. \"Sabré si no lo hiciste bien. El gato del monasterio me cuenta todo.\"\n\nEste es el examen final. Cada técnica que has aprendido. Una rama. Una noche.",
+      "concept": "La limpieza de ramas en el mundo real a menudo requiere combinar varias técnicas: cherry-pick para mover commits mal ubicados, reset para eliminar commits problemáticos y rebase para actualizar tu rama. La clave está en trabajar de forma metódica -- una operación a la vez.",
+      "objectives": [
+        "Haz cherry-pick del commit mal ubicado hacia la rama hotfix",
+        "Elimina el secreto del historial de la rama feature",
+        "Haz squash del commit WIP con el trabajo de feature",
+        "Haz rebase de la feature ya limpia sobre main",
+        "Haz merge de todo en main"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El gato de medianoche ronronea: 'Trabaja de forma metódica. Mueve lo que no pertenece, elimina lo que no debería existir, une con squash lo que debería estar junto, y luego haz rebase y merge. Un paso a la vez.'"
+    ]
+  },
+  "act4-19-reflog": {
+    "title": "El Reflog Lo Recuerda Todo",
+    "subtitle": "Nada se pierde de verdad en el monasterio",
+    "briefing": {
+      "narrative": "El Hermano Linus estaba trabajando en una función secreta. Llamó a la rama 'secret-feature'. Le hizo commit a un mapa del tesoro. Y luego -- y esta es la parte importante -- borró la rama.\n\n\"Se perdió,\" dice, mirando fijamente la terminal. \"Borré la rama antes de fusionarla. El mapa del tesoro... se perdió para siempre.\"\n\nEl Monje Mayor suelta una risita desde el rincón. \"¿Perdido? ¿PERDIDO? Nada se pierde de verdad en Git, joven monje. El reflog lo recuerda TODO.\"\n\nSe toca la sien con el dedo. \"Git registra cada movimiento que hace HEAD. Cada checkout, cada commit, cada cambio de rama. El commit sigue ahí, flotando en el vacío. Solo necesitas encontrar su hash en el reflog y darle una rama de nuevo.\"\n\nLos ojos del Monje Mayor brillan. \"Ve. Trae de vuelta el tesoro.\"",
+      "concept": "El reflog (registro de referencias) guarda cada posición en la que ha estado HEAD. Aunque borres una rama, los commits siguen existiendo -- solo que ninguna rama apunta a ellos. Usa git reflog para encontrar el hash del commit perdido, y luego crea una rama nueva en ese hash.",
+      "objectives": [
+        "Usa git reflog para encontrar el commit perdido",
+        "Crea una rama nueva llamada 'recovered' en el hash del commit perdido",
+        "Haz checkout a la rama recovered para verificar el tesoro"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El archivista del monasterio susurra: 'git reflog muestra cada lugar donde ha estado HEAD. Busca la entrada que dice \"Add treasure\" -- el hash de al lado es el que necesitas.'",
+      "Un pergamino polvoriento dice: 'Encuentra el hash en el reflog. Luego crea una rama en ese hash y haz checkout.'"
+    ]
+  },
+  "act4-20-force-push": {
+    "title": "Recuperación tras un Force Push",
+    "subtitle": "Alguien sobrescribió tu trabajo, pero el reflog lo sabe",
+    "briefing": {
+      "narrative": "Vuelves de almorzar. Tres commits de trabajo cuidadoso y hermoso -- desaparecidos. El git log solo muestra tu primer commit. Alguien (el Hermano Linus jura que no fue él) hizo force-push sobre tu rama.\n\nTus cambios de v2 y v3 se esfumaron de la rama. El estado actual volvió a v1. Miras la pantalla sin poder creerlo.\n\nPero espera. Recuerdas la enseñanza del Monje Mayor: \"El reflog lo recuerda TODO.\" Tu reflog local todavía tiene entradas de cuando HEAD apuntaba a esos commits. Siguen en el almacén de objetos, solo que ninguna rama puede alcanzarlos.\n\nEs hora de escarbar en el reflog, encontrar tu commit v3, y traer tu trabajo de vuelta de entre los muertos.",
+      "concept": "Cuando alguien hace force-push (o cuando accidentalmente haces un reset), los commits no desaparecen de inmediato del repositorio local. El reflog guarda un registro de dónde apuntaba HEAD. Ahí puedes encontrar commits 'perdidos' y crear ramas nuevas para recuperarlos.",
+      "objectives": [
+        "Usa git reflog para encontrar el commit v3 perdido",
+        "Crea una rama llamada 'recovered' en ese commit",
+        "Verifica que tu trabajo esté restaurado"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El monje de respaldos del monasterio sugiere: 'git reflog mostrará entradas de cuando hiciste esos commits. Busca el hash del commit v3.'",
+      "Una nota en el disco de respaldo dice: 'El reflog lo recuerda todo. Encuentra el commit perdido y dale un nombre de rama.'"
+    ]
+  },
+  "act4-21-blame": {
+    "title": "¿Quién Escribió Esto?",
+    "subtitle": "El arte ancestral de git blame",
+    "briefing": {
+      "narrative": "El código del monasterio tiene un bug. La línea 2 de code.txt dice \"BUG HERE\" en letras grandes y obvias. Y aun así, pasó desapercibido durante cuatro commits de cuatro monjes distintos.\n\nEl Monje Mayor necesita respuestas. \"¿Quién metió este bug? Necesito un nombre. No estoy enojado, solo quiero... conversar con esa persona.\" Truena los nudillos.\n\nPor suerte, Git tiene una herramienta justo para esto: git blame. Muestra quién modificó por última vez cada línea de un archivo, y en qué commit. Encuentra al culpable, arregla el bug, y haz commit de la corrección.\n\nAlicia escribió la línea 1. Roberto agregó la línea 4. Carlos... bueno, digamos que Carlos tiene que dar explicaciones. Daniel agregó la línea 5 y jura ser inocente.\n\nComienza el trabajo detectivesco del monasterio.",
+      "concept": "git blame muestra el commit y el autor responsable de cada línea de un archivo. Es invaluable para entender quién cambió qué y cuándo. Úsalo para rastrear bugs hasta su origen, y luego arréglalos.",
+      "objectives": [
+        "Usa git blame en code.txt para encontrar quién metió el bug",
+        "Corrige la línea 2 para eliminar el bug",
+        "Haz commit de la corrección"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El gato detective olfatea la evidencia: 'git blame code.txt te mostrará quién tocó por última vez cada línea. Fíjate en la línea 2.'",
+      "Una lupa revela: 'Encuentra al culpable, corrige la línea, haz commit de la corrección. Procedimiento detectivesco estándar.'"
+    ]
+  },
+  "act4-22-bisect": {
+    "title": "La Cacería del Bisect",
+    "subtitle": "Búsqueda binaria a través del tiempo mismo",
+    "briefing": {
+      "narrative": "Algo se rompió. La suite de pruebas del monasterio dice \"FAIL\" pero nadie sabe desde cuándo falla. Hay 8 commits. Revisar cada uno tomaría una eternidad (bueno, ocho pasos, pero los monjes son impacientes).\n\nEl Monje Mayor saca un pergamino ancestral titulado \"El Arte de la Bisección.\" \"Búsqueda binaria,\" dice con reverencia. \"Divide y vencerás. Git puede hacer esto automáticamente.\"\n\nLe dices a Git: el commit actual está MAL (las pruebas fallan). El primer commit estaba BIEN (las pruebas pasaban). Git elige el commit del medio. Tú revisas si está bien o mal. Git reduce el rango. En solo 3 pasos, encuentras el commit exacto que rompió todo.\n\nEl archivo de pruebas es simple: si dice \"PASS\", el commit está bien. Si dice \"FAIL\", el commit está mal. La ruptura ocurrió en el commit 5.\n\nEncuentra el commit que rompió todo, y luego revierte ese commit para arreglar las pruebas.",
+      "concept": "git bisect realiza una búsqueda binaria a través de tu historial de commits para encontrar cuál commit introdujo un bug. Empieza con 'git bisect start', marca el estado actual como malo y un estado antiguo conocido como bueno, y luego Git te irá dejando en los puntos intermedios para que los pruebes.",
+      "objectives": [
+        "Inicia una sesión de bisect",
+        "Marca el commit actual como malo y el primer commit como bueno",
+        "Prueba cada commit intermedio revisando test.txt",
+        "Deja que bisect identifique el commit que rompió todo",
+        "Reinicia el bisect y revierte el commit malo"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El bibliotecario del monasterio sugiere: 'git bisect start, y luego marca el actual como malo y el primer commit como bueno. Git te guiará desde ahí.'",
+      "Un manual de búsqueda dice: 'En cada punto intermedio, revisa test.txt. Márcalo como bueno o malo según corresponda. Una vez encontrado el culpable, reinicia el bisect y deshaz el daño.'"
+    ]
+  },
+  "act4-23-diff-detective": {
+    "title": "Diff Detective",
+    "subtitle": "Compara ramas, combina la verdad",
+    "briefing": {
+      "narrative": "El informe trimestral del monasterio es un desastre. Tres ramas, tres versiones distintas de la verdad.\n\nMain tiene el informe original: Q1: 100, Q2: 200, Q3: 300, Q4: 400.\n\nLa rama 'update-a' actualizó Q1 a 150. La rama 'update-b' actualizó Q2 a 250 y Q3 a 350. Ambas ramas son correctas -- solo que actualizaron trimestres distintos.\n\nEl Monje Mayor necesita el informe FINAL en main con TODOS los números correctos combinados. \"Usa diff,\" dice. \"Compara las ramas. Entiende qué cambió. Luego crea la versión definitiva.\"\n\nTú eres el Diff Detective. Examina la evidencia entre ramas, deduce el estado combinado correcto, y haz commit de la verdad.",
+      "concept": "git diff puede comparar ramas: 'git diff main..update-a' muestra qué cambió. Al examinar los diffs entre ramas, puedes entender qué modificó cada una y combinar manualmente los cambios en el estado final correcto.",
+      "objectives": [
+        "Usa git diff para examinar los cambios en update-a y update-b",
+        "Crea el informe combinado correcto en main",
+        "Haz commit de la versión final"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El auditor de informes sugiere: 'Prueba git diff main..update-a y git diff main..update-b para ver qué cambió cada rama.'",
+      "Una nota adhesiva en el informe dice: 'Cada rama actualizó trimestres distintos. Combina los valores correctos de ambas ramas en un solo informe definitivo.'"
+    ]
+  },
+  "act4-24-boss": {
+    "title": "El Caso Sin Resolver",
+    "subtitle": "Bisect, blame, revert -- resuelve el misterio más antiguo del monasterio",
+    "briefing": {
+      "narrative": "El código ancestral del monasterio tiene un bug que nadie puede encontrar. Ha estado ahí durante commits y commits, enterrado bajo capas de cambios de múltiples monjes.\n\nEl Monje Mayor abre un archivo polvoriento etiquetado \"CASO SIN RESOLVER.\" \"Diez commits. Múltiples autores. En algún punto de en medio, alguien rompió la prueba sagrada. El archivo de pruebas debería decir PASS pero dice FAIL.\"\n\nDesliza el expediente sobre el escritorio. \"Usa bisect para encontrar CUÁNDO se rompió. Usa blame para encontrar QUIÉN lo hizo. Usa revert para arreglarlo. Procedimiento detectivesco estándar.\"\n\nEl gato del monasterio salta sobre el escritorio y tira el archivo al suelo. Los papeles se dispersan por todas partes. El gato te mira como diciendo: \"El reloj corre, detective.\"\n\nEsta es la investigación final. Todas las herramientas de tu kit detectivesco. Un caso sin resolver. Resuélvelo.",
+      "concept": "Combinar bisect, blame y revert te da un kit de investigación completo. Bisect acota el rango de commits. Blame te dice quién cambió qué. Revert deshace el daño de forma limpia. Juntos, pueden resolver cualquier misterio de código.",
+      "objectives": [
+        "Usa bisect para encontrar el commit que introdujo el bug",
+        "Usa blame para entender qué cambió",
+        "Revierte el commit malo para arreglar el código",
+        "Verifica que la prueba pase de nuevo"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El expediente del caso sin resolver tiene una nota: 'Procedimiento detectivesco estándar: acota el rango, identifica al sospechoso, deshaz el daño. Tienes todas las herramientas de investigación que necesitas.'"
+    ]
+  },
+  "act5-25-surgical": {
+    "title": "Staging Quirúrgico",
+    "subtitle": "Desenreda 5 cambios entrelazados en 5 commits atómicos",
+    "briefing": {
+      "narrative": "El Monje Mayor observa code.txt con la intensidad de un cirujano revisando una resonancia magnética.\n\n\"Alguien —y no voy a dar nombres— hizo CINCO tipos distintos de cambios en este archivo y nunca hizo commit de NINGUNO. Una corrección de bug. Una nueva funcionalidad. Una refactorización. Una optimización de rendimiento. Y actualizaciones de documentación. Todo mezclado como los ingredientes de un guiso monástico.\"\n\nGolpea el escritorio. El gato ni se inmuta. El gato ha visto cosas peores.\n\n\"Cada cambio debe convertirse en su propio commit. Con el prefijo CORRECTO: Fix:, Feature:, Refactor:, Perf:, Docs:. Cinco cambios. Cinco commits. Los cambios están entrelazados —una línea de bugfix junto a una línea de feature junto a una de refactor. Vas a tener que pensar qué ES cada línea antes de hacer stage de nada.\"\n\nTe entrega el archivo. Es un desastre. Pero un desastre hermoso, si entrecierras los ojos.\n\n\"Los commits atómicos no son solo buena práctica. Son la forma de hacer que la historia sea LEGIBLE. De hacer que los reverts sean SEGUROS. De ganarte el respeto de los monjes que revisan tu código a las 3 de la madrugada.\"",
+      "concept": "Cuando un archivo contiene múltiples cambios entrelazados, debes construir cuidadosamente cada versión del archivo para cada commit. Edita el archivo para que contenga SOLO un cambio lógico a la vez, haz el commit, y luego vuelve a editar para el siguiente cambio.\n\nEsto requiere entender qué ES cada cambio —no solo cómo se ve. Un bugfix, una feature, un refactor, una optimización y la documentación cumplen propósitos distintos y pertenecen a commits distintos.",
+      "objectives": [
+        "Separa los 5 cambios entrelazados en 5 commits atómicos",
+        "Cada mensaje de commit debe usar el prefijo correcto: Fix:, Feature:, Refactor:, Perf:, Docs:",
+        "El archivo final debe contener TODOS los cambios aplicados correctamente",
+        "Cambios: corrección de división por cero, función de potencia, renombrar OLD_calc a calc, optimización de caché, comentarios JSDoc"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "Un monje susurra: 'Piénsalo bien: cada commit debe transformar el archivo para agregar SOLO un tipo de cambio. Edita, agrega, haz commit. Repite cinco veces.'",
+      "El Pergamino de los Cinco Cortes: Haz un cambio a la vez. Primero corrige el bug de la división (agrega la verificación de cero). Luego renombra OLD_calc a calc. Luego agrega la función de potencia. Luego agrega la caché. Luego agrega los comentarios JSDoc @param. Cada uno recibe su propio commit con el prefijo correcto."
+    ]
+  },
+  "act5-26-orphan": {
+    "title": "La Rama Huérfana",
+    "subtitle": "Crea una rama sin historia compartida",
+    "briefing": {
+      "narrative": "El Monje Mayor tiene una visión.\n\n\"El monasterio necesita documentación. No DENTRO de la aplicación. No AL LADO de la aplicación. Una dimensión de documentación completamente aparte.\"\n\nMira hacia la distancia como un capitán pirata avistando tierra tras meses en altamar. \"Una rama que no comparta NADA con main. Sin ancestro común. Sin archivos compartidos. Como un barco fantasma que navega junto a nosotros pero en un océano completamente distinto.\"\n\nEl gato parece confundido. Honestamente, igual que yo.\n\n\"Algunas ramas cumplen un propósito completamente distinto al del código principal. GitHub Pages usa este patrón: una rama llamada 'docs' que contiene solo documentación, sin ninguna conexión con la historia del código fuente.\"\n\nHace una pausa dramática. \"Créame una rama huérfana. Una rama nacida del vacío mismo.\"",
+      "concept": "A veces necesitas una rama que no tenga absolutamente ninguna relación con tu código base principal, como una rama de GitHub Pages para documentación. Puedes lograrlo creando una rama, eliminando todos los archivos rastreados y empezando de cero.\n\nLa idea clave: no todas las ramas necesitan compartir historia. Algunas ramas cumplen propósitos completamente distintos.",
+      "objectives": [
+        "Crea una rama llamada 'docs'",
+        "Elimina todos los archivos de la aplicación de la rama docs",
+        "Crea archivos de documentación en la rama docs",
+        "Haz commit de la documentación",
+        "La rama docs no debe tener archivos de la aplicación"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "Un monje sugiere: 'Crea la rama docs con git branch docs, luego git checkout docs. Elimina los archivos de la app con git rm, y después crea tu documentación.'",
+      "El gato garabatea: 'git branch docs && git checkout docs, luego git rm app.txt config.txt, después crea README.txt con tu documentación, git add README.txt, git commit.'",
+      "El Pergamino Ancestral: git branch docs, git checkout docs, git rm app.txt, git rm config.txt, escribe README.txt con la documentación, git add README.txt, git commit -m \"Add documentation\"."
+    ]
+  },
+  "act5-27-dependency": {
+    "title": "La Danza de las Dependencias",
+    "subtitle": "Tres ramas dependientes, cadena de rebase, el orden de merge importa",
+    "briefing": {
+      "narrative": "La revisión de sprint del monasterio es mañana y tres equipos están atrapados en una cadena de dependencias.\n\nEl equipo Auth construyó el sistema de inicio de sesión. El equipo API construyó endpoints ENCIMA de auth. El equipo Frontend construyó la interfaz ENCIMA de la API. Mientras tanto, main avanzó con commits de infraestructura que entran en conflicto con el trabajo de auth en readme.txt.\n\nEl Monje Mayor dibuja el grafo de dependencias en la pizarra. Parece un árbol genealógico diseñado por un fanático de M.C. Escher.\n\n\"Tres ramas. Haz rebase en el orden correcto, haz merge en el orden correcto. Si haces rebase de api antes que auth, obtienes un enredo total. Si haces merge en el orden equivocado, obtienes conflictos que no deberían existir.\"\n\nEl gato estudia la pizarra y sabiamente decide tomar una siesta en su lugar.\n\n\"La danza de las dependencias tiene UN solo orden correcto. Descúbrelo.\"",
+      "concept": "Cuando las ramas de funcionalidades forman una cadena de dependencias (A depende de B que depende de C), debes hacer rebase y merge en el orden correcto:\n\n1. Haz rebase de la base de la cadena sobre main\n2. Haz rebase de cada rama dependiente sobre su dependencia ya actualizada\n3. Haz merge a main en el orden de dependencia\n\nHacerlo en el orden equivocado genera conflictos innecesarios y una historia enredada.",
+      "objectives": [
+        "Haz rebase de auth sobre main (resuelve el conflicto en readme.txt)",
+        "Haz rebase de api sobre el auth ya rebaseado",
+        "Haz rebase de frontend sobre el api ya rebaseado",
+        "Haz merge de las tres ramas a main en el orden correcto"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "Piensa en la cadena: auth depende de main, api depende de auth, frontend depende de api. Haz el rebase en ese orden.",
+      "Orden: haz rebase de auth sobre main (resuelve el conflicto de readme.txt), luego haz checkout de api y rebase sobre auth, luego haz checkout de frontend y rebase sobre api, luego haz checkout de main y haz merge de auth, api y frontend en ese orden."
+    ]
+  },
+  "act5-28-patch": {
+    "title": "El Maestro de los Parches",
+    "subtitle": "Examina los commits, aplica los buenos con cherry-pick y descarta la basura",
+    "briefing": {
+      "narrative": "Dos ramas de funcionalidades llegan para revisión de código. Cada una tiene 4 commits. Pero los autores fueron... poco disciplinados.\n\nLa rama 'feature-search' tiene 4 commits: una implementación de búsqueda funcional, un experimento WIP, una optimización de búsqueda, y otro experimento que rompió cosas. La rama 'feature-export' tiene 4 commits: un módulo de exportación, un hack de depuración, un formateador de CSV, y más basura de depuración.\n\nEl Monje Mayor desliza una lista de verificación de release sobre la mesa. \"Necesitamos una rama de release con SOLO los commits buenos. Dos de search, dos de export. Los experimentos y los hacks de depuración se quedan afuera.\"\n\nHace una pausa. \"Pero no te voy a decir CUÁLES commits son buenos. Vas a tener que examinar cada uno con git log y git show. Lee los mensajes de commit. Mira los cambios. Forma tu propio criterio.\"\n\nEl gato ya revisó ambas ramas y te está juzgando en silencio.",
+      "concept": "En proyectos reales, a menudo necesitas seleccionar commits específicos de ramas que mezclan trabajo bueno con experimentos descartables. Usa git log para ver los mensajes de commit, git show para inspeccionar los cambios, y luego haz cherry-pick solo de lo que pertenece a tu release.\n\ngit log <branch> — ver qué commits existen\ngit show <ref> — inspeccionar un commit específico\ngit cherry-pick <ref> — aplicar un commit a la rama actual",
+      "objectives": [
+        "Examina ambas ramas de funcionalidades para identificar los commits buenos",
+        "Crea una rama 'release' a partir de main",
+        "Haz cherry-pick SOLO de los commits buenos: las implementaciones funcionales y las mejoras, no los de WIP/debug",
+        "La rama release debe tener search.txt y export.txt con el contenido final correcto"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "Usa git log feature-search y git log feature-export para ver los mensajes de commit. Los commits de WIP y DEBUG son los malos.",
+      "Crea una rama release. Haz cherry-pick de los commits 'Implement search' y 'Optimize search' de feature-search. Haz cherry-pick de los commits 'Implement export' y 'Add CSV' de feature-export. Salta todos los commits de WIP y DEBUG."
+    ]
+  },
+  "act5-29-time-travel": {
+    "title": "El Viajero en el Tiempo",
+    "subtitle": "Reconstruye la configuración correcta a partir de 5 versiones históricas",
+    "briefing": {
+      "narrative": "INFORME DE INCIDENTE: config.txt ha sido modificado 5 veces a lo largo de 4 releases etiquetados. Cada versión cambió configuraciones distintas. La versión actual es un desastre: contraseña incorrecta, puerto incorrecto, y una bandera de funcionalidad crítica que fue eliminada por accidente.\n\nEl Monje Mayor te desliza una línea de tiempo:\n- v1.0: Configuración inicial con la bandera de funcionalidad correcta (enable_backups: true)\n- v2.0: Cambió a la contraseña de base de datos correcta (db_pass: monastery_secure_789)\n- v3.0: Estableció el puerto correcto (port: 8443)\n- v4.0: Alguien rompió la contraseña Y eliminó la bandera de backups\n- Actual: Alguien también rompió el puerto\n\n\"Tres problemas en la configuración actual. Cada valor correcto vive en una versión histórica DISTINTA. Vas a tener que usar git show para leer cada versión etiquetada, encontrar los valores correctos, y ensamblar la única configuración verdadera.\"\n\nEl gato memorizó cada versión de cada archivo de configuración. Pero no te va a ayudar.\n\n\"Esto es arqueología temporal. Excava entre las capas. Encuentra la verdad.\"",
+      "concept": "Git almacena el contenido completo de cada archivo en cada commit. Puedes leer cualquier versión histórica:\n\ngit tag — lista todas las etiquetas\ngit show v1.0:config.txt — lee config.txt tal como estaba en la etiqueta v1.0\ngit log --oneline — muestra el historial de commits\n\nCuando la versión actual tiene múltiples problemas, cada corrección puede provenir de un punto distinto de la historia. Necesitas investigar cada versión para encontrar cuál tiene el valor correcto para cada configuración.",
+      "objectives": [
+        "Usa git log y git tag para entender el historial",
+        "Usa git show para leer config.txt en cada versión etiquetada",
+        "Corrige los 3 problemas: restaura la contraseña desde v2.0, el puerto desde v3.0, y la bandera de backups desde v1.0",
+        "La configuración final debe tener TODOS los valores correctos combinados"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "Usa git log --oneline para ver el historial. Luego usa git show HEAD~N:config.txt en cada versión para encontrar cuál tenía la contraseña, el puerto y la bandera de backups correctos.",
+      "La contraseña 'monastery_secure_789' viene de HEAD~3. El puerto '8443' viene de HEAD~2. La línea 'enable_backups: true' viene de HEAD~4. Combina todo en la configuración actual."
+    ]
+  },
+  "act5-30-boss": {
+    "title": "El Desafío del Código Abierto",
+    "subtitle": "Examina, divide, enmienda, cherry-pick, rebase, merge, etiqueta: el flujo de trabajo completo",
+    "briefing": {
+      "narrative": "Has estado contribuyendo a MonkOS, el legendario sistema operativo de código abierto escrito enteramente por monjes. El mantenedor acaba de publicar una reseña demoledora:\n\n\"Tu rama de funcionalidad es un DESASTRE. 5 commits: 3 están bien, 1 tiene un error tipográfico en el mensaje de commit, y 1 mezcla un bugfix con una feature. Mientras tanto, main avanzó con nuevos releases. Ah, y hay una rama contributor-fix con una dependencia que necesitas.\"\n\nLa lista de verificación del mantenedor:\n1. Examina el repositorio: entiende qué hay y dónde\n2. Corrige el error tipográfico del mensaje de commit (enmienda el segundo commit)\n3. Divide el commit mixto en commits separados de bugfix y feature\n4. Haz cherry-pick de la corrección del colaborador\n5. Haz rebase sobre main (se espera un conflicto)\n6. Haz merge a main y etiqueta como v3.0\n\nEl Monje Mayor observa desde las sombras. \"Así es como se ve una contribución real de código abierto. No es un tutorial. Es un campo de batalla.\"\n\nEl gato tiene 47 PRs fusionados. No dice nada.",
+      "concept": "Una contribución real de código abierto requiere dominar todo el flujo de trabajo de Git en conjunto:\n- git log/show para entender el estado del repositorio\n- git commit --amend para corregir mensajes de commit\n- git reset + volver a hacer commit para dividir commits\n- git cherry-pick para tomar correcciones de otras ramas\n- git rebase para actualizar tu rama\n- git merge + git tag para el release final\n\nEl desafío es hacer todo esto en el orden correcto sin crear un desastre.",
+      "objectives": [
+        "Examina el repositorio para entender qué hay que corregir",
+        "Corrige el error tipográfico en el mensaje de commit (el que dice 'Add netwerk module')",
+        "Haz cherry-pick de la corrección del colaborador desde la rama contributor-fix",
+        "Haz rebase de tu rama de funcionalidad sobre main (resuelve el conflicto)",
+        "Haz merge a main y etiqueta como v3.0"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "Empieza examinando el repositorio: git log --oneline, git log contributor-fix. Luego corrige el error tipográfico con git commit --amend. Haz cherry-pick de la corrección del colaborador. Haz rebase sobre main."
+    ]
+  },
+  "act6-31-wrong-branch": {
+    "title": "La Rama Equivocada",
+    "subtitle": "5 commits entrelazados en main — ordénalos en las ramas correctas",
+    "briefing": {
+      "narrative": "Cinco commits en main. Cada uno de ellos es un commit de funcionalidad. Ninguno debería estar aquí.\n\nPero se pone peor: están entrelazados. Tres commits pertenecen a feature-ui (modifican archivos de UI), y dos pertenecen a feature-api (modifican archivos de API). Y NO están en un orden conveniente — UI, API, UI, UI, API.\n\nEl Monje Mayor mira el git log como un padre decepcionado leyendo una boleta de calificaciones. \"Tienes que EXAMINAR cada commit. Lee el log. Usa git show si es necesario. Averigua cuáles commits son trabajo de UI y cuáles son trabajo de API.\"\n\n\"Luego: crea ambas ramas de funcionalidad, aplica cherry-pick a los commits correctos en cada una, y reinicia main hasta donde debería estar.\"\n\nEl gato ya ordenó su ovillo de lana por color, textura y trascendencia filosófica. Le resulta ofensivo tu caos.",
+      "concept": "Cuando los commits están en la rama equivocada, necesitas:\n1. Examinar cada commit con git log o git show para entender qué hace\n2. Crear las ramas correctas\n3. Aplicar cherry-pick a cada commit en la rama correcta\n4. Reiniciar la rama original para eliminarlos\n\nLa habilidad clave es la INVESTIGACIÓN — debes determinar a dónde pertenece cada commit antes de actuar.",
+      "objectives": [
+        "Examina los commits en main para determinar cuáles son de UI y cuáles de API",
+        "Crea la rama feature-ui y aplica cherry-pick a los 3 commits de UI en ella",
+        "Crea la rama feature-api y aplica cherry-pick a los 2 commits de API en ella",
+        "Reinicia main hasta que solo quede el commit base",
+        "Todos los archivos de funcionalidad deben existir en sus ramas correctas"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "Usa git log --oneline para ver todos los commits. El header, sidebar y footer son de UI. El users-api y posts-api son trabajo de API. Aplica cherry-pick haciendo referencia a HEAD~N.",
+      "1) git log --oneline para identificar los commits. 2) git branch feature-ui, git branch feature-api. 3) git checkout feature-ui, aplica cherry-pick a los 3 commits de UI. 4) git checkout feature-api, aplica cherry-pick a los 2 commits de API. 5) git checkout main, git reset --hard HEAD~5."
+    ]
+  },
+  "act6-32-split": {
+    "title": "Personalidad Dividida",
+    "subtitle": "Divide un commit en 3 — pero el orden importa",
+    "briefing": {
+      "narrative": "La revisión de código ha vuelto, y es brutal.\n\n\"Un commit. TRES cambios diferentes. Una corrección de errores en app.js, una funcionalidad en feature.js, y una refactorización en utils.js. Todo amontonado como monjes en una cabina telefónica.\"\n\nEl Monje Mayor dibuja un diagrama de dependencias. \"Pero aquí está la trampa. La funcionalidad en feature.js IMPORTA desde utils.js usando el NUEVO nombre de la refactorización. Si haces commit de la funcionalidad ANTES de la refactorización, la ruta de importación queda mal. La compilación se rompe. El monasterio cae.\"\n\nGolpea el diagrama con énfasis. \"El orden de los commits debe ser: refactorización PRIMERO (renombra la función en utils.js), LUEGO la funcionalidad (que usa el nuevo nombre), LUEGO la corrección de errores (independiente, va al final). Tres commits, orden correcto, o nada.\"\n\nEl gato ya descifró el grafo de dependencias. Está comiendo pescado y juzgándote.",
+      "concept": "Dividir commits requiere entender las dependencias entre los cambios:\n\n1. git reset --mixed HEAD~1 — deshace el commit, mantiene los archivos sin preparar (unstaged)\n2. Determina el ORDEN correcto según las dependencias\n3. Prepara (stage) y haz commit de cada cambio por separado\n\nCuando un cambio depende de otro (por ejemplo, una importación que hace referencia a una función renombrada), la dependencia debe hacerse commit primero. Por eso importan los commits atómicos — deben ser correctos de forma independiente.",
+      "objectives": [
+        "Reinicia (reset) el commit mixto para dejar sin preparar los 3 archivos",
+        "Haz commit de utils.txt PRIMERO con un mensaje Refactor: (renombra la función)",
+        "Haz commit de feature.txt SEGUNDO con un mensaje Feature: (depende del utils refactorizado)",
+        "Haz commit de app.txt TERCERO con un mensaje Fix: (corrección de errores independiente)",
+        "Los 3 archivos deben existir con el contenido correcto"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "La dependencia: feature.txt importa calculateTotal desde utils.txt. Por eso utils.txt (la refactorización) debe hacerse commit ANTES que feature.txt.",
+      "git reset --mixed HEAD~1, luego: git add utils.txt, git commit -m 'Refactor: rename calcTotal to calculateTotal', git add feature.txt, git commit -m 'Feature: add pricing module', git add app.txt, git commit -m 'Fix: add null check'."
+    ]
+  },
+  "act6-33-octopus": {
+    "title": "El Pulpo de las Fusiones",
+    "subtitle": "4 ramas con dependencias de orden, conflictos y un error que revertir",
+    "briefing": {
+      "narrative": "Día de integración. Cuatro ramas. Pero esta vez no se trata solo de resolver conflictos. Se trata del ORDEN.\n\nLa rama A cambia la configuración de la base de datos. La rama D DEPENDE del cambio de base de datos de A — si fusionas D antes que A, obtienes una configuración incorrecta. La rama B cambia el mismo ajuste que A — conflicto garantizado. La rama C tiene dos commits: uno bueno, otro que introduce un error.\n\nEl Monje Mayor dibuja el mapa de dependencias:\n- A debe ir PRIMERO (D depende de ella)\n- D va SEGUNDO (fusión limpia después de A)\n- B va TERCERO (entra en conflicto con A por la configuración de la base de datos, hay que resolverlo)\n- C va AL FINAL (luego debes REVERTIR el commit defectuoso de C)\n\n\"Fusiona en el orden equivocado y crearás conflictos innecesarios. Pasa por alto el error en C y llegará a producción. Por eso la integración es un arte, no una receta.\"\n\nEl gato tiene cuatro tentáculos. Espera, no, lleva puestas cuatro bufandas. Es casi lo mismo.",
+      "concept": "La integración compleja requiere entender las dependencias entre ramas:\n\n1. Algunas ramas dependen de que otras se fusionen primero\n2. El orden de fusión afecta qué conflictos surgen\n3. Después de fusionar, puede que necesites revertir commits defectuosos específicos\n\nEstrategia: identifica las dependencias, planifica el orden de fusión, resuelve los conflictos y luego limpia los errores con git revert.",
+      "objectives": [
+        "Fusiona las 4 ramas en main en el orden correcto",
+        "Resuelve el conflicto entre branch-a y branch-b",
+        "Después de fusionar branch-c, revierte su commit defectuoso",
+        "El config.txt final debe tener los valores correctos de todos los equipos",
+        "El archivo del error debe estar revertido"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "El orden de fusión importa: branch-a primero (actualización de base de datos), branch-d segundo (depende de ir después de a), branch-b tercero (entra en conflicto con la base de datos de a), branch-c al final (luego revierte su error).",
+      "1) git merge branch-a. 2) git merge branch-d (resuelve: conserva postgres + structured). 3) git merge branch-b (resuelve: conserva postgres + redis). 4) git merge branch-c (resuelve: conserva todo). 5) git revert HEAD~1 --no-edit (revierte el commit del error de C)."
+    ]
+  },
+  "act6-34-archaeology": {
+    "title": "Expedición Arqueológica",
+    "subtitle": "Dos ramas eliminadas en el reflog — encuentra la correcta, omite los commits revertidos",
+    "briefing": {
+      "narrative": "Se eliminaron dos ramas. Ambas aparecen en el reflog. Una es el tesoro — tres meses de trabajo crítico. La otra es un experimento abandonado que debería seguir enterrado.\n\nPero la rama del tesoro tuvo una historia accidentada: se hicieron 5 commits, pero 2 fueron revertidos antes de la eliminación. Eso significa que solo 3 commits contienen 'trabajo real' — los revertidos son ruido.\n\nEl Monje Mayor está sentado en la bóveda de artefactos, quitándole el polvo a pergaminos antiguos. \"Dos ramas eliminadas. Dos conjuntos de commits en el reflog. Debes:\n1. Encontrar AMBAS ramas\n2. Examinar cada una para determinar cuál es el trabajo real\n3. De la rama correcta, aplicar cherry-pick solo a los 3 commits buenos — no a los revertidos\n4. Llevarlos a una rama de recuperación en el orden correcto\"\n\nEl gato se ajusta su sombrero de arqueólogo. \"El reflog lo recuerda todo. Incluso las cosas que desearías que olvidara.\"\n\nEl Monje Mayor añade con gravedad: \"La rama del experimento tiene mensajes de commit con apariencia similar. Vas a tener que LEER el contenido para distinguirlos.\"",
+      "concept": "Cuando se eliminan ramas, el reflog conserva hacia dónde apuntaban. Pero recuperar los commits correctos requiere investigación:\n\n1. git reflog — encuentra la punta de las ramas eliminadas\n2. git show <hash> — examina el contenido de cada commit\n3. git log <hash> — observa el historial completo de una rama eliminada\n4. git cherry-pick — recupera selectivamente solo los commits buenos\n\nNo todos los commits merecen ser recuperados. Los commits revertidos y los experimentos abandonados deben quedarse atrás.",
+      "objectives": [
+        "Encuentra ambas ramas eliminadas en el reflog",
+        "Determina cuál rama tiene el trabajo real (no el experimento)",
+        "Aplica cherry-pick SOLO a los 3 commits buenos (omite los revertidos) en una rama de recuperación",
+        "La rama de recuperación debe contener artifact1.txt, artifact2.txt y artifact3.txt"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "git reflog mostrará commits de ambas ramas eliminadas. Usa git show <hash> para examinar cada uno. La rama de trabajo real tiene 'Artifact' en los mensajes de commit. El experimento tiene 'prototype'.",
+      "Encuentra la punta de la rama de trabajo real en el reflog (commit 'Add artifact 3'). Usa git log <hash> para ver sus 5 commits. Aplica cherry-pick solo a los 3 commits de artefactos (omite los commits 'broken implementation' y 'failed optimization') en una nueva rama 'recovered'."
+    ]
+  },
+  "act6-35-gitvana": {
+    "title": "Gitvana",
+    "subtitle": "EL EXAMEN FINAL — Recupera, limpia, aplica cherry-pick, fusiona, etiqueta",
+    "briefing": {
+      "narrative": "El Salón de los Ancestros está en silencio. Todos los monjes del monasterio se han reunido. El gato está sentado en el estante más alto, luciendo una corona hecha de cables ethernet.\n\nEl Monje Mayor da un paso al frente. Su voz resuena por toda la cámara.\n\n\"Has recorrido el camino del init. Has resistido conflictos de fusión que quebrarían a almas menores. Has viajado a través del tiempo, recuperado lo perdido, y dividido lo indivisible.\"\n\nSeñala una pantalla enorme que muestra un repositorio en CRISIS ABSOLUTA:\n\n- Una rama dev con 3 commits críticos (network, monitoring, backup) fue ELIMINADA. Esos commits ahora solo existen en el reflog.\n- La rama feature-enlightenment tiene 7 commits: 3 buenos (módulo de iluminación, base de datos de sabiduría, modo zen), 2 WIP, 1 secreto filtrado, y 1 hotfix que pertenece a la rama hotfix.\n- La rama hotfix existe pero todavía no tiene nada.\n- Main necesita TODO el trabajo bueno: los commits recuperados de dev, la funcionalidad limpia y el hotfix.\n\nCinco problemas en cascada. Cada uno depende de resolver el anterior.\n\n\"Recupera los commits perdidos. Limpia la rama de funcionalidad. Mueve el hotfix. Fusiona todo. Etiqueta v3.0.\"\n\nEl gato ronronea. Ya cree en ti.\n\n\"Haz todo esto... y habrás alcanzado GITVANA.\"\n\nSe sienta en posición de loto. \"Dominio total del control de versiones. El fin del sufrimiento. O al menos, el fin del sufrimiento con Git.\"",
+      "concept": "Este desafío final combina todas las habilidades que has aprendido:\n\n- Reflog: recupera commits perdidos de ramas eliminadas\n- Reset + cherry-pick: limpia ramas desordenadas, elimina secretos\n- Cherry-pick: mueve commits entre ramas\n- Merge: une las ramas\n- Tag: marca la versión final\n\nLa clave está en hacer triage: evalúa todo el daño primero, planifica tu estrategia, luego ejecuta un paso a la vez. Cada paso depende de que el anterior sea correcto. No hay atajos.",
+      "objectives": [
+        "Recupera los 3 commits perdidos de dev desde el reflog (network, monitoring, backup)",
+        "Limpia la rama de funcionalidad: conserva solo los 3 commits buenos de enlightenment",
+        "Mueve el commit del hotfix de feature a la rama hotfix",
+        "Fusiona las ramas de recuperación, hotfix y la funcionalidad limpia en main",
+        "Etiqueta el resultado final como v3.0",
+        "Sin secretos ni archivos WIP en el resultado final"
+      ]
+    },
+    "tips": null,
+    "hints": []
+  },
+  "act6-36-first-push": {
+    "title": "El Primer Push",
+    "subtitle": "Comparte tu trabajo con el monasterio remoto",
+    "briefing": {
+      "narrative": "El Monasterio del Control de Versiones se ha expandido. Ahora existe un monasterio REMOTO — un espejo de tu repositorio al que otros monjes pueden acceder.\n\nEl Monje Mayor te entrega un pergamino: \"Se ha configurado un repositorio remoto llamado 'origin'. Tu tarea es simple, joven monje: crea trabajo significativo, y luego haz PUSH a origin para que todos se beneficien de tu sabiduría.\"\n\nEl gato se estira perezosamente. Ya hizo push de su horario de siestas a tres ubicaciones remotas.\n\n\"Recuerda: primero haces commit localmente, luego haces push. El remoto solo recibe lo que compartes explícitamente.\"",
+      "concept": "Los repositorios remotos son copias de tu repositorio que viven en otro lugar. 'git push' envía tus commits a un remoto. Antes de hacer push, necesitas un remoto configurado con 'git remote add'.\n\nEl flujo de trabajo: haz commit localmente, luego haz push para compartir.\n\n'git push origin main' envía tu rama main al remoto llamado 'origin'.",
+      "objectives": [
+        "Crea un archivo llamado 'scroll.txt' con cualquier contenido",
+        "Agrégalo (add) y haz commit con un mensaje significativo",
+        "Haz push de tu rama main a origin",
+        "Verifica con 'git branch -r' que origin/main existe"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "Primero crea un archivo: echo \"wisdom\" > scroll.txt",
+      "Prepara y haz commit: git add scroll.txt && git commit -m \"Add scroll\"",
+      "Haz push al remoto: git push origin main"
+    ]
+  },
+  "act6-37-fetch-forward": {
+    "title": "Los Pergaminos Remotos",
+    "subtitle": "Otro monje hizo push de trabajo nuevo — tráelo (fetch) y avanza rápido (fast-forward)",
+    "briefing": {
+      "narrative": "Mientras meditabas, el Hermano Guybrush hizo push de dos commits nuevos al remoto. Tu repositorio local ahora está POR DETRÁS de origin/main.\n\nEl Monje Mayor se acaricia la barba. \"Esta es la realidad diaria de la colaboración. Otros hacen push de su trabajo. Debes hacer FETCH para ver qué cambió, y luego integrar su trabajo en tu rama.\"\n\n\"Usa 'git fetch' para descargar sus commits, y luego 'git log' para ver qué hay de nuevo. Como no has divergido, una fusión simple avanzará tu rama en fast-forward.\"\n\nEl gato ya trajo (fetch) un ratón del jardín remoto. Te lleva ventaja en todo.",
+      "concept": "Cuando otros hacen push a un remoto, tu repositorio local no se entera hasta que haces fetch.\n\n'git fetch' descarga los commits nuevos y actualiza las referencias de seguimiento (origin/main).\n'git pull' hace fetch + merge en un solo paso.\n\nCuando tu rama no ha divergido, la fusión es un 'fast-forward' — simplemente mueve el puntero de tu rama hacia adelante.",
+      "objectives": [
+        "Haz fetch de los últimos cambios desde origin",
+        "Fusiona origin/main con tu main local (o usa git pull)",
+        "Verifica que 'ancient-wisdom.txt' ahora exista localmente",
+        "Tu rama main debe tener los 4 commits"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "Comienza con: git fetch origin",
+      "Revisa qué hay de nuevo: git log --oneline origin/main",
+      "Fusiónalo: git merge origin/main (o simplemente: git pull)"
+    ]
+  },
+  "act6-38-pull-conflict": {
+    "title": "Caminos Divergentes",
+    "subtitle": "Tu trabajo y el remoto han divergido — resuelve el conflicto",
+    "briefing": {
+      "narrative": "Desastre. Mientras tú cambiaste el lunes a 'Kung Fu', el Hermano Guybrush cambió el lunes a 'Calligraphy' en el remoto. Ambos editaron la MISMA LÍNEA.\n\nEl Monje Mayor suspira profundamente. \"Este es el dolor más común del trabajo colaborativo. Ambos cambiaron la misma línea. Cuando haces pull, Git no puede decidir cuál cambio gana — verás marcadores de conflicto.\"\n\n\"Resuelve el conflicto eligiendo qué debería ser el lunes — o combina ambos. Edita el archivo, elimina los marcadores de conflicto, y luego haz add y commit.\"\n\nEl gato observa a dos pájaros pelear por el mismo gusano. Le parece divertido el paralelismo.",
+      "concept": "Cuando lo local y lo remoto divergen en el mismo archivo, 'git pull' crea un conflicto de fusión.\n\nLos marcadores de conflicto se ven así:\n<<<<<<< HEAD\ntus cambios\n=======\nsus cambios\n>>>>>>> origin/main\n\nResuélvelo editando el archivo para combinar ambos cambios, y luego 'git add' y 'git commit'.",
+      "objectives": [
+        "Haz pull desde origin para ver el conflicto",
+        "Resuelve el conflicto en schedule.txt",
+        "El archivo debe contener 'Kung Fu' (tu elección para el lunes)",
+        "Agrega y haz commit de la fusión resuelta"
+      ]
+    },
+    "tips": null,
+    "hints": [
+      "Comienza haciendo pull: git pull origin main",
+      "Revisa el conflicto: cat schedule.txt — verás marcadores <<<<<<<",
+      "Edita el archivo para conservar tanto Kung Fu COMO Calligraphy, elimina los marcadores de conflicto, y luego: git add schedule.txt && git commit -m \"Resolve merge\""
+    ]
+  }
+}

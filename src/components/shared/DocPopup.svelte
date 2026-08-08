@@ -2,6 +2,8 @@
   import { commandDocs } from '../../docs/commands/index.js';
   import { guides } from '../../docs/guides/index.js';
   import type { GuideDoc } from '../../docs/types.js';
+  import { locale } from '../../i18n/index.js';
+  import { loadCommandOverrides, loadGuideOverrides, mergeCommandDoc, mergeGuide } from '../../i18n/content/docs.js';
 
   interface Props {
     commandName: string;
@@ -10,6 +12,23 @@
 
   let { commandName, onClose }: Props = $props();
 
+  let commandOverrides: Record<string, { description?: string; tip?: string; advanced?: string; options?: string[]; examples?: string[] }> = $state({});
+  let guideOverrides: Record<string, { title?: string; content?: string }> = $state({});
+
+  $effect(() => {
+    loadCommandOverrides($locale).then(o => { commandOverrides = o; });
+    loadGuideOverrides($locale).then(o => { guideOverrides = o; });
+  });
+
+  // Localized views of the full docs/guides maps — used everywhere in this
+  // component instead of the raw English `guides`/`commandDocs` imports.
+  const localizedGuides = $derived(
+    Object.fromEntries(Object.entries(guides).map(([id, g]) => [id, mergeGuide(g, guideOverrides[id])]))
+  );
+  const localizedCommandDocs = $derived(
+    Object.fromEntries(Object.entries(commandDocs).map(([key, d]) => [key, mergeCommandDoc(d, commandOverrides[key])]))
+  );
+
   // Check if this is a guide request
   const isGuideRequest = $derived(
     commandName.startsWith('guide/') || guides[commandName] !== undefined
@@ -17,7 +36,7 @@
   const guideId = $derived(
     commandName.startsWith('guide/') ? commandName.slice('guide/'.length) : commandName
   );
-  const guide = $derived(isGuideRequest ? guides[guideId] ?? null : null);
+  const guide = $derived(isGuideRequest ? localizedGuides[guideId] ?? null : null);
   // Extract command name from strings like "git merge <branch>" or "git commit -m"
   const normalizedName = $derived(() => {
     let name = commandName;
@@ -25,7 +44,7 @@
     name = name.split(/[\s<\-]/)[0]; // take first word before space, <, or -
     return name;
   });
-  const doc = $derived(!isGuideRequest ? commandDocs[commandName] ?? commandDocs[normalizedName()] ?? null : null);
+  const doc = $derived(!isGuideRequest ? localizedCommandDocs[commandName] ?? localizedCommandDocs[normalizedName()] ?? null : null);
   const showIndex = $derived(!doc && !guide);
   const allCommands = Object.keys(commandDocs);
 
@@ -37,7 +56,7 @@
   ];
 
   function getGuidesByCategory(category: GuideDoc['category']): GuideDoc[] {
-    return Object.values(guides)
+    return Object.values(localizedGuides)
       .filter(g => g.category === category)
       .sort((a, b) => a.order - b.order);
   }
@@ -204,8 +223,8 @@
             <h3 class="section-label">LEARN MORE</h3>
             <div class="related-list">
               {#each doc.seeAlso as gId}
-                {#if guides[gId]}
-                  <code class="guide-badge">{guides[gId].title}</code>
+                {#if localizedGuides[gId]}
+                  <code class="guide-badge">{localizedGuides[gId].title}</code>
                 {/if}
               {/each}
             </div>
