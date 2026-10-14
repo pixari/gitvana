@@ -47,6 +47,10 @@
 
   let { onEditRequest, onDocRequest, onAbout, onRestart, level, onSkip, playerName }: Props = $props();
 
+  export function focus() {
+    terminal?.focus();
+  }
+
   onMount(() => {
     terminal = new Terminal({
       theme: {
