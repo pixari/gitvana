@@ -13,6 +13,7 @@ export const availableLocales: { code: string; label: string }[] = [
   { code: 'en', label: 'English' },
   { code: 'es', label: 'Español' },
   { code: 'fr', label: 'Français' },
+  { code: 'pt-BR', label: 'Português (Brasil)' },
 ];
 
 // Detect browser language, fallback to 'en'
