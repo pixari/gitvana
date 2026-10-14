@@ -148,6 +148,12 @@
   let editingFile = $state<string | null>(null);
   let editingFileHasConflict = $state(false);
   let docCommand = $state<string | null>(null);
+  let terminalPanelComponent: any = $state();
+
+  function closeEditor() {
+    editingFile = null;
+    setTimeout(() => terminalPanelComponent?.focus(), 10);
+  }
   let completedLevels = $state(0);
   let levelStars: Record<string, number> = {};
   let totalStars = $state(0);
@@ -190,7 +196,7 @@
     earnedStars = stars;
     // Act 0 (prologue) doesn't count toward main progression
     if (currentLevel.act > 0 && completedLevels < TOTAL_LEVELS) {
-      if (completedLevels < TOTAL_LEVELS) completedLevels++;
+      completedLevels++;
     }
     const prev = levelStars[currentLevel.id] ?? 0;
     if (stars > prev) {
@@ -298,6 +304,7 @@
   <GameLayout>
     {#snippet terminalSlot()}
       <TerminalPanel
+        bind:this={terminalPanelComponent}
         onEditRequest={handleEditRequest}
         onDocRequest={handleDocRequest}
         onAbout={() => showLanding = true}
@@ -341,11 +348,11 @@
   {#if editingFileHasConflict}
     <ConflictEditor
       filepath={editingFile}
-      onClose={() => editingFile = null}
-      onSave={() => editingFile = null}
+      onClose={closeEditor}
+      onSave={closeEditor}
     />
   {:else}
-    <FileEditor filepath={editingFile} onClose={() => editingFile = null} />
+    <FileEditor filepath={editingFile} onClose={closeEditor} />
   {/if}
 {/if}
 

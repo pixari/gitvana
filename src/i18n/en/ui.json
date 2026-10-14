@@ -1,16 +1,19 @@
 {
   "app_name": "GITVANA",
   "alpha": "ALPHA",
+
   "nav_play": "Play",
   "nav_docs": "Docs",
   "nav_changelog": "Changelog",
   "nav_blog": "Blog",
   "nav_stats": "Stats",
+
   "act_level": "ACT {{act}} — LEVEL {{order}}",
   "act_level_act0": "THE WAY OF THE TERMINAL — LESSON {{order}}",
   "concept": "CONCEPT",
   "objectives": "OBJECTIVES",
   "start_level": "START LEVEL",
+
   "stage_clear": "STAGE CLEAR!",
   "commands_used": "Commands used",
   "par_3_stars": "Par (3 stars)",
@@ -19,6 +22,7 @@
   "next_level": "NEXT LEVEL",
   "review_steps": "Review my steps",
   "show_results": "RESULTS",
+
   "terminal": "TERMINAL",
   "undo": "UNDO",
   "home": "Home",
@@ -27,35 +31,50 @@
   "mute": "Mute",
   "unmute": "Unmute",
   "restart": "Restart level",
+
   "new_commands": "NEW:",
   "progress": "{{passed}}/{{total}}",
   "cmds": "{{count}} cmds",
+
   "your_journey": "YOUR JOURNEY",
   "anonymous_monk": "Anonymous Monk",
+
+  "name_prompt_welcome_line1": "Welcome to the Monastery",
+  "name_prompt_welcome_line2": "of Version Control",
+  "name_prompt_question": "What shall the monks call you?",
+  "name_prompt_placeholder": "Enter your name...",
+  "name_prompt_begin": "BEGIN",
+  "name_prompt_skip": "Skip ({{name}})",
+
   "no_commits_yet": "No commits yet",
   "make_first_commit_prefix": "Make your first",
   "commit_graph": "COMMIT GRAPH",
   "detached_head": "DETACHED HEAD",
   "detached_head_state": "Detached HEAD state",
   "no_reachable_commits": "No reachable commits from current HEAD",
+
   "nothing_to_undo": "Nothing to undo.",
   "undo_restored": "Undo: restored to before last command.",
   "command_not_found": "{{cmd}}: command not found",
+
   "mobile_title": "GITVANA",
   "mobile_message": "Gitvana needs a keyboard and a wider screen.",
   "mobile_hint": "Please visit on a desktop or laptop.",
   "mobile_joke": "The monastery terminal doesn't fit in your pocket. The monks tried. It didn't end well.",
+
   "help_title": "GITVANA — Monastery Terminal",
   "help_git": "Git commands (the main quest):",
   "help_shell": "Shell commands (survival kit):",
   "help_meta": "Meta:",
+
   "landing_tagline": "Reach git enlightenment",
   "landing_subtitle": "Learn git by playing. A browser-based adventure game with a real terminal, {{levels}} levels, and a judgmental cat.",
   "landing_play": "PLAY NOW",
   "landing_continue": "CONTINUE",
   "landing_read_docs": "READ THE DOCS",
   "landing_scroll_hint": "SCROLL",
-  "landing_meta": "{{levels}} levels · 6 acts · 21 git commands · Free forever",
+  "landing_meta": "{{levels}} levels · 6 acts · 29 git commands · Free forever",
+
   "landing_journey_caption": "{{levels}} levels across 6 acts. From git init to git mastery.",
   "landing_tier1_name": "Lost",
   "landing_tier1_desc": "You just arrived.",
@@ -65,18 +84,24 @@
   "landing_tier3_desc": "You rebase fearlessly.",
   "landing_tier4_name": "Enlightened",
   "landing_tier4_desc": "You ARE the repo.",
+
   "landing_master_title": "WHAT YOU'LL MASTER",
   "landing_col_basics": "Basics",
   "landing_col_power_tools": "Power Tools",
   "landing_col_mastery": "Mastery",
+
   "landing_docs_cta_title": "Not ready to play yet?",
-  "landing_docs_cta_subtitle": "Browse the complete git reference — 21 commands, 9 conceptual guides, all free.",
+  "landing_docs_cta_subtitle": "Browse the complete git reference — 29 commands, 11 conceptual guides, all free.",
+
   "landing_final_cta_title": "Ready to begin your journey?",
+
   "landing_author_heading": "Built by",
   "landing_author_aka": "aka",
   "landing_author_bio": "Software engineer and pixel art enthusiast. Built Gitvana because learning git shouldn't feel like reading a manual.",
   "landing_buy_coffee": "Buy me a coffee",
+
   "landing_github_star": "Star on GitHub",
   "landing_github_desc": "open source, MIT licensed",
+
   "all_challenges_completed": "You have completed all challenges. Wait for the next ones!"
 }

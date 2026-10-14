@@ -12,6 +12,7 @@ const NAMESPACES = ['ui', 'stages', 'hints'] as const;
 export const availableLocales: { code: string; label: string }[] = [
   { code: 'en', label: 'English' },
   { code: 'es', label: 'Español' },
+  { code: 'fr', label: 'Français' },
 ];
 
 // Detect browser language, fallback to 'en'
