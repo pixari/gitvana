@@ -33,6 +33,7 @@
   import StatsPage from './components/stats/StatsPage.svelte';
   import DevBlogPage from './components/devblog/DevBlogPage.svelte';
   import { getAllLevels, getLevels, ACT0_COUNT } from './levels/index.js';
+  import { TOTAL_LEVELS } from './lib/engine/progression/stages.js';
   import { onMount } from 'svelte';
   import { trackEvent } from './lib/telemetry.js';
 
@@ -194,7 +195,7 @@
   function handleComplete(stars: number) {
     earnedStars = stars;
     // Act 0 (prologue) doesn't count toward main progression
-    if (currentLevel.act > 0) {
+    if (currentLevel.act > 0 && completedLevels < TOTAL_LEVELS) {
       completedLevels++;
     }
     const prev = levelStars[currentLevel.id] ?? 0;
@@ -214,8 +215,6 @@
   function handleNext() {
     if (levelIndex < allLevels.length - 1) {
       levelIndex++;
-    } else {
-      levelIndex = ACT0_COUNT; // Wrap to Act 1, not the tutorial
     }
     screen = 'intro';
     persistProgress();
@@ -243,7 +242,7 @@
   }
 
   function handleSkip() {
-    completedLevels++;
+    if (completedLevels < TOTAL_LEVELS) completedLevels++;
     if (levelIndex < allLevels.length - 1) {
       levelIndex++;
     }
@@ -368,7 +367,7 @@
     {completedLevels}
     {playerName}
     onRetry={handleRetry}
-    onNext={handleNext}
+    onNext={levelIndex < allLevels.length - 1 ? handleNext : undefined}
   />
 {/if}
 

@@ -101,5 +101,7 @@
   "landing_buy_coffee": "Invítame un café",
 
   "landing_github_star": "Dale una estrella en GitHub",
-  "landing_github_desc": "código abierto, licencia MIT"
+  "landing_github_desc": "código abierto, licencia MIT",
+
+  "all_challenges_completed": "Has completado todos los desafíos. ¡Espera los próximos!"
 }

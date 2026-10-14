@@ -101,5 +101,7 @@
   "landing_buy_coffee": "Buy me a coffee",
 
   "landing_github_star": "Star on GitHub",
-  "landing_github_desc": "open source, MIT licensed"
+  "landing_github_desc": "open source, MIT licensed",
+
+  "all_challenges_completed": "You have completed all challenges. Wait for the next ones!"
 }

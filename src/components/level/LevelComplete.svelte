@@ -86,6 +86,12 @@
         {/if}
       </div>
 
+      {#if !onNext}
+        <div class="completion-msg">
+          {$translate('ui.all_challenges_completed')}
+        </div>
+      {/if}
+
       {#if showShare}
         <ShareCard
           levelTitle={level.title}
@@ -359,4 +365,16 @@
     color: #0a0a0a;
     background: #00ff41;
   }
+
+  .completion-msg {
+    margin-top: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #ffa300;
+    background: #ffa30011;
+    border: 1px dashed #ffa30044;
+    border-radius: 4px;
+    padding: 12px;
+  }
+
 </style>
