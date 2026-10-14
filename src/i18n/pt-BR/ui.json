@@ -1,0 +1,107 @@
+{
+  "app_name": "GITVANA",
+  "alpha": "ALFA",
+
+  "nav_play": "Jogar",
+  "nav_docs": "Docs",
+  "nav_changelog": "Novidades",
+  "nav_blog": "Blog",
+  "nav_stats": "Estatísticas",
+
+  "act_level": "ATO {{act}} — NÍVEL {{order}}",
+  "act_level_act0": "O CAMINHO DO TERMINAL — LIÇÃO {{order}}",
+  "concept": "CONCEITO",
+  "objectives": "OBJETIVOS",
+  "start_level": "INICIAR NÍVEL",
+
+  "stage_clear": "FASE CONCLUÍDA!",
+  "commands_used": "Comandos usados",
+  "par_3_stars": "Par (3 estrelas)",
+  "retry": "TENTAR DE NOVO",
+  "share": "COMPARTILHAR",
+  "next_level": "PRÓXIMO NÍVEL",
+  "review_steps": "Revisar meus passos",
+  "show_results": "RESULTADOS",
+
+  "terminal": "TERMINAL",
+  "undo": "DESFAZER",
+  "home": "Início",
+  "docs": "DOCS",
+  "report_bug": "BUG",
+  "mute": "Silenciar",
+  "unmute": "Ativar som",
+  "restart": "Reiniciar nível",
+
+  "new_commands": "NOVO:",
+  "progress": "{{passed}}/{{total}}",
+  "cmds": "{{count}} cmds",
+
+  "your_journey": "SUA JORNADA",
+  "anonymous_monk": "Monge Anônimo",
+
+  "name_prompt_welcome_line1": "Bem-vindo ao Mosteiro",
+  "name_prompt_welcome_line2": "do Controle de Versão",
+  "name_prompt_question": "Como os monges devem te chamar?",
+  "name_prompt_placeholder": "Digite seu nome...",
+  "name_prompt_begin": "COMEÇAR",
+  "name_prompt_skip": "Pular ({{name}})",
+
+  "no_commits_yet": "Nenhum commit ainda",
+  "make_first_commit_prefix": "Faça seu primeiro",
+  "commit_graph": "GRAFO DE COMMITS",
+  "detached_head": "HEAD DESANEXADO",
+  "detached_head_state": "Estado de HEAD desanexado",
+  "no_reachable_commits": "Nenhum commit alcançável a partir do HEAD atual",
+
+  "nothing_to_undo": "Nada para desfazer.",
+  "undo_restored": "Desfazer: restaurado para antes do último comando.",
+  "command_not_found": "{{cmd}}: comando não encontrado",
+
+  "mobile_title": "GITVANA",
+  "mobile_message": "Gitvana precisa de um teclado e de uma tela maior.",
+  "mobile_hint": "Acesse de um computador ou notebook.",
+  "mobile_joke": "O terminal do mosteiro não cabe no seu bolso. Os monges tentaram. Não acabou bem.",
+
+  "help_title": "GITVANA — Terminal do Mosteiro",
+  "help_git": "Comandos git (a missão principal):",
+  "help_shell": "Comandos de shell (kit de sobrevivência):",
+  "help_meta": "Meta:",
+
+  "landing_tagline": "Alcance a iluminação do git",
+  "landing_subtitle": "Aprenda git jogando. Uma aventura no navegador com um terminal de verdade, {{levels}} níveis e um gato que te julga.",
+  "landing_play": "JOGAR AGORA",
+  "landing_continue": "CONTINUAR",
+  "landing_read_docs": "LER A DOCUMENTAÇÃO",
+  "landing_scroll_hint": "ROLE",
+  "landing_meta": "{{levels}} níveis · 6 atos · 29 comandos git · Grátis para sempre",
+
+  "landing_journey_caption": "{{levels}} níveis em 6 atos. Do git init à maestria em git.",
+  "landing_tier1_name": "Perdido",
+  "landing_tier1_desc": "Você acabou de chegar.",
+  "landing_tier2_name": "Estudante",
+  "landing_tier2_desc": "Você sabe criar branches.",
+  "landing_tier3_name": "Adepto",
+  "landing_tier3_desc": "Você faz rebase sem medo.",
+  "landing_tier4_name": "Iluminado",
+  "landing_tier4_desc": "Você É o repositório.",
+
+  "landing_master_title": "O QUE VOCÊ VAI DOMINAR",
+  "landing_col_basics": "Básico",
+  "landing_col_power_tools": "Ferramentas Avançadas",
+  "landing_col_mastery": "Maestria",
+
+  "landing_docs_cta_title": "Ainda não está pronto para jogar?",
+  "landing_docs_cta_subtitle": "Explore a referência completa de git — 29 comandos, 11 guias conceituais, tudo grátis.",
+
+  "landing_final_cta_title": "Pronto para começar sua jornada?",
+
+  "landing_author_heading": "Criado por",
+  "landing_author_aka": "também conhecido como",
+  "landing_author_bio": "Engenheiro de software e entusiasta de pixel art. Criou o Gitvana porque aprender git não deveria parecer ler um manual.",
+  "landing_buy_coffee": "Me pague um café",
+
+  "landing_github_star": "Dê uma estrela no GitHub",
+  "landing_github_desc": "código aberto, licença MIT",
+
+  "all_challenges_completed": "Você completou todos os desafios. Aguarde os próximos!"
+}
