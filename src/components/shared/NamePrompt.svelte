@@ -1,5 +1,6 @@
 <script lang="ts">
   import { savePlayerName } from '../../lib/engine/progression/persistence.js';
+  import { translate } from '../../i18n/index.js';
 
   interface Props {
     onComplete: (name: string) => void;
@@ -29,21 +30,21 @@
 <div class="name-overlay">
   <div class="name-card">
     <div class="title">GITVANA</div>
-    <h2 class="heading">Welcome to the Monastery<br/>of Version Control</h2>
-    <p class="prompt-text">What shall the monks call you?</p>
+    <h2 class="heading">{$translate('ui.name_prompt_welcome_line1')}<br/>{$translate('ui.name_prompt_welcome_line2')}</h2>
+    <p class="prompt-text">{$translate('ui.name_prompt_question')}</p>
 
     <input
       class="name-input"
       type="text"
       bind:value={name}
       onkeydown={handleKeydown}
-      placeholder="Enter your name..."
+      placeholder={$translate('ui.name_prompt_placeholder')}
       maxlength="24"
       autofocus
     />
 
-    <button class="begin-btn" onclick={submit}>BEGIN</button>
-    <button class="skip-btn" onclick={skip}>Skip (Anonymous Monk)</button>
+    <button class="begin-btn" onclick={submit}>{$translate('ui.name_prompt_begin')}</button>
+    <button class="skip-btn" onclick={skip}>{$translate('ui.name_prompt_skip', { name: $translate('ui.anonymous_monk') })}</button>
   </div>
 </div>
 

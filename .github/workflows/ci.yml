@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Fork PRs use the `pull_request` event, which runs with a read-only token
+# and no repo secrets — safe to run automatically without maintainer approval.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test, typecheck & build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Type check
+        # main already carries pre-existing svelte-check errors, so this
+        # isn't a hard gate yet — it surfaces new problems in the log
+        # without blocking merges on unrelated, pre-existing debt.
+        run: bunx svelte-check --tsconfig ./tsconfig.json
+        continue-on-error: true
+
+      - name: Unit tests
+        # bun's test runner globs all *.test.ts/*.spec.ts by default, which
+        # would otherwise also pick up the Playwright spec in tests/e2e.
+        run: bun test --path-ignore-patterns 'tests/e2e/**'
+
+      - name: Build
+        run: bun run build
+
+  e2e:
+    name: E2E tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        run: bunx playwright test
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14

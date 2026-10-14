@@ -39,6 +39,13 @@
   "your_journey": "TU CAMINO",
   "anonymous_monk": "Monje Anónimo",
 
+  "name_prompt_welcome_line1": "Bienvenido al Monasterio",
+  "name_prompt_welcome_line2": "del Control de Versiones",
+  "name_prompt_question": "¿Cómo deben llamarte los monjes?",
+  "name_prompt_placeholder": "Escribe tu nombre...",
+  "name_prompt_begin": "COMENZAR",
+  "name_prompt_skip": "Omitir ({{name}})",
+
   "no_commits_yet": "Aún no hay commits",
   "make_first_commit_prefix": "Haz tu primer",
   "commit_graph": "GRÁFICO DE COMMITS",
@@ -66,7 +73,7 @@
   "landing_continue": "CONTINUAR",
   "landing_read_docs": "LEER LOS DOCS",
   "landing_scroll_hint": "DESPLÁZATE",
-  "landing_meta": "{{levels}} niveles · 6 actos · 21 comandos de git · Gratis para siempre",
+  "landing_meta": "{{levels}} niveles · 6 actos · 29 comandos de git · Gratis para siempre",
 
   "landing_journey_caption": "{{levels}} niveles a lo largo de 6 actos. De git init a la maestría en git.",
   "landing_tier1_name": "Perdido",
@@ -84,7 +91,7 @@
   "landing_col_mastery": "Maestría",
 
   "landing_docs_cta_title": "¿Aún no listo para jugar?",
-  "landing_docs_cta_subtitle": "Explora la referencia completa de git — 21 comandos, 9 guías conceptuales, todo gratis.",
+  "landing_docs_cta_subtitle": "Explora la referencia completa de git — 29 comandos, 11 guías conceptuales, todo gratis.",
 
   "landing_final_cta_title": "¿Listo para comenzar tu camino?",
 

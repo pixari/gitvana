@@ -39,6 +39,13 @@
   "your_journey": "YOUR JOURNEY",
   "anonymous_monk": "Anonymous Monk",
 
+  "name_prompt_welcome_line1": "Welcome to the Monastery",
+  "name_prompt_welcome_line2": "of Version Control",
+  "name_prompt_question": "What shall the monks call you?",
+  "name_prompt_placeholder": "Enter your name...",
+  "name_prompt_begin": "BEGIN",
+  "name_prompt_skip": "Skip ({{name}})",
+
   "no_commits_yet": "No commits yet",
   "make_first_commit_prefix": "Make your first",
   "commit_graph": "COMMIT GRAPH",
@@ -66,7 +73,7 @@
   "landing_continue": "CONTINUE",
   "landing_read_docs": "READ THE DOCS",
   "landing_scroll_hint": "SCROLL",
-  "landing_meta": "{{levels}} levels · 6 acts · 21 git commands · Free forever",
+  "landing_meta": "{{levels}} levels · 6 acts · 29 git commands · Free forever",
 
   "landing_journey_caption": "{{levels}} levels across 6 acts. From git init to git mastery.",
   "landing_tier1_name": "Lost",
@@ -84,7 +91,7 @@
   "landing_col_mastery": "Mastery",
 
   "landing_docs_cta_title": "Not ready to play yet?",
-  "landing_docs_cta_subtitle": "Browse the complete git reference — 21 commands, 9 conceptual guides, all free.",
+  "landing_docs_cta_subtitle": "Browse the complete git reference — 29 commands, 11 conceptual guides, all free.",
 
   "landing_final_cta_title": "Ready to begin your journey?",
 

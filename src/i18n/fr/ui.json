@@ -1,0 +1,105 @@
+{
+  "app_name": "GITVANA",
+  "alpha": "ALPHA",
+
+  "nav_play": "Jouer",
+  "nav_docs": "Docs",
+  "nav_changelog": "Changelog",
+  "nav_blog": "Blog",
+  "nav_stats": "Stats",
+
+  "act_level": "ACTE {{act}} — NIVEAU {{order}}",
+  "act_level_act0": "LA VOIE DU TERMINAL — LEÇON {{order}}",
+  "concept": "CONCEPT",
+  "objectives": "OBJECTIFS",
+  "start_level": "COMMENCER LE NIVEAU",
+
+  "stage_clear": "NIVEAU TERMINÉ !",
+  "commands_used": "Commandes utilisées",
+  "par_3_stars": "Par (3 étoiles)",
+  "retry": "RÉESSAYER",
+  "share": "PARTAGER",
+  "next_level": "NIVEAU SUIVANT",
+  "review_steps": "Revoir mes étapes",
+  "show_results": "RÉSULTATS",
+
+  "terminal": "TERMINAL",
+  "undo": "ANNULER",
+  "home": "Accueil",
+  "docs": "DOCS",
+  "report_bug": "BUG",
+  "mute": "Muet",
+  "unmute": "Activer le son",
+  "restart": "Recommencer le niveau",
+
+  "new_commands": "NOUVEAU :",
+  "progress": "{{passed}}/{{total}}",
+  "cmds": "{{count}} cmds",
+
+  "your_journey": "TON PARCOURS",
+  "anonymous_monk": "Moine Anonyme",
+
+  "name_prompt_welcome_line1": "Bienvenue au Monastère",
+  "name_prompt_welcome_line2": "du Contrôle de Version",
+  "name_prompt_question": "Comment les moines doivent-ils t'appeler ?",
+  "name_prompt_placeholder": "Entre ton nom...",
+  "name_prompt_begin": "COMMENCER",
+  "name_prompt_skip": "Ignorer ({{name}})",
+
+  "no_commits_yet": "Aucun commit pour l'instant",
+  "make_first_commit_prefix": "Fais ton premier",
+  "commit_graph": "GRAPHE DES COMMITS",
+  "detached_head": "HEAD DÉTACHÉE",
+  "detached_head_state": "État de HEAD détachée",
+  "no_reachable_commits": "Aucun commit accessible depuis le HEAD actuel",
+
+  "nothing_to_undo": "Rien à annuler.",
+  "undo_restored": "Annuler : restauré à l'état précédant la dernière commande.",
+  "command_not_found": "{{cmd}} : commande introuvable",
+
+  "mobile_title": "GITVANA",
+  "mobile_message": "Gitvana a besoin d'un clavier et d'un écran plus large.",
+  "mobile_hint": "Merci de visiter depuis un ordinateur de bureau ou portable.",
+  "mobile_joke": "Le terminal du monastère ne tient pas dans ta poche. Les moines ont essayé. Ça s'est mal fini.",
+
+  "help_title": "GITVANA — Terminal du Monastère",
+  "help_git": "Commandes git (la quête principale) :",
+  "help_shell": "Commandes shell (kit de survie) :",
+  "help_meta": "Meta :",
+
+  "landing_tagline": "Atteins l'illumination git",
+  "landing_subtitle": "Apprends git en jouant. Une aventure dans le navigateur avec un vrai terminal, {{levels}} niveaux, et un chat qui te juge.",
+  "landing_play": "JOUER MAINTENANT",
+  "landing_continue": "CONTINUER",
+  "landing_read_docs": "LIRE LES DOCS",
+  "landing_scroll_hint": "DÉFILE",
+  "landing_meta": "{{levels}} niveaux · 6 actes · 29 commandes git · Gratuit pour toujours",
+
+  "landing_journey_caption": "{{levels}} niveaux répartis sur 6 actes. De git init à la maîtrise de git.",
+  "landing_tier1_name": "Perdu",
+  "landing_tier1_desc": "Tu viens d'arriver.",
+  "landing_tier2_name": "Étudiant",
+  "landing_tier2_desc": "Tu sais créer des branches.",
+  "landing_tier3_name": "Adepte",
+  "landing_tier3_desc": "Tu fais du rebase sans peur.",
+  "landing_tier4_name": "Illuminé",
+  "landing_tier4_desc": "TU ES le dépôt.",
+
+  "landing_master_title": "CE QUE TU VAS MAÎTRISER",
+  "landing_col_basics": "Les bases",
+  "landing_col_power_tools": "Outils avancés",
+  "landing_col_mastery": "Maîtrise",
+
+  "landing_docs_cta_title": "Pas encore prêt à jouer ?",
+  "landing_docs_cta_subtitle": "Parcours la référence git complète — 29 commandes, 11 guides conceptuels, tout gratuit.",
+
+  "landing_final_cta_title": "Prêt à commencer ton parcours ?",
+
+  "landing_author_heading": "Créé par",
+  "landing_author_aka": "alias",
+  "landing_author_bio": "Ingénieur logiciel et passionné de pixel art. A créé Gitvana parce qu'apprendre git ne devrait pas ressembler à lire un manuel.",
+  "landing_buy_coffee": "Offre-moi un café",
+
+  "landing_github_star": "Mets une étoile sur GitHub",
+  "landing_github_desc": "open source, licence MIT"
+}
